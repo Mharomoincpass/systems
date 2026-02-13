@@ -1,0 +1,25 @@
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+
+const inter = Inter({ subsets: ['latin'] })
+
+export const metadata: Metadata = {
+  title: 'Mharomo.systems',
+  description: 'Full-stack developer & tech lead. Building scalable systems with Node.js, React, Python, and AI.',
+  icons: {
+    icon: '/icon.svg',
+  },
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body className={inter.className}>{children}</body>
+    </html>
+  )
+}
