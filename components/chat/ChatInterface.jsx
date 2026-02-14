@@ -12,32 +12,20 @@ export default function ChatInterface({ conversationId }) {
   const scrollRef = useRef(null)
   const inputRef = useRef(null)
   
-  // Use visualViewport height for reliable mobile keyboard handling
-  const [viewportHeight, setViewportHeight] = useState('100dvh')
-
-  useEffect(() => {
-    if (!window.visualViewport || window.innerWidth >= 768) return
-
-    const handleResize = () => {
-      // Update height immediately when viewport changes (e.g. keyboard opens)
-      setViewportHeight(`${window.visualViewport.height}px`)
-      // Scroll to bottom to keep context visible
-      scrollToBottom()
-    }
-
-    window.visualViewport.addEventListener('resize', handleResize)
-    // Initial set
-    setViewportHeight(`${window.visualViewport.height}px`)
-
-    return () => window.visualViewport.removeEventListener('resize', handleResize)
-  }, [])
-
   // Lock body scroll to prevent background scrolling (mobile only)
   useEffect(() => {
     if (window.innerWidth >= 768) return
+    // Lock both html and body to be safe on iOS
+    document.documentElement.style.overflow = 'hidden'
     document.body.style.overflow = 'hidden'
+    document.body.style.position = 'fixed' // This sometimes helps lock it in place, but can be risky. Let's try just overflow first.
+    document.body.style.width = '100%'
+    
     return () => {
+      document.documentElement.style.overflow = ''
       document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.width = ''
     }
   }, [])
 
@@ -168,8 +156,7 @@ export default function ChatInterface({ conversationId }) {
 
   return (
     <div 
-      className="fixed inset-0 flex flex-col bg-[#030014] text-white font-sans overflow-hidden"
-      style={{ height: viewportHeight }}
+      className="flex flex-col w-full h-screen h-[100dvh] bg-[#030014] text-white font-sans overflow-hidden md:h-screen"
     >
       {/* Header */}
       <div className="shrink-0 bg-[#030014] border-b border-white/10 z-10">
