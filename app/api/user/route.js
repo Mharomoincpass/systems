@@ -66,7 +66,7 @@ export async function PUT(request) {
 
       const isPasswordValid = await comparePasswords(currentPassword, user.password)
       if (!isPasswordValid) {
-        return Response.json({ error: 'Current password is incorrect' }, { status: 400 })
+        return Response.json({ error: 'Invalid credentials' }, { status: 400 })
       }
 
       if (newPassword.length < 6) {
