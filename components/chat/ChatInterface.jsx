@@ -1,128 +1,104 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
-import Button from '@/components/Button'
-import Input from '@/components/Input'
 
-export default function ChatInterface({ conversationId, hfToken }) {
+/*
+ * ChatInterface — complete rewrite for mobile-first performance.
+ *
+ * Key changes vs previous version:
+ *  - NO visualViewport JS listeners (caused jank / re-renders every frame)
+ *  - NO transition-[height] (animating height = layout thrash)
+ *  - NO backdrop-blur on mobile (GPU-heavy, causes lag on older devices)
+ *  - Uses `position:fixed; inset:0` as root → immune to address-bar resize
+ *  - Scrolls with scrollTop (instant) during streaming, smooth otherwise
+ *  - Input font-size 16px → prevents iOS auto-zoom
+ *  - env(safe-area-inset-bottom) for notch phones
+ *  - Keyboard dismiss on send (blur) for mobile
+ */
+
+export default function ChatInterface({ conversationId }) {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
   const [error, setError] = useState(null)
-  const messagesEndRef = useRef(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [viewportHeight, setViewportHeight] = useState('100dvh')
+  const scrollRef = useRef(null)
+  const inputRef = useRef(null)
 
-  // Handle mobile keyboard height and address bar
-  useEffect(() => {
-    if (!window.visualViewport) return
-
-    const handleResize = () => {
-      // Adjust height based on visual viewport (handles keyboard)
-      setViewportHeight(`${window.visualViewport.height}px`)
-      // Scroll to bottom when keyboard opens
-      if (window.visualViewport.height < window.innerHeight) {
-        setTimeout(() => {
-          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-        }, 100)
-      }
-    }
-
-    window.visualViewport.addEventListener('resize', handleResize)
-    window.visualViewport.addEventListener('scroll', handleResize)
-    
-    return () => {
-      window.visualViewport.removeEventListener('resize', handleResize)
-      window.visualViewport.removeEventListener('scroll', handleResize)
+  // ── scroll helper ──
+  const scrollToBottom = useCallback((instant = false) => {
+    const el = scrollRef.current
+    if (!el) return
+    if (instant) {
+      el.scrollTop = el.scrollHeight
+    } else {
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
     }
   }, [])
 
-  // Load initial messages
+  // ── load messages ──
   useEffect(() => {
-    const loadMessages = async () => {
-      try {
-        const response = await fetch(
-          `/api/chat/messages?conversationId=${conversationId}`
-        )
-        const data = await response.json()
-        if (data.success) {
-          setMessages(data.messages)
-        }
-      } catch (err) {
-        console.error('Failed to load messages:', err)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    if (conversationId) {
-      loadMessages()
-    }
+    if (!conversationId) return
+    let cancelled = false
+    fetch(`/api/chat/messages?conversationId=${conversationId}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (!cancelled && data.success) setMessages(data.messages)
+      })
+      .catch((err) => console.error('Load messages failed:', err))
+      .finally(() => { if (!cancelled) setIsLoading(false) })
+    return () => { cancelled = true }
   }, [conversationId])
 
-  // Auto-scroll to bottom
+  // ── scroll on new messages ──
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    scrollToBottom(isStreaming)
+  }, [messages, scrollToBottom, isStreaming])
 
-  const handleSendMessage = async (e) => {
+  // ── send ──
+  const handleSend = async (e) => {
     e.preventDefault()
-
-    if (!input.trim() || isStreaming) return
+    const text = input.trim()
+    if (!text || isStreaming) return
 
     setError(null)
-    const userMessage = input
     setInput('')
 
-    // Add user message to UI immediately
+    // dismiss keyboard on mobile after sending
+    if ('ontouchstart' in window) inputRef.current?.blur()
+
+    const userId = `u_${Date.now()}`
     setMessages((prev) => [
       ...prev,
-      {
-        _id: Date.now().toString(),
-        content: userMessage,
-        role: 'user',
-        createdAt: new Date().toISOString(),
-      },
+      { _id: userId, content: text, role: 'user', createdAt: new Date().toISOString() },
     ])
 
     setIsStreaming(true)
+    const asstId = `a_${Date.now()}`
 
     try {
-      const response = await fetch('/api/chat/stream', {
+      const res = await fetch('/api/chat/stream', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          conversationId,
-          content: userMessage,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conversationId, content: text }),
       })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to send message')
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || `Server error ${res.status}`)
       }
 
-      let currentMessage = ''
-      const placeholderId = Date.now().toString()
-
-      // Add placeholder for assistant message
+      // placeholder bubble
       setMessages((prev) => [
         ...prev,
-        {
-          _id: placeholderId,
-          content: '',
-          role: 'assistant',
-          createdAt: new Date().toISOString(),
-        },
+        { _id: asstId, content: '', role: 'assistant', createdAt: new Date().toISOString() },
       ])
 
-      // Read the SSE stream
-      const reader = response.body.getReader()
+      const reader = res.body.getReader()
       const decoder = new TextDecoder()
       let buffer = ''
+      let fullText = ''
 
       while (true) {
         const { done, value } = await reader.read()
@@ -130,204 +106,337 @@ export default function ChatInterface({ conversationId, hfToken }) {
 
         buffer += decoder.decode(value, { stream: true })
         const lines = buffer.split('\n')
-
-        // Keep the last incomplete line in the buffer
         buffer = lines.pop() || ''
 
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6)
-            try {
-              const parsed = JSON.parse(data)
-
-              if (parsed.error) {
-                setError(parsed.error)
-                break
-              }
-
-              if (parsed.content) {
-                currentMessage += parsed.content
-                setMessages((prev) =>
-                  prev.map((msg) =>
-                    msg._id === placeholderId
-                      ? { ...msg, content: currentMessage }
-                      : msg
-                  )
-                )
-              }
-            } catch (e) {
-              console.error('Failed to parse SSE data:', line, e)
+          if (!line.startsWith('data: ')) continue
+          try {
+            const parsed = JSON.parse(line.slice(6))
+            if (parsed.error) { setError(parsed.error); break }
+            if (parsed.content) {
+              fullText += parsed.content
+              const snap = fullText
+              setMessages((prev) =>
+                prev.map((m) => (m._id === asstId ? { ...m, content: snap } : m))
+              )
             }
-          }
+          } catch { /* partial JSON, skip */ }
         }
       }
-
-      setIsStreaming(false)
     } catch (err) {
-      console.error('Send message error:', err)
-      setError(err.message || 'Failed to send message. Please try again.')
+      console.error('Send error:', err)
+      setError(err.message || 'Failed to send. Try again.')
+      setMessages((prev) => prev.filter((m) => m._id !== asstId))
+    } finally {
       setIsStreaming(false)
-      // Remove the last message that failed
-      setMessages((prev) => prev.slice(0, -1))
     }
   }
 
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text)
-  }
+  const copy = (text) => navigator.clipboard?.writeText(text)
 
-  const shareMessage = (text) => {
-    if (navigator.share) {
-      navigator.share({
-        title: 'Chat Message',
-        text: text,
-      })
-    } else {
-      copyToClipboard(text)
-    }
-  }
-
+  // ── loading spinner ──
   if (isLoading) {
     return (
-      <div className="w-full h-screen bg-[#030014] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
-          <p className="text-gray-500 text-sm animate-pulse">Initializing Secure Session...</p>
+      <div style={styles.root}>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={styles.spinner} />
         </div>
       </div>
     )
   }
 
   return (
-    <div 
-      className="w-full bg-[#030014] text-white flex flex-col overflow-hidden transition-[height] duration-300"
-      style={{ height: viewportHeight }}
-    >
-      {/* Header */}
-      <div className="px-4 py-2 sm:py-3 border-b border-gray-800 flex justify-between items-center bg-[#030014]/80 backdrop-blur-md z-10 shrink-0">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/systems"
-            className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-800/50 hover:bg-gray-700 transition border border-gray-700 active:scale-90"
-            title="Back to Applications"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              className="w-5 h-5 fill-current text-gray-400"
-            >
+    <div style={styles.root}>
+      {/* ─── HEADER ─── */}
+      <div style={styles.header}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Link href="/systems" style={styles.backBtn}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#9ca3af">
               <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
             </svg>
           </Link>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <h1 className="font-bold text-base sm:text-lg">SLM Chat</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={styles.statusDot} />
+            <span style={{ fontWeight: 700, fontSize: 17 }}>SLM Chat</span>
           </div>
         </div>
-        <button
-          onClick={() => window.location.reload()}
-          className="text-[11px] sm:text-xs bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 px-3 py-1.5 rounded-lg transition border border-indigo-500/20 active:scale-95 font-medium"
-        >
+        <button onClick={() => window.location.reload()} style={styles.newChatBtn}>
           New Chat
         </button>
       </div>
 
-      {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto px-3 sm:px-4 pt-4 pb-20 space-y-4 scroll-smooth overscroll-contain">
+      {/* ─── MESSAGES ─── */}
+      <div ref={scrollRef} style={styles.messageArea}>
         {messages.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-gray-500 text-center p-8">
-            <div className="w-16 h-16 bg-indigo-500/10 rounded-3xl flex items-center justify-center mb-4 border border-indigo-500/20 shadow-inner">
-              <span className="text-3xl">🤖</span>
-            </div>
-            <p className="text-xl font-bold text-gray-200 mb-2">Welcome to SLM</p>
-            <p className="text-sm max-w-[240px] leading-relaxed">
-              Your private, secure AI assistant. How can I help you today?
+          <div style={styles.empty}>
+            <div style={styles.emptyIcon}>🤖</div>
+            <p style={{ fontSize: 18, fontWeight: 700, color: '#e5e7eb', margin: '0 0 6px' }}>
+              Welcome to SLM
+            </p>
+            <p style={{ fontSize: 14, color: '#6b7280', maxWidth: 240, lineHeight: 1.5, margin: 0 }}>
+              Your private AI assistant. Send a message to start.
             </p>
           </div>
         ) : (
-          messages.map((message) => (
+          messages.map((msg) => (
             <div
-              key={message._id}
-              className={`flex ${
-                message.role === 'user' ? 'justify-end' : 'justify-start'
-              } animate-in fade-in slide-in-from-bottom-2 duration-300`}
+              key={msg._id}
+              style={{
+                display: 'flex',
+                justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                marginBottom: 10,
+              }}
             >
               <div
-                className={`max-w-[90%] sm:max-w-[80%] px-4 py-3 rounded-2xl group relative shadow-md ${
-                  message.role === 'user'
-                    ? 'bg-indigo-600 text-white rounded-tr-none'
-                    : 'bg-gray-800/80 text-gray-100 rounded-tl-none border border-gray-700/50 backdrop-blur-sm'
-                }`}
+                onClick={() => copy(msg.content)}
+                style={{
+                  ...styles.bubble,
+                  ...(msg.role === 'user' ? styles.userBubble : styles.asstBubble),
+                }}
               >
-                <p className="text-[15px] sm:text-base leading-relaxed break-words whitespace-pre-wrap">
-                  {message.content}
-                </p>
-
-                {/* Desktop-only copy button, simpler for mobile tap */}
-                <button
-                  onClick={() => copyToClipboard(message.content)}
-                  className="absolute -bottom-6 right-0 text-[10px] text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity hover:text-gray-300"
-                >
-                  Copy
-                </button>
+                {msg.content || (
+                  <span style={styles.typingDots}>
+                    <span style={{ ...styles.dot, animationDelay: '-0.32s' }} />
+                    <span style={{ ...styles.dot, animationDelay: '-0.16s' }} />
+                    <span style={styles.dot} />
+                  </span>
+                )}
               </div>
             </div>
           ))
         )}
-
-        {isStreaming && (
-          <div className="flex justify-start animate-in fade-in duration-300">
-            <div className="bg-gray-800/50 px-4 py-4 rounded-2xl rounded-tl-none border border-gray-700/50 backdrop-blur-sm">
-              <div className="flex gap-1.5">
-                <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"></div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div ref={messagesEndRef} className="h-4" />
       </div>
 
-      {/* Error Message */}
-      {error && (
-        <div className="mx-4 mb-2 p-3 bg-red-900/40 border border-red-500/50 text-red-200 text-xs rounded-xl backdrop-blur-sm animate-in shake duration-300">
-          <p className="font-bold mb-1 flex items-center gap-1">
-            <span>⚠️</span> Connection Error
-          </p>
-          {error}
-        </div>
-      )}
+      {/* ─── ERROR ─── */}
+      {error && <div style={styles.errorBar}>⚠️ {error}</div>}
 
-      {/* Input Area - Sticky at bottom */}
-      <div className="shrink-0 bg-[#030014]/95 backdrop-blur-xl border-t border-gray-800/50 px-3 py-3 sm:px-4 sm:py-4 pb-safe">
-        <form onSubmit={handleSendMessage} className="max-w-7xl mx-auto">
-          <div className="relative flex items-center gap-2">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Message SLM..."
-              disabled={isStreaming}
-              className="flex-1 bg-gray-900 text-white border border-gray-700/50 rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 disabled:opacity-50 text-[16px] placeholder:text-gray-500 transition-all shadow-inner min-h-[52px]"
-              autoComplete="off"
-            />
-            <button
-              type="submit"
-              disabled={isStreaming || !input.trim()}
-              className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:bg-gray-800 text-white w-12 h-12 flex items-center justify-center rounded-2xl transition-all active:scale-90 shadow-lg shadow-indigo-600/20 shrink-0"
-            >
-              {isStreaming ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              ) : (
-                <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
-                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-                </svg>
-              )}
-            </button>
-          </div>
+      {/* ─── INPUT ─── */}
+      <div style={styles.inputBar}>
+        <form onSubmit={handleSend} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <input
+            ref={inputRef}
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Message SLM..."
+            disabled={isStreaming}
+            autoComplete="off"
+            autoCorrect="off"
+            enterKeyHint="send"
+            style={styles.input}
+          />
+          <button
+            type="submit"
+            disabled={isStreaming || !input.trim()}
+            style={{
+              ...styles.sendBtn,
+              opacity: isStreaming || !input.trim() ? 0.4 : 1,
+              background: isStreaming || !input.trim() ? '#1f2937' : '#4f46e5',
+            }}
+          >
+            {isStreaming ? (
+              <div style={styles.sendSpinner} />
+            ) : (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+              </svg>
+            )}
+          </button>
         </form>
       </div>
+
+      {/* Typing-dot keyframes injected once */}
+      <style>{`
+        @keyframes slm-bounce {
+          0%, 80%, 100% { transform: scale(0); }
+          40% { transform: scale(1); }
+        }
+        @keyframes slm-spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   )
+}
+
+/* ────────────────────────────────
+ *  All styles as plain JS objects
+ *  → zero Tailwind, zero CSS-in-JS runtime
+ * ──────────────────────────────── */
+const styles = {
+  root: {
+    position: 'fixed',
+    inset: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    background: '#030014',
+    color: '#fff',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    overflow: 'hidden',
+  },
+  spinner: {
+    width: 32,
+    height: 32,
+    border: '3px solid rgba(99,102,241,0.3)',
+    borderTopColor: '#6366f1',
+    borderRadius: '50%',
+    animation: 'slm-spin 0.8s linear infinite',
+  },
+
+  /* header */
+  header: {
+    flexShrink: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: '10px 16px',
+    borderBottom: '1px solid rgba(255,255,255,0.08)',
+    background: '#030014',
+    zIndex: 10,
+  },
+  backBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    background: 'rgba(255,255,255,0.06)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textDecoration: 'none',
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: '50%',
+    background: '#22c55e',
+  },
+  newChatBtn: {
+    fontSize: 12,
+    padding: '6px 14px',
+    borderRadius: 8,
+    background: 'rgba(99,102,241,0.1)',
+    color: '#818cf8',
+    border: '1px solid rgba(99,102,241,0.2)',
+    fontWeight: 500,
+    cursor: 'pointer',
+  },
+
+  /* messages */
+  messageArea: {
+    flex: 1,
+    overflowY: 'auto',
+    WebkitOverflowScrolling: 'touch',
+    overscrollBehavior: 'contain',
+    padding: '16px 12px',
+  },
+  empty: {
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    padding: 32,
+  },
+  emptyIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    background: 'rgba(99,102,241,0.08)',
+    border: '1px solid rgba(99,102,241,0.15)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    fontSize: 28,
+  },
+
+  /* bubble */
+  bubble: {
+    maxWidth: '88%',
+    padding: '12px 16px',
+    borderRadius: 20,
+    fontSize: 15,
+    lineHeight: 1.5,
+    wordBreak: 'break-word',
+    whiteSpace: 'pre-wrap',
+  },
+  userBubble: {
+    background: '#4f46e5',
+    color: '#fff',
+    borderTopRightRadius: 4,
+  },
+  asstBubble: {
+    background: 'rgba(255,255,255,0.07)',
+    color: '#e5e7eb',
+    borderTopLeftRadius: 4,
+    border: '1px solid rgba(255,255,255,0.07)',
+  },
+  typingDots: {
+    display: 'flex',
+    gap: 5,
+  },
+  dot: {
+    display: 'inline-block',
+    width: 6,
+    height: 6,
+    borderRadius: '50%',
+    background: '#818cf8',
+    animation: 'slm-bounce 1.4s infinite ease-in-out',
+  },
+
+  /* error */
+  errorBar: {
+    margin: '0 12px 8px',
+    padding: '10px 14px',
+    background: 'rgba(127,29,29,0.4)',
+    border: '1px solid rgba(239,68,68,0.3)',
+    borderRadius: 12,
+    color: '#fca5a5',
+    fontSize: 13,
+    flexShrink: 0,
+  },
+
+  /* input bar */
+  inputBar: {
+    flexShrink: 0,
+    padding: '12px 12px',
+    paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+    borderTop: '1px solid rgba(255,255,255,0.08)',
+    background: '#030014',
+  },
+  input: {
+    flex: 1,
+    background: 'rgba(255,255,255,0.06)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: 24,
+    padding: '14px 20px',
+    color: '#fff',
+    fontSize: 16,  // 16px prevents iOS zoom
+    outline: 'none',
+    WebkitAppearance: 'none',
+    appearance: 'none',
+  },
+  sendBtn: {
+    flexShrink: 0,
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    border: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: '#fff',
+    cursor: 'pointer',
+    transition: 'opacity 0.15s',
+  },
+  sendSpinner: {
+    width: 20,
+    height: 20,
+    border: '2.5px solid rgba(255,255,255,0.3)',
+    borderTopColor: '#fff',
+    borderRadius: '50%',
+    animation: 'slm-spin 0.8s linear infinite',
+  },
 }

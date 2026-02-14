@@ -12,7 +12,6 @@ body {
   color: #ededed;
   background: #000000; /* Pure black for minimalist look */
   overflow-x: hidden;
-  cursor: none;
 }
 
 /* Custom cursor hiding - only on devices with a mouse */
