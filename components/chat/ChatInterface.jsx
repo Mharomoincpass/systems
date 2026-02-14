@@ -164,7 +164,7 @@ export default function ChatInterface({ conversationId }) {
   // ── loading spinner ──
   if (isLoading) {
     return (
-      <div style={styles.root}>
+      <div className="slm-root" style={styles.root}>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={styles.spinner} />
         </div>
@@ -173,7 +173,7 @@ export default function ChatInterface({ conversationId }) {
   }
 
   return (
-    <div style={styles.root}>
+    <div className="slm-root" style={styles.root}>
       {/* ─── HEADER ─── */}
       <div style={styles.header}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -272,8 +272,12 @@ export default function ChatInterface({ conversationId }) {
         </form>
       </div>
 
-      {/* Typing-dot keyframes injected once */}
+      {/* CSS — keyframes + root height with dvh fallback */}
       <style>{`
+        .slm-root {
+          height: 100vh;
+          height: 100dvh;
+        }
         @keyframes slm-bounce {
           0%, 80%, 100% { transform: scale(0); }
           40% { transform: scale(1); }
@@ -294,13 +298,10 @@ const styles = {
   root: {
     display: 'flex',
     flexDirection: 'column',
-    height: '100dvh',        /* dynamic viewport — resizes with keyboard */
-    height: '100vh',         /* fallback for very old browsers (overridden by dvh above in supporting browsers) */
     background: '#030014',
     color: '#fff',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     overflow: 'hidden',
-    /* no position:fixed — it breaks keyboard handling on iOS Safari */
   },
   spinner: {
     width: 32,
