@@ -26,8 +26,15 @@ export default function ChatInterface({ conversationId }) {
       containerRef.current.style.height = `${vv.height}px`
 
       // Offset the container to match where the visual viewport actually is
-      // This eliminates the gap between the input and the keyboard
       containerRef.current.style.top = `${vv.offsetTop}px`
+
+      // After resizing, scroll the chat messages to the bottom so user sees latest messages
+      requestAnimationFrame(() => {
+        const el = scrollRef.current
+        if (el) {
+          el.scrollTop = el.scrollHeight
+        }
+      })
     }
 
     const fallbackUpdate = () => {
@@ -35,6 +42,13 @@ export default function ChatInterface({ conversationId }) {
       window.scrollTo(0, 0)
       containerRef.current.style.height = `${window.innerHeight}px`
       containerRef.current.style.top = '0px'
+
+      requestAnimationFrame(() => {
+        const el = scrollRef.current
+        if (el) {
+          el.scrollTop = el.scrollHeight
+        }
+      })
     }
 
     if (window.visualViewport) {
