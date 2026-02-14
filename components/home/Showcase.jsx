@@ -82,7 +82,7 @@ export default function Showcase() {
     <section ref={container} className="relative bg-black z-10 overflow-hidden">
       <div className="container mx-auto px-6 py-32">
         <h2 className="text-4xl md:text-6xl font-bold text-white mb-4">
-          Selected <span className="text-zinc-500">Works</span>
+          Top <span className="text-zinc-500">Projects by yours truly</span>
         </h2>
         <div className="w-full h-px bg-white/10 mt-8"></div>
       </div>
