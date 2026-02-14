@@ -158,14 +158,14 @@ pm2 stop myapp
 ```bash
 sudo nginx -t
 sudo systemctl reload nginx
-```MongoDB
-- **ODM**: Mongoose
+```
+
 ## 📚 Tech Stack
 
 - **Framework**: Next.js 14
-- **Language**: TypeScript
-- **Database**: PostgreSQL
-- **ORM**: Prisma
+- **Language**: JavaScript
+- **Database**: MongoDB
+- **ODM**: Mongoose
 - **Authentication**: JWT with bcrypt
 - **Styling**: Tailwind CSS
 - **Validation**: Zod
@@ -181,12 +181,12 @@ sudo systemctl reload nginx
 - Security headers via Nginx
 - Environment variables for sensitive data
 
+## 💻 Available Scripts
+
+- `npm run dev` - Run development server
 - `npm run build` - Build for production
 - `npm start` - Start production server
 - `npm run lint` - Run ESLint
-- `npm run prisma:generate` - Generate Prisma Client
-- `npm run prisma:migrate` - Run database migrations
-- `npm run prisma:studio` - Open Prisma Studio
 
 ## 🤝 Contributing
 
