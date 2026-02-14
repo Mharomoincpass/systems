@@ -9,23 +9,37 @@ export default function ChatInterface({ conversationId }) {
   const [isStreaming, setIsStreaming] = useState(false)
   const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [viewportHeight, setViewportHeight] = useState('100dvh')
   const scrollRef = useRef(null)
   const inputRef = useRef(null)
   
+  // Track visualViewport height for mobile keyboard (mobile only)
+  useEffect(() => {
+    if (!window.visualViewport || window.innerWidth >= 768) return
+
+    const handleResize = () => {
+      setViewportHeight(`${window.visualViewport.height}px`)
+      // Scroll to bottom after viewport change
+      const el = scrollRef.current
+      if (el) {
+        el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+      }
+      // Ensure input stays visible when keyboard opens
+      inputRef.current?.scrollIntoView({ block: 'nearest' })
+    }
+
+    window.visualViewport.addEventListener('resize', handleResize)
+    setViewportHeight(`${window.visualViewport.height}px`)
+    return () => window.visualViewport.removeEventListener('resize', handleResize)
+  }, [])
+
   // Lock body scroll to prevent background scrolling (mobile only)
   useEffect(() => {
     if (window.innerWidth >= 768) return
-    // Lock both html and body to be safe on iOS
-    document.documentElement.style.overflow = 'hidden'
     document.body.style.overflow = 'hidden'
-    document.body.style.position = 'fixed' // This sometimes helps lock it in place, but can be risky. Let's try just overflow first.
-    document.body.style.width = '100%'
     
     return () => {
-      document.documentElement.style.overflow = ''
       document.body.style.overflow = ''
-      document.body.style.position = ''
-      document.body.style.width = ''
     }
   }, [])
 
@@ -156,7 +170,8 @@ export default function ChatInterface({ conversationId }) {
 
   return (
     <div 
-      className="flex flex-col w-full h-screen h-[100dvh] bg-[#030014] text-white font-sans overflow-hidden md:h-screen"
+      className="flex flex-col min-h-0 w-full bg-[#030014] text-white font-sans overflow-hidden"
+      style={{ height: viewportHeight }}
     >
       {/* Header */}
       <div className="shrink-0 bg-[#030014] border-b border-white/10 z-10">
@@ -233,7 +248,7 @@ export default function ChatInterface({ conversationId }) {
       )}
 
       {/* Input */}
-      <div className="shrink-0 p-3 bg-[#030014] border-t border-white/10 pb-[max(12px,env(safe-area-inset-bottom))]">
+      <div className="shrink-0 sticky bottom-0 z-10 p-3 bg-[#030014] border-t border-white/10 pb-[max(12px,env(safe-area-inset-bottom))]">
         <form onSubmit={handleSend} className="max-w-3xl mx-auto w-full flex gap-2 items-center">
           <input
             ref={inputRef}
