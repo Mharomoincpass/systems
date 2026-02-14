@@ -5,10 +5,26 @@ import { generateToken } from '@/lib/auth'
 import { getIPLocation } from '@/lib/geolocation'
 
 function getClientIP(request) {
-  const forwarded = request.headers.get('x-forwarded-for')
-  const ip = forwarded ? forwarded.split(',')[0].trim() : request.headers.get('x-real-ip') || 'unknown'
-  console.log('🔍 Client IP extracted:', ip)
-  return ip
+  // Try various headers for real IP (standard for proxies/load balancers)
+  const headers = request.headers
+  
+  const ip = headers.get('cf-connecting-ip') ||
+             headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+             headers.get('x-real-ip') ||
+             headers.get('x-client-ip') ||
+             headers.get('true-client-ip') ||
+             'unknown'
+
+  // Clean up IPv4-mapped IPv6 (::ffff:127.0.0.1 -> 127.0.0.1)
+  let cleanIp = ip
+  if (ip.includes(':') && ip.includes('.')) {
+    cleanIp = ip.split(':').pop()
+  } else if (ip === '::1') {
+    cleanIp = '127.0.0.1'
+  }
+
+  console.log('🔍 Client IP extracted:', cleanIp)
+  return cleanIp
 }
 
 export async function POST(request) {
