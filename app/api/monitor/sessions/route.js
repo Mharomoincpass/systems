@@ -3,6 +3,8 @@ import Session from '@/models/Session'
 import { getIPLocation } from '@/lib/geolocation'
 import { verifyToken } from '@/lib/auth'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request) {
   try {
     const cookieHeader = request.headers.get('cookie') || ''

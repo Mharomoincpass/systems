@@ -3,6 +3,8 @@ import Conversation from '@/models/Conversation'
 import Message from '@/models/Message'
 import { z } from 'zod'
 
+export const dynamic = 'force-dynamic'
+
 const sendMessageSchema = z.object({
   conversationId: z.string(),
   content: z.string().min(1, 'Message cannot be empty'),

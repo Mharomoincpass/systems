@@ -1,6 +1,8 @@
 import connectDB from '@/lib/mongodb'
 import Session from '@/models/Session'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request) {
   try {
     const body = await request.json()

@@ -12,6 +12,31 @@ export default function ChatInterface({ conversationId, hfToken }) {
   const [error, setError] = useState(null)
   const messagesEndRef = useRef(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [viewportHeight, setViewportHeight] = useState('100dvh')
+
+  // Handle mobile keyboard height and address bar
+  useEffect(() => {
+    if (!window.visualViewport) return
+
+    const handleResize = () => {
+      // Adjust height based on visual viewport (handles keyboard)
+      setViewportHeight(`${window.visualViewport.height}px`)
+      // Scroll to bottom when keyboard opens
+      if (window.visualViewport.height < window.innerHeight) {
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+        }, 100)
+      }
+    }
+
+    window.visualViewport.addEventListener('resize', handleResize)
+    window.visualViewport.addEventListener('scroll', handleResize)
+    
+    return () => {
+      window.visualViewport.removeEventListener('resize', handleResize)
+      window.visualViewport.removeEventListener('scroll', handleResize)
+    }
+  }, [])
 
   // Load initial messages
   useEffect(() => {
@@ -174,13 +199,16 @@ export default function ChatInterface({ conversationId, hfToken }) {
   }
 
   return (
-    <div className="w-full h-screen bg-[#030014] text-white flex flex-col overflow-hidden">
+    <div 
+      className="w-full bg-[#030014] text-white flex flex-col overflow-hidden transition-[height] duration-300"
+      style={{ height: viewportHeight }}
+    >
       {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-800 flex justify-between items-center bg-[#030014]/80 backdrop-blur-md z-10">
+      <div className="px-4 py-2 sm:py-3 border-b border-gray-800 flex justify-between items-center bg-[#030014]/80 backdrop-blur-md z-10 shrink-0">
         <div className="flex items-center gap-3">
           <Link
             href="/systems"
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-800/50 hover:bg-gray-700 transition border border-gray-700 active:scale-90"
+            className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-800/50 hover:bg-gray-700 transition border border-gray-700 active:scale-90"
             title="Back to Applications"
           >
             <svg
@@ -192,26 +220,26 @@ export default function ChatInterface({ conversationId, hfToken }) {
           </Link>
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <h1 className="font-bold text-lg">SLM Chat</h1>
+            <h1 className="font-bold text-base sm:text-lg">SLM Chat</h1>
           </div>
         </div>
         <button
           onClick={() => window.location.reload()}
-          className="text-xs bg-gray-800 hover:bg-gray-700 px-3 py-1.5 rounded-full transition border border-gray-700 active:scale-95"
+          className="text-[11px] sm:text-xs bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 px-3 py-1.5 rounded-lg transition border border-indigo-500/20 active:scale-95 font-medium"
         >
           New Chat
         </button>
       </div>
 
       {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-28 space-y-4 scroll-smooth">
+      <div className="flex-1 overflow-y-auto px-3 sm:px-4 pt-4 pb-20 space-y-4 scroll-smooth overscroll-contain">
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-gray-500 text-center p-8">
-            <div className="w-16 h-16 bg-indigo-500/10 rounded-full flex items-center justify-center mb-4 border border-indigo-500/20">
-              <span className="text-2xl">🤖</span>
+            <div className="w-16 h-16 bg-indigo-500/10 rounded-3xl flex items-center justify-center mb-4 border border-indigo-500/20 shadow-inner">
+              <span className="text-3xl">🤖</span>
             </div>
             <p className="text-xl font-bold text-gray-200 mb-2">Welcome to SLM</p>
-            <p className="text-sm max-w-[240px]">
+            <p className="text-sm max-w-[240px] leading-relaxed">
               Your private, secure AI assistant. How can I help you today?
             </p>
           </div>
@@ -224,29 +252,23 @@ export default function ChatInterface({ conversationId, hfToken }) {
               } animate-in fade-in slide-in-from-bottom-2 duration-300`}
             >
               <div
-                className={`max-w-[85%] px-4 py-3 rounded-2xl group relative shadow-lg ${
+                className={`max-w-[90%] sm:max-w-[80%] px-4 py-3 rounded-2xl group relative shadow-md ${
                   message.role === 'user'
                     ? 'bg-indigo-600 text-white rounded-tr-none'
-                    : 'bg-gray-800 text-gray-100 rounded-tl-none border border-gray-700/50'
+                    : 'bg-gray-800/80 text-gray-100 rounded-tl-none border border-gray-700/50 backdrop-blur-sm'
                 }`}
               >
-                <p className="text-[15px] leading-relaxed break-words whitespace-pre-wrap">
+                <p className="text-[15px] sm:text-base leading-relaxed break-words whitespace-pre-wrap">
                   {message.content}
                 </p>
 
-                {/* Mobile-friendly actions (visible on tap/hover) */}
-                <div
-                  className={`absolute ${
-                    message.role === 'user' ? '-left-12' : '-right-12'
-                  } bottom-0 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity pb-1`}
+                {/* Desktop-only copy button, simpler for mobile tap */}
+                <button
+                  onClick={() => copyToClipboard(message.content)}
+                  className="absolute -bottom-6 right-0 text-[10px] text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity hover:text-gray-300"
                 >
-                  <button
-                    onClick={() => copyToClipboard(message.content)}
-                    className="bg-gray-800/80 backdrop-blur p-2 rounded-full text-xs border border-gray-700 active:bg-indigo-500"
-                  >
-                    📋
-                  </button>
-                </div>
+                  Copy
+                </button>
               </div>
             </div>
           ))
@@ -254,7 +276,7 @@ export default function ChatInterface({ conversationId, hfToken }) {
 
         {isStreaming && (
           <div className="flex justify-start animate-in fade-in duration-300">
-            <div className="bg-gray-800 px-4 py-4 rounded-2xl rounded-tl-none border border-gray-700/50">
+            <div className="bg-gray-800/50 px-4 py-4 rounded-2xl rounded-tl-none border border-gray-700/50 backdrop-blur-sm">
               <div className="flex gap-1.5">
                 <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
                 <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
@@ -269,7 +291,7 @@ export default function ChatInterface({ conversationId, hfToken }) {
 
       {/* Error Message */}
       {error && (
-        <div className="mx-4 mb-24 p-3 bg-red-900/40 border border-red-500/50 text-red-200 text-xs rounded-xl backdrop-blur-sm animate-in shake duration-300">
+        <div className="mx-4 mb-2 p-3 bg-red-900/40 border border-red-500/50 text-red-200 text-xs rounded-xl backdrop-blur-sm animate-in shake duration-300">
           <p className="font-bold mb-1 flex items-center gap-1">
             <span>⚠️</span> Connection Error
           </p>
@@ -278,7 +300,7 @@ export default function ChatInterface({ conversationId, hfToken }) {
       )}
 
       {/* Input Area - Sticky at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[#030014]/90 backdrop-blur-lg border-t border-gray-800/50 px-4 py-4 pb-6">
+      <div className="shrink-0 bg-[#030014]/95 backdrop-blur-xl border-t border-gray-800/50 px-3 py-3 sm:px-4 sm:py-4 pb-safe">
         <form onSubmit={handleSendMessage} className="max-w-7xl mx-auto">
           <div className="relative flex items-center gap-2">
             <input
@@ -287,7 +309,7 @@ export default function ChatInterface({ conversationId, hfToken }) {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Message SLM..."
               disabled={isStreaming}
-              className="flex-1 bg-gray-900/50 text-white border border-gray-700/50 rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 disabled:opacity-50 text-[16px] placeholder:text-gray-500 transition-all shadow-inner"
+              className="flex-1 bg-gray-900 text-white border border-gray-700/50 rounded-2xl px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 disabled:opacity-50 text-[16px] placeholder:text-gray-500 transition-all shadow-inner min-h-[52px]"
               autoComplete="off"
             />
             <button

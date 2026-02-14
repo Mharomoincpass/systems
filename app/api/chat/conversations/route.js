@@ -2,6 +2,8 @@ import connectDB from '@/lib/mongodb'
 import Conversation from '@/models/Conversation'
 import { z } from 'zod'
 
+export const dynamic = 'force-dynamic'
+
 const createConversationSchema = z.object({
   userId: z.string().optional().nullable(),
 })

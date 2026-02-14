@@ -2,6 +2,8 @@ import connectDB from '@/lib/mongodb'
 import Message from '@/models/Message'
 import { z } from 'zod'
 
+export const dynamic = 'force-dynamic'
+
 const getMessagesSchema = z.object({
   conversationId: z.string(),
 })

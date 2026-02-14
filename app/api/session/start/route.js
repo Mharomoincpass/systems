@@ -4,6 +4,8 @@ import Session from '@/models/Session'
 import { generateToken } from '@/lib/auth'
 import { getIPLocation } from '@/lib/geolocation'
 
+export const dynamic = 'force-dynamic'
+
 function getClientIP(request) {
   // Try various headers for real IP (standard for proxies/load balancers)
   const headers = request.headers

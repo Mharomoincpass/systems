@@ -15,9 +15,21 @@ body {
   cursor: none;
 }
 
-/* Custom cursor hiding */
-* {
-  cursor: none !important;
+/* Custom cursor hiding - only on devices with a mouse */
+@media (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
+}
+
+/* Safe area utilities if not present */
+@layer utilities {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
 }
 
 /* Perspective for 3D transforms */
