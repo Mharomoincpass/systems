@@ -212,7 +212,7 @@ export default function ChatInterface({ conversationId }) {
       {/* Messages */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-4 py-4 overscroll-contain -webkit-overflow-scrolling-touch"
+        className="flex-1 overflow-y-auto px-4 py-4 overscroll-contain"
       >
         <div className="max-w-3xl mx-auto w-full space-y-4">
           {messages.length === 0 ? (
