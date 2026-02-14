@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
+import Link from 'next/link'
 
 export default function SystemsPage() {
   const [sessionToken, setSessionToken] = useState(null)
@@ -74,15 +75,15 @@ export default function SystemsPage() {
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8">Applications</h1>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          <div className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border border-indigo-500/30 rounded-lg p-4 sm:p-6 hover:border-indigo-400/50 transition">
-            <h2 className="text-lg sm:text-xl font-semibold mb-2">App 1</h2>
-            <p className="text-sm sm:text-base text-gray-300">Coming soon</p>
-          </div>
+          <Link href="/SLM" className="bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border border-indigo-500/30 rounded-lg p-4 sm:p-6 hover:border-indigo-400/50 transition block">
+            <h2 className="text-lg sm:text-xl font-semibold mb-2">SLM Chat</h2>
+            <p className="text-sm sm:text-base text-gray-300">Open application</p>
+          </Link>
         </div>
 
         {/* Activity indicator */}
         <div className="mt-8 text-xs text-gray-500">
-          <p>🟢 Session active · Tracking: Mouse, Scroll, Touch, Keyboard</p>
+          <p>🟢 Session active</p>
         </div>
       </div>
     </div>
