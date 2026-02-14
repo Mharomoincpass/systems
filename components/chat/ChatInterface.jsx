@@ -3,18 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 
-/*
- * ChatInterface — mobile-first chat like ChatGPT.
- *
- * Layout approach:
- *  - height: 100dvh (dynamic viewport — shrinks when iOS keyboard opens)
- *  - body overflow locked while chat is mounted
- *  - interactiveWidget=resizes-content in viewport meta for Chrome
- *  - NO position:fixed (breaks iOS — header scrolls off with keyboard)
- *  - NO visualViewport JS (causes jank)
- *  - Keyboard auto-dismisses after send, then scrolls to show response
- */
-
 export default function ChatInterface({ conversationId }) {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
@@ -23,24 +11,37 @@ export default function ChatInterface({ conversationId }) {
   const [isLoading, setIsLoading] = useState(true)
   const scrollRef = useRef(null)
   const inputRef = useRef(null)
+  
+  // Use visualViewport height for reliable mobile keyboard handling
+  const [viewportHeight, setViewportHeight] = useState('100dvh')
 
-  // ── lock body scroll while chat is mounted (no position:fixed — it kills keyboard on iOS) ──
   useEffect(() => {
-    const html = document.documentElement
-    const body = document.body
-    const prevHtml = html.style.overflow
-    const prevBody = body.style.overflow
+    if (!window.visualViewport || window.innerWidth >= 768) return
 
-    html.style.overflow = 'hidden'
-    body.style.overflow = 'hidden'
+    const handleResize = () => {
+      // Update height immediately when viewport changes (e.g. keyboard opens)
+      setViewportHeight(`${window.visualViewport.height}px`)
+      // Scroll to bottom to keep context visible
+      scrollToBottom()
+    }
 
+    window.visualViewport.addEventListener('resize', handleResize)
+    // Initial set
+    setViewportHeight(`${window.visualViewport.height}px`)
+
+    return () => window.visualViewport.removeEventListener('resize', handleResize)
+  }, [])
+
+  // Lock body scroll to prevent background scrolling (mobile only)
+  useEffect(() => {
+    if (window.innerWidth >= 768) return
+    document.body.style.overflow = 'hidden'
     return () => {
-      html.style.overflow = prevHtml
-      body.style.overflow = prevBody
+      document.body.style.overflow = ''
     }
   }, [])
 
-  // ── scroll helper ──
+  // Scroll helper
   const scrollToBottom = useCallback((instant = false) => {
     const el = scrollRef.current
     if (!el) return
@@ -51,37 +52,33 @@ export default function ChatInterface({ conversationId }) {
     }
   }, [])
 
-  // ── load messages ──
+  // Load messages
   useEffect(() => {
     if (!conversationId) return
     let cancelled = false
+    setIsLoading(true)
+    
     fetch(`/api/chat/messages?conversationId=${conversationId}`)
       .then((r) => r.json())
       .then((data) => {
-        if (!cancelled && data.success) setMessages(data.messages)
+        if (!cancelled && data.success) {
+          setMessages(data.messages)
+        }
       })
       .catch((err) => console.error('Load messages failed:', err))
-      .finally(() => { if (!cancelled) setIsLoading(false) })
+      .finally(() => { 
+        if (!cancelled) setIsLoading(false) 
+      })
+      
     return () => { cancelled = true }
   }, [conversationId])
 
-  // ── scroll on new messages ──
+  // Scroll on new messages
   useEffect(() => {
     scrollToBottom(isStreaming)
-  }, [messages, scrollToBottom, isStreaming])
+  }, [messages, isStreaming, scrollToBottom])
 
-  // ── after stream finishes, wait for keyboard dismiss then scroll ──
-  const prevStreaming = useRef(false)
-  useEffect(() => {
-    if (prevStreaming.current && !isStreaming) {
-      // Stream just ended — keyboard may still be closing, wait then scroll
-      const t = setTimeout(() => scrollToBottom(false), 350)
-      return () => clearTimeout(t)
-    }
-    prevStreaming.current = isStreaming
-  }, [isStreaming, scrollToBottom])
-
-  // ── send ──
+  // Send message
   const handleSend = async (e) => {
     e.preventDefault()
     const text = input.trim()
@@ -90,8 +87,8 @@ export default function ChatInterface({ conversationId }) {
     setError(null)
     setInput('')
 
-    // dismiss keyboard on mobile after sending
-    if ('ontouchstart' in window) {
+    // Dismiss keyboard on mobile
+    if (window.innerWidth < 768) {
       inputRef.current?.blur()
     }
 
@@ -116,7 +113,7 @@ export default function ChatInterface({ conversationId }) {
         throw new Error(err.error || `Server error ${res.status}`)
       }
 
-      // placeholder bubble
+      // Add assistant placeholder
       setMessages((prev) => [
         ...prev,
         { _id: asstId, content: '', role: 'assistant', createdAt: new Date().toISOString() },
@@ -147,12 +144,12 @@ export default function ChatInterface({ conversationId }) {
                 prev.map((m) => (m._id === asstId ? { ...m, content: snap } : m))
               )
             }
-          } catch { /* partial JSON, skip */ }
+          } catch { /* skip partial */ }
         }
       }
     } catch (err) {
       console.error('Send error:', err)
-      setError(err.message || 'Failed to send. Try again.')
+      setError(err.message || 'Failed to send')
       setMessages((prev) => prev.filter((m) => m._id !== asstId))
     } finally {
       setIsStreaming(false)
@@ -161,85 +158,96 @@ export default function ChatInterface({ conversationId }) {
 
   const copy = (text) => navigator.clipboard?.writeText(text)
 
-  // ── loading spinner ──
   if (isLoading) {
     return (
-      <div className="slm-root" style={styles.root}>
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={styles.spinner} />
-        </div>
+      <div className="fixed inset-0 flex items-center justify-center bg-[#030014] text-white">
+        <div className="w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="slm-root" style={styles.root}>
-      {/* ─── HEADER ─── */}
-      <div style={styles.header}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Link href="/systems" style={styles.backBtn}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="#9ca3af">
-              <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-            </svg>
-          </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={styles.statusDot} />
-            <span style={{ fontWeight: 700, fontSize: 17 }}>SLM Chat</span>
-          </div>
-        </div>
-        <button onClick={() => window.location.reload()} style={styles.newChatBtn}>
-          New Chat
-        </button>
-      </div>
-
-      {/* ─── MESSAGES ─── */}
-      <div ref={scrollRef} style={styles.messageArea}>
-        {messages.length === 0 ? (
-          <div style={styles.empty}>
-            <div style={styles.emptyIcon}>🤖</div>
-            <p style={{ fontSize: 18, fontWeight: 700, color: '#e5e7eb', margin: '0 0 6px' }}>
-              Welcome to SLM
-            </p>
-            <p style={{ fontSize: 14, color: '#6b7280', maxWidth: 240, lineHeight: 1.5, margin: 0 }}>
-              Your private AI assistant. Send a message to start.
-            </p>
-          </div>
-        ) : (
-          messages.map((msg) => (
-            <div
-              key={msg._id}
-              style={{
-                display: 'flex',
-                justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                marginBottom: 10,
-              }}
-            >
-              <div
-                onClick={() => copy(msg.content)}
-                style={{
-                  ...styles.bubble,
-                  ...(msg.role === 'user' ? styles.userBubble : styles.asstBubble),
-                }}
-              >
-                {msg.content || (
-                  <span style={styles.typingDots}>
-                    <span style={{ ...styles.dot, animationDelay: '-0.32s' }} />
-                    <span style={{ ...styles.dot, animationDelay: '-0.16s' }} />
-                    <span style={styles.dot} />
-                  </span>
-                )}
-              </div>
+    <div 
+      className="fixed inset-0 flex flex-col bg-[#030014] text-white font-sans overflow-hidden"
+      style={{ height: viewportHeight }}
+    >
+      {/* Header */}
+      <div className="shrink-0 bg-[#030014] border-b border-white/10 z-10">
+        <div className="max-w-4xl mx-auto w-full flex items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-3">
+            <Link href="/systems" className="w-9 h-9 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 active:scale-95 transition-transform">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#9ca3af">
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+              </svg>
+            </Link>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-green-500" />
+              <span className="font-bold text-lg">SLM Chat</span>
             </div>
-          ))
-        )}
+          </div>
+          <button 
+            onClick={() => window.location.reload()}
+            className="px-3 py-1.5 text-xs font-medium text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 rounded-lg active:scale-95 transition-transform"
+          >
+            New Chat
+          </button>
+        </div>
       </div>
 
-      {/* ─── ERROR ─── */}
-      {error && <div style={styles.errorBar}>⚠️ {error}</div>}
+      {/* Messages */}
+      <div 
+        ref={scrollRef} 
+        className="flex-1 overflow-y-auto px-4 py-4 overscroll-contain"
+      >
+        <div className="max-w-3xl mx-auto w-full space-y-4">
+          {messages.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-center p-8">
+              <div className="w-14 h-14 flex items-center justify-center rounded-2xl bg-indigo-500/10 border border-indigo-500/20 mb-4 text-3xl">
+                🤖
+              </div>
+              <h3 className="text-lg font-bold text-gray-200 mb-2">Welcome to SLM</h3>
+              <p className="text-sm text-gray-400 max-w-[240px]">
+                Your private AI assistant. Send a message to start.
+              </p>
+            </div>
+          ) : (
+            messages.map((msg) => (
+              <div
+                key={msg._id}
+                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  onClick={() => copy(msg.content)}
+                  className={`max-w-[88%] px-4 py-3 rounded-2xl text-[15px] leading-relaxed break-words whitespace-pre-wrap shadow-sm ${
+                    msg.role === 'user' 
+                      ? 'bg-indigo-600 text-white rounded-tr-sm' 
+                      : 'bg-white/5 text-gray-200 border border-white/5 rounded-tl-sm'
+                  }`}
+                >
+                  {msg.content || (
+                    <div className="flex gap-1 py-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.32s]" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.16s]" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
 
-      {/* ─── INPUT ─── */}
-      <div style={styles.inputBar}>
-        <form onSubmit={handleSend} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      {/* Error */}
+      {error && (
+        <div className="px-4 py-2 mx-3 mb-2 bg-red-500/10 border border-red-500/20 rounded-xl text-red-300 text-xs">
+          ⚠️ {error}
+        </div>
+      )}
+
+      {/* Input */}
+      <div className="shrink-0 p-3 bg-[#030014] border-t border-white/10 pb-[max(12px,env(safe-area-inset-bottom))]">
+        <form onSubmit={handleSend} className="max-w-3xl mx-auto w-full flex gap-2 items-center">
           <input
             ref={inputRef}
             type="text"
@@ -250,19 +258,19 @@ export default function ChatInterface({ conversationId }) {
             autoComplete="off"
             autoCorrect="off"
             enterKeyHint="send"
-            style={styles.input}
+            className="flex-1 bg-white/5 border border-white/10 rounded-full px-5 py-3.5 text-base text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500/50 focus:bg-white/10 transition-colors"
           />
           <button
             type="submit"
             disabled={isStreaming || !input.trim()}
-            style={{
-              ...styles.sendBtn,
-              opacity: isStreaming || !input.trim() ? 0.4 : 1,
-              background: isStreaming || !input.trim() ? '#1f2937' : '#4f46e5',
-            }}
+            className={`shrink-0 w-12 h-12 flex items-center justify-center rounded-2xl transition-all ${
+              isStreaming || !input.trim() 
+                ? 'bg-gray-800 text-gray-500 opacity-50 cursor-not-allowed' 
+                : 'bg-indigo-600 text-white active:scale-95 shadow-lg shadow-indigo-600/20'
+            }`}
           >
             {isStreaming ? (
-              <div style={styles.sendSpinner} />
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
               <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
@@ -271,201 +279,6 @@ export default function ChatInterface({ conversationId }) {
           </button>
         </form>
       </div>
-
-      {/* CSS — keyframes + root height with dvh fallback */}
-      <style>{`
-        .slm-root {
-          height: 100vh;
-          height: 100dvh;
-        }
-        @keyframes slm-bounce {
-          0%, 80%, 100% { transform: scale(0); }
-          40% { transform: scale(1); }
-        }
-        @keyframes slm-spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   )
-}
-
-/* ────────────────────────────────
- *  All styles as plain JS objects
- *  → zero Tailwind, zero CSS-in-JS runtime
- * ──────────────────────────────── */
-const styles = {
-  root: {
-    display: 'flex',
-    flexDirection: 'column',
-    background: '#030014',
-    color: '#fff',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    overflow: 'hidden',
-  },
-  spinner: {
-    width: 32,
-    height: 32,
-    border: '3px solid rgba(99,102,241,0.3)',
-    borderTopColor: '#6366f1',
-    borderRadius: '50%',
-    animation: 'slm-spin 0.8s linear infinite',
-  },
-
-  /* header */
-  header: {
-    flexShrink: 0,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '10px 16px',
-    borderBottom: '1px solid rgba(255,255,255,0.08)',
-    background: '#030014',
-    zIndex: 10,
-  },
-  backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    background: 'rgba(255,255,255,0.06)',
-    border: '1px solid rgba(255,255,255,0.1)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textDecoration: 'none',
-  },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: '50%',
-    background: '#22c55e',
-  },
-  newChatBtn: {
-    fontSize: 12,
-    padding: '6px 14px',
-    borderRadius: 8,
-    background: 'rgba(99,102,241,0.1)',
-    color: '#818cf8',
-    border: '1px solid rgba(99,102,241,0.2)',
-    fontWeight: 500,
-    cursor: 'pointer',
-  },
-
-  /* messages */
-  messageArea: {
-    flex: 1,
-    overflowY: 'auto',
-    WebkitOverflowScrolling: 'touch',
-    overscrollBehavior: 'contain',
-    padding: '16px 12px',
-  },
-  empty: {
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center',
-    padding: 32,
-  },
-  emptyIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
-    background: 'rgba(99,102,241,0.08)',
-    border: '1px solid rgba(99,102,241,0.15)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-    fontSize: 28,
-  },
-
-  /* bubble */
-  bubble: {
-    maxWidth: '88%',
-    padding: '12px 16px',
-    borderRadius: 20,
-    fontSize: 15,
-    lineHeight: 1.5,
-    wordBreak: 'break-word',
-    whiteSpace: 'pre-wrap',
-  },
-  userBubble: {
-    background: '#4f46e5',
-    color: '#fff',
-    borderTopRightRadius: 4,
-  },
-  asstBubble: {
-    background: 'rgba(255,255,255,0.07)',
-    color: '#e5e7eb',
-    borderTopLeftRadius: 4,
-    border: '1px solid rgba(255,255,255,0.07)',
-  },
-  typingDots: {
-    display: 'flex',
-    gap: 5,
-  },
-  dot: {
-    display: 'inline-block',
-    width: 6,
-    height: 6,
-    borderRadius: '50%',
-    background: '#818cf8',
-    animation: 'slm-bounce 1.4s infinite ease-in-out',
-  },
-
-  /* error */
-  errorBar: {
-    margin: '0 12px 8px',
-    padding: '10px 14px',
-    background: 'rgba(127,29,29,0.4)',
-    border: '1px solid rgba(239,68,68,0.3)',
-    borderRadius: 12,
-    color: '#fca5a5',
-    fontSize: 13,
-    flexShrink: 0,
-  },
-
-  /* input bar */
-  inputBar: {
-    flexShrink: 0,
-    padding: '12px 12px',
-    paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
-    borderTop: '1px solid rgba(255,255,255,0.08)',
-    background: '#030014',
-  },
-  input: {
-    flex: 1,
-    background: 'rgba(255,255,255,0.06)',
-    border: '1px solid rgba(255,255,255,0.1)',
-    borderRadius: 24,
-    padding: '14px 20px',
-    color: '#fff',
-    fontSize: 16,  // 16px prevents iOS zoom
-    outline: 'none',
-    WebkitAppearance: 'none',
-    appearance: 'none',
-  },
-  sendBtn: {
-    flexShrink: 0,
-    width: 48,
-    height: 48,
-    borderRadius: 16,
-    border: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: '#fff',
-    cursor: 'pointer',
-    transition: 'opacity 0.15s',
-  },
-  sendSpinner: {
-    width: 20,
-    height: 20,
-    border: '2.5px solid rgba(255,255,255,0.3)',
-    borderTopColor: '#fff',
-    borderRadius: '50%',
-    animation: 'slm-spin 0.8s linear infinite',
-  },
 }
