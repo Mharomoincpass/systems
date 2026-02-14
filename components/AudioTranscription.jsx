@@ -29,7 +29,7 @@ export default function AudioTranscription() {
 
     // Validate file size (max 50MB)
     if (file.size > 50 * 1024 * 1024) {
-      setError('Audio file must be smaller than 50MB')
+      setError('Audioo file must be smaller than 50MB')
       return
     }
 
