@@ -4,17 +4,15 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 
 /*
- * ChatInterface — complete rewrite for mobile-first performance.
+ * ChatInterface — mobile-first chat like ChatGPT.
  *
- * Key changes vs previous version:
- *  - NO visualViewport JS listeners (caused jank / re-renders every frame)
- *  - NO transition-[height] (animating height = layout thrash)
- *  - NO backdrop-blur on mobile (GPU-heavy, causes lag on older devices)
- *  - Uses `position:fixed; inset:0` as root → immune to address-bar resize
- *  - Scrolls with scrollTop (instant) during streaming, smooth otherwise
- *  - Input font-size 16px → prevents iOS auto-zoom
- *  - env(safe-area-inset-bottom) for notch phones
- *  - Keyboard dismiss on send (blur) for mobile
+ * Layout approach:
+ *  - height: 100dvh (dynamic viewport — shrinks when iOS keyboard opens)
+ *  - body overflow locked while chat is mounted
+ *  - interactiveWidget=resizes-content in viewport meta for Chrome
+ *  - NO position:fixed (breaks iOS — header scrolls off with keyboard)
+ *  - NO visualViewport JS (causes jank)
+ *  - Keyboard auto-dismisses after send, then scrolls to show response
  */
 
 export default function ChatInterface({ conversationId }) {
@@ -25,6 +23,31 @@ export default function ChatInterface({ conversationId }) {
   const [isLoading, setIsLoading] = useState(true)
   const scrollRef = useRef(null)
   const inputRef = useRef(null)
+
+  // ── lock body scroll while chat is mounted ──
+  useEffect(() => {
+    const html = document.documentElement
+    const body = document.body
+    const prevHtmlOverflow = html.style.overflow
+    const prevBodyOverflow = body.style.overflow
+    const prevBodyPosition = body.style.position
+    const prevBodyWidth = body.style.width
+    const prevBodyHeight = body.style.height
+
+    html.style.overflow = 'hidden'
+    body.style.overflow = 'hidden'
+    body.style.position = 'fixed'
+    body.style.width = '100%'
+    body.style.height = '100%'
+
+    return () => {
+      html.style.overflow = prevHtmlOverflow
+      body.style.overflow = prevBodyOverflow
+      body.style.position = prevBodyPosition
+      body.style.width = prevBodyWidth
+      body.style.height = prevBodyHeight
+    }
+  }, [])
 
   // ── scroll helper ──
   const scrollToBottom = useCallback((instant = false) => {
@@ -56,6 +79,17 @@ export default function ChatInterface({ conversationId }) {
     scrollToBottom(isStreaming)
   }, [messages, scrollToBottom, isStreaming])
 
+  // ── after stream finishes, wait for keyboard dismiss then scroll ──
+  const prevStreaming = useRef(false)
+  useEffect(() => {
+    if (prevStreaming.current && !isStreaming) {
+      // Stream just ended — keyboard may still be closing, wait then scroll
+      const t = setTimeout(() => scrollToBottom(false), 350)
+      return () => clearTimeout(t)
+    }
+    prevStreaming.current = isStreaming
+  }, [isStreaming, scrollToBottom])
+
   // ── send ──
   const handleSend = async (e) => {
     e.preventDefault()
@@ -66,7 +100,9 @@ export default function ChatInterface({ conversationId }) {
     setInput('')
 
     // dismiss keyboard on mobile after sending
-    if ('ontouchstart' in window) inputRef.current?.blur()
+    if ('ontouchstart' in window) {
+      inputRef.current?.blur()
+    }
 
     const userId = `u_${Date.now()}`
     setMessages((prev) => [
@@ -265,14 +301,15 @@ export default function ChatInterface({ conversationId }) {
  * ──────────────────────────────── */
 const styles = {
   root: {
-    position: 'fixed',
-    inset: 0,
     display: 'flex',
     flexDirection: 'column',
+    height: '100dvh',        /* dynamic viewport — resizes with keyboard */
+    height: '100vh',         /* fallback for very old browsers (overridden by dvh above in supporting browsers) */
     background: '#030014',
     color: '#fff',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     overflow: 'hidden',
+    /* no position:fixed — it breaks keyboard handling on iOS Safari */
   },
   spinner: {
     width: 32,
