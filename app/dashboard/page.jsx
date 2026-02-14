@@ -8,6 +8,14 @@ export default function DashboardPage() {
   const router = useRouter()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [editing, setEditing] = useState(false)
+  const [formData, setFormData] = useState({
+    name: '',
+    currentPassword: '',
+    newPassword: '',
+  })
+  const [updateLoading, setUpdateLoading] = useState(false)
+  const [message, setMessage] = useState({ type: '', text: '' })
 
   useEffect(() => {
     fetchUser()
@@ -19,11 +27,48 @@ export default function DashboardPage() {
       if (!response.ok) throw new Error('Failed to fetch user')
       const data = await response.json()
       setUser(data.user)
+      setFormData({ name: data.user.name || '', currentPassword: '', newPassword: '' })
     } catch (error) {
       console.error('Error fetching user:', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault()
+    setUpdateLoading(true)
+    setMessage({ type: '', text: '' })
+
+    try {
+      const response = await fetch('/api/user', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setMessage({ type: 'error', text: data.error || 'Failed to update profile' })
+        return
+      }
+
+      setUser(data.user)
+      setFormData({ name: data.user.name || '', currentPassword: '', newPassword: '' })
+      setMessage({ type: 'success', text: 'Profile updated successfully!' })
+      setEditing(false)
+    } catch (error) {
+      setMessage({ type: 'error', text: 'An error occurred while updating profile' })
+    } finally {
+      setUpdateLoading(false)
+    }
+  }
+
+  const handleCancel = () => {
+    setFormData({ name: user.name || '', currentPassword: '', newPassword: '' })
+    setEditing(false)
+    setMessage({ type: '', text: '' })
   }
 
   const handleLogout = async () => {
@@ -79,28 +124,114 @@ export default function DashboardPage() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="bg-white/5 border border-white/10 rounded-lg p-8">
-          <h2 className="text-xl font-semibold text-white mb-6">Welcome, {user.name || 'User'}!</h2>
-          
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm text-zinc-400">Email</p>
-              <p className="text-lg text-white">{user.email}</p>
-            </div>
-            
-            {user.name && (
-              <div>
-                <p className="text-sm text-zinc-400">Name</p>
-                <p className="text-lg text-white">{user.name}</p>
-              </div>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-white">Welcome, {user.name || 'User'}!</h2>
+            {!editing && (
+              <button
+                onClick={() => setEditing(true)}
+                className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+              >
+                Edit Profile
+              </button>
             )}
-            
-            <div>
-              <p className="text-sm text-zinc-400">Member Since</p>
-              <p className="text-lg text-white">
-                {new Date(user.createdAt).toLocaleDateString()}
-              </p>
-            </div>
           </div>
+
+          {message.text && (
+            <div className={`mb-4 p-3 rounded-lg ${message.type === 'success' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+              {message.text}
+            </div>
+          )}
+          
+          {!editing ? (
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-zinc-400">Email</p>
+                <p className="text-lg text-white">{user.email}</p>
+              </div>
+              
+              {user.name && (
+                <div>
+                  <p className="text-sm text-zinc-400">Name</p>
+                  <p className="text-lg text-white">{user.name}</p>
+                </div>
+              )}
+              
+              <div>
+                <p className="text-sm text-zinc-400">Member Since</p>
+                <p className="text-lg text-white">
+                  {new Date(user.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleUpdateProfile} className="space-y-4">
+              <div>
+                <label className="block text-sm text-zinc-400 mb-2">Email (cannot be changed)</label>
+                <input
+                  type="email"
+                  value={user.email}
+                  disabled
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white opacity-50 cursor-not-allowed"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-zinc-400 mb-2">Name</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Enter your name"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-white/10">
+                <p className="text-sm text-zinc-400 mb-4">Change Password (optional)</p>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm text-zinc-400 mb-2">Current Password</label>
+                    <input
+                      type="password"
+                      value={formData.currentPassword}
+                      onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
+                      className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      placeholder="Enter current password"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm text-zinc-400 mb-2">New Password</label>
+                    <input
+                      type="password"
+                      value={formData.newPassword}
+                      onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
+                      className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      placeholder="Enter new password (min 6 characters)"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="submit"
+                  disabled={updateLoading}
+                  className="px-6 py-3 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {updateLoading ? 'Saving...' : 'Save Changes'}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="px-6 py-3 rounded-lg bg-white/5 text-white hover:bg-white/10 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
         </div>
       </div>
     </div>
