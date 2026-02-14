@@ -1,4 +1,3 @@
-import { NextRequest } from 'next/server'
 import { z } from 'zod'
 import connectDB from '@/lib/mongodb'
 import User from '@/models/User'
@@ -11,7 +10,7 @@ const registerSchema = z.object({
   name: z.string().optional(),
 })
 
-export async function POST(request: NextRequest) {
+export async function POST(request) {
   try {
     await connectDB()
     

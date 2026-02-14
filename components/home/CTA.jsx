@@ -9,7 +9,7 @@ import MagneticButton from '../MagneticButton'
 gsap.registerPlugin(ScrollTrigger)
 
 export default function CTA() {
-  const container = useRef<HTMLDivElement>(null)
+  const container = useRef(null)
 
   return (
     <section ref={container} className="relative min-h-[80vh] flex flex-col items-center justify-center bg-black overflow-hidden border-t border-white/10">
@@ -26,7 +26,7 @@ export default function CTA() {
                 </a>
             </MagneticButton>
             <MagneticButton>
-                <a href="https://linkedin.com/in/mharomo-ezung-51b158191" target="_blank" className="px-12 py-5 border border-white/20 text-white text-lg font-bold rounded-sm hover:bg-white hover:text-black hover:border-transparent transition-all duration-300">
+                <a href="https://linkedin.com/in/mharomo-ezung-51b158191" target="_blank" rel="noopener noreferrer" className="px-12 py-5 border border-white/20 text-white text-lg font-bold rounded-sm hover:bg-white hover:text-black hover:border-transparent transition-all duration-300">
                     Connect
                 </a>
             </MagneticButton>

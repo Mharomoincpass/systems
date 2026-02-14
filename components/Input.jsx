@@ -1,18 +1,12 @@
 import React from 'react'
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string
-  helperText?: string
-  error?: string
-}
-
 export function Input({
   label,
   helperText,
   error,
   className = '',
   ...props
-}: InputProps) {
+}) {
   return (
     <div className="w-full">
       {label && (

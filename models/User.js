@@ -1,14 +1,6 @@
-import mongoose, { Model, Schema } from 'mongoose'
+import mongoose, { Schema } from 'mongoose'
 
-export interface IUser {
-  email: string
-  name?: string
-  password: string
-  createdAt?: Date
-  updatedAt?: Date
-}
-
-const UserSchema = new Schema<IUser>(
+const UserSchema = new Schema(
   {
     email: {
       type: String,
@@ -33,7 +25,6 @@ const UserSchema = new Schema<IUser>(
 )
 
 // Prevent model recompilation in Next.js development
-const User: Model<IUser> = 
-  mongoose.models.User || mongoose.model<IUser>('User', UserSchema)
+const User = mongoose.models.User || mongoose.model('User', UserSchema)
 
 export default User

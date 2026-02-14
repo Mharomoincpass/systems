@@ -1,4 +1,3 @@
-
 import { Navbar } from '@/components/Navbar'
 import SmoothScroll from '@/components/SmoothScroll'
 import CustomCursor from '@/components/CustomCursor'

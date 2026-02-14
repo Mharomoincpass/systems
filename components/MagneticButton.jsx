@@ -3,18 +3,13 @@
 import { useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 
-interface MagneticButtonProps {
-  children: React.ReactNode
-  className?: string
-}
-
-export default function MagneticButton({ children, className = '' }: MagneticButtonProps) {
-  const ref = useRef<HTMLDivElement>(null)
+export default function MagneticButton({ children, className = '' }) {
+  const ref = useRef(null)
   const [position, setPosition] = useState({ x: 0, y: 0 })
 
-  const handleMouse = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouse = (e) => {
     const { clientX, clientY } = e
-    const { width, height, left, top } = ref.current!.getBoundingClientRect()
+    const { width, height, left, top } = ref.current.getBoundingClientRect()
     const x = clientX - (left + width / 2)
     const y = clientY - (top + height / 2)
     setPosition({ x, y })

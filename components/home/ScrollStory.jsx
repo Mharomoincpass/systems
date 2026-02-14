@@ -8,8 +8,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 gsap.registerPlugin(ScrollTrigger)
 
 export default function ScrollStory() {
-  const container = useRef<HTMLDivElement>(null)
-  const storyRef = useRef<HTMLDivElement>(null)
+  const container = useRef(null)
+  const storyRef = useRef(null)
 
   useGSAP(() => {
     const sections = gsap.utils.toArray('.story-section')
@@ -25,7 +25,7 @@ export default function ScrollStory() {
       }
     })
 
-    sections.forEach((section: any, i) => {
+    sections.forEach((section, i) => {
         if (i === 0) return // Skip first section
         
         tl.fromTo(section, 
@@ -33,7 +33,7 @@ export default function ScrollStory() {
             { opacity: 1, scale: 1, z: 0, duration: 1, ease: "power2.inOut" }
         )
         // Fade out previous
-        .to(sections[i-1] as gsap.TweenTarget, 
+        .to(sections[i-1], 
             { opacity: 0, scale: 1.2, filter: "blur(10px)", duration: 0.5 }, 
             "<"
         )

@@ -1,6 +1,10 @@
 {
     "chat.tools.terminal.autoApprove": {
         "npm install": true,
-        "Move-Item": true
+        "Move-Item": true,
+        "/^Get-ChildItem -Path \\. -Exclude node_modules,\\.next,\\.git -Directory \\| ForEach-Object \\{ \"\\$\\(\\$_\\.Name\\)/\"; Get-ChildItem -Path \\$_\\.FullName \\| ForEach-Object \\{ \"  \\$\\(\\$_\\.Name\\)\" \\} \\}$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
     }
 }

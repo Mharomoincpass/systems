@@ -36,17 +36,17 @@ const products = [
 ]
 
 export default function Showcase() {
-  const container = useRef<HTMLDivElement>(null)
+  const container = useRef(null)
 
   useGSAP(() => {
     const panels = gsap.utils.toArray('.project-panel')
     
-    panels.forEach((panel: any, i) => {
+    panels.forEach((panel, i) => {
       const images = gsap.utils.toArray('.project-img-card', panel)
       
       // Set initial states for all images
       gsap.set(images, { opacity: 0, scale: 0.9 })
-      gsap.set(images[0] as gsap.TweenTarget, { opacity: 1, scale: 1 }) // First image visible
+      gsap.set(images[0], { opacity: 1, scale: 1 }) // First image visible
       
       // Create a timeline for this project's images
       const tl = gsap.timeline({
@@ -62,10 +62,10 @@ export default function Showcase() {
       })
 
       // Animate images one by one
-      images.forEach((img: any, idx) => {
+      images.forEach((img, idx) => {
         if (idx === 0) return // Skip first (already visible)
         
-        tl.to(images[idx - 1] as gsap.TweenTarget, 
+        tl.to(images[idx - 1], 
           { opacity: 0, scale: 1.1, duration: 0.5 },
           "+=0.5"
         )
@@ -98,39 +98,39 @@ export default function Showcase() {
                 {product.images.map((img, idx) => (
                   <div 
                     key={idx} 
-                    className="project-img-card absolute inset-0 rounded-sm overflow-hidden border border-white/10"
+                    className="project-img-card absolute inset-0 rounded-lg overflow-hidden border border-white/10"
                   >
-                    <Image 
-                      src={img} 
-                      alt={`${product.name} screenshot ${idx + 1}`}
+                    <Image
+                      src={img}
+                      alt={`${product.name} - ${idx}`}
                       fill
-                      className="object-contain bg-zinc-900/50"
-                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      className="object-cover"
                     />
                   </div>
-                  ))}
-                </div>
-                
-                {/* Project Info */}
-                <div className={`project-info ${i % 2 === 1 ? 'lg:order-1 lg:text-right' : ''}`}>
-                  <div className="project-info-content space-y-8">
-                    <span className="inline-block px-3 py-1 border border-white/20 text-white text-xs tracking-widest uppercase">
-                      {product.category}
-                    </span>
-                    <h3 className="text-5xl md:text-7xl font-bold text-white">
-                      {product.name}
-                    </h3>
-                    <p className="text-xl text-zinc-500 leading-relaxed">
-                      {product.desc}
-                    </p>
-                    <a href={product.url} target="_blank" rel="noopener noreferrer" className="group/btn relative inline-flex items-center gap-2 text-white font-semibold tracking-wide hover:text-zinc-300 transition-colors">
-                      <span>Visit Website</span>
-                      <span className="w-8 h-px bg-white group-hover/btn:w-12 transition-all"></span>
-                    </a>
-                  </div>
-                </div>
-                
+                ))}
               </div>
+
+              {/* Text Content */}
+              <div className={`${i % 2 === 1 ? 'lg:order-1' : ''}`}>
+                <h3 className="text-5xl md:text-6xl font-bold text-white mb-4">
+                  {product.name}
+                </h3>
+                <p className="text-sm uppercase tracking-widest text-zinc-500 mb-6">
+                  {product.category}
+                </p>
+                <p className="text-lg text-zinc-400 leading-relaxed mb-8">
+                  {product.desc}
+                </p>
+                <a
+                  href={product.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block px-8 py-3 border border-white/20 text-white hover:bg-white hover:text-black transition-all duration-300"
+                >
+                  View Project →
+                </a>
+              </div>
+            </div>
           </div>
         ))}
       </div>

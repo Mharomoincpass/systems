@@ -1,9 +1,8 @@
-import { NextRequest } from 'next/server'
 import connectDB from '@/lib/mongodb'
 import User from '@/models/User'
 import { getAuthUser } from '@/lib/auth-helpers'
 
-export async function GET(request: NextRequest) {
+export async function GET(request) {
   try {
     await connectDB()
     

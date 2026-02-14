@@ -3,18 +3,13 @@
 import { useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 
-interface TiltCardProps {
-  children: React.ReactNode
-  className?: string
-}
-
-export default function TiltCard({ children, className = '' }: TiltCardProps) {
-  const ref = useRef<HTMLDivElement>(null)
+export default function TiltCard({ children, className = '' }) {
+  const ref = useRef(null)
   const [rotateX, setRotateX] = useState(0)
   const [rotateY, setRotateY] = useState(0)
   const [isHovering, setIsHovering] = useState(false)
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = (e) => {
     if (!ref.current) return
     const rect = ref.current.getBoundingClientRect()
     const x = e.clientX - rect.left

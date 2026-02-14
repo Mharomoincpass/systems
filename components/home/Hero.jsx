@@ -8,9 +8,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 gsap.registerPlugin(ScrollTrigger)
 
 export default function Hero() {
-  const container = useRef<HTMLDivElement>(null)
-  const textRef = useRef<HTMLDivElement>(null)
-  const bgRef = useRef<HTMLDivElement>(null)
+  const container = useRef(null)
+  const textRef = useRef(null)
+  const bgRef = useRef(null)
 
   useGSAP(() => {
     const tl = gsap.timeline()

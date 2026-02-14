@@ -3,19 +3,12 @@
 import { useEffect, useRef } from 'react'
 import { motion, useInView, useAnimation } from 'framer-motion'
 
-interface ScrollRevealProps {
-  children: React.ReactNode
-  className?: string
-  delay?: number
-  direction?: 'up' | 'down' | 'left' | 'right'
-}
-
 export default function ScrollReveal({
   children,
   className = '',
   delay = 0,
   direction = 'up',
-}: ScrollRevealProps) {
+}) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-100px' })
   const controls = useAnimation()

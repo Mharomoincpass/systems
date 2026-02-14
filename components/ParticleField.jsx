@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 
 export function ParticleField() {
-  const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; size: number; duration: number; delay: number }>>([])
+  const [particles, setParticles] = useState([])
 
   useEffect(() => {
     const generated = Array.from({ length: 50 }, (_, i) => ({

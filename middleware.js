@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
 import { verifyToken } from './lib/auth'
 
 // Paths that require authentication
@@ -8,7 +7,7 @@ const protectedPaths = ['/dashboard', '/profile']
 // Paths that should redirect authenticated users
 const authPaths = ['/login', '/register']
 
-export function middleware(request: NextRequest) {
+export function middleware(request) {
   const token = request.cookies.get('token')?.value
   const { pathname } = request.nextUrl
 

@@ -29,29 +29,6 @@ export function Navbar() {
             Mharomo<span className="text-zinc-600 text-sm">.systems</span>
           </span>
         </Link>
-
-        {/* <div className="hidden md:flex items-center gap-8">
-          <a href="#about" className="text-sm text-zinc-500 hover:text-white transition-colors duration-300">About</a>
-          <a href="#products" className="text-sm text-zinc-500 hover:text-white transition-colors duration-300">Products</a>
-          <a href="#skills" className="text-sm text-zinc-500 hover:text-white transition-colors duration-300">Skills</a>
-          <a href="#experience" className="text-sm text-zinc-500 hover:text-white transition-colors duration-300">Experience</a>
-          <a href="#contact" className="text-sm text-zinc-500 hover:text-white transition-colors duration-300">Contact</a>
-        </div> 
-        
-        <div className="flex items-center gap-3">
-          <Link
-            href="/login"
-            className="px-4 py-2 text-sm text-zinc-500 hover:text-white transition-colors duration-300"
-          >
-            Sign in
-          </Link>
-          <Link
-            href="/register"
-            className="px-5 py-2.5 text-sm border border-white/20 text-white hover:bg-white hover:text-black transition-all duration-300"
-          >
-            Get started
-          </Link>
-        </div> */}
       </div>
     </nav>
   )

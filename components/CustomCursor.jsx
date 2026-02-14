@@ -8,10 +8,10 @@ export default function CustomCursor() {
   const [isPointer, setIsPointer] = useState(false)
 
   useEffect(() => {
-    const mouseMove = (e: MouseEvent) => {
+    const mouseMove = (e) => {
       setMousePosition({ x: e.clientX, y: e.clientY })
 
-      const target = e.target as HTMLElement
+      const target = e.target
       setIsPointer(
         window.getComputedStyle(target).cursor === 'pointer' ||
         target.tagName === 'BUTTON' ||
@@ -48,9 +48,9 @@ export default function CustomCursor() {
         }}
         transition={{
           type: 'spring',
-          stiffness: 150,
-          damping: 20,
-          mass: 0.6,
+          stiffness: 400,
+          damping: 30,
+          mass: 0.5,
         }}
       />
     </>
