@@ -1,27 +1,34 @@
 import { NextResponse } from 'next/server'
-import { verifyToken } from './lib/auth'
 
-// Paths that require authentication
-const protectedPaths = ['/dashboard', '/profile']
+// Paths that require session authentication
+const sessionProtectedPaths = ['/systems']
 
-// Paths that should redirect authenticated users
-const authPaths = ['/login', '/register']
+// Paths that require admin authentication
+const adminProtectedPaths = ['/monitor']
 
 export function middleware(request) {
-  const token = request.cookies.get('token')?.value
+  const sessionToken = request.cookies.get('sessionToken')?.value
+  const adminToken = request.cookies.get('adminToken')?.value
   const { pathname } = request.nextUrl
 
-  // Check if user is authenticated
-  const user = token ? verifyToken(token) : null
+  console.log(`🚦 Middleware: ${request.method} ${pathname}`)
 
-  // Redirect authenticated users away from auth pages
-  if (user && authPaths.some((path) => pathname.startsWith(path))) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+  // Protect admin routes
+  if (adminProtectedPaths.some((path) => pathname.startsWith(path))) {
+    if (!adminToken) {
+      console.log(`   ❌ No admin token for monitor, redirecting to /admin`)
+      return NextResponse.redirect(new URL('/admin', request.url))
+    }
+    console.log(`   ✅ Admin token present`)
   }
 
-  // Redirect unauthenticated users from protected pages
-  if (!user && protectedPaths.some((path) => pathname.startsWith(path))) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  // Protect session routes
+  if (sessionProtectedPaths.some((path) => pathname.startsWith(path))) {
+    if (!sessionToken) {
+      console.log(`   ❌ No session token for systems, redirecting to /`)
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+    console.log(`   ✅ Session token present`)
   }
 
   return NextResponse.next()
