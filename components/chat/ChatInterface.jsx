@@ -13,29 +13,46 @@ export default function ChatInterface({ conversationId }) {
   const inputRef = useRef(null)
   const containerRef = useRef(null)
 
-  // Dynamically set container height based on visualViewport (iOS keyboard fix)
+  // Dynamically set container height and position based on visualViewport (iOS keyboard fix)
   useEffect(() => {
-    const setHeight = () => {
-      const vh = window.visualViewport?.height ?? window.innerHeight
-      if (containerRef.current) {
-        containerRef.current.style.height = `${vh}px`
-      }
+    const updateLayout = () => {
+      const vv = window.visualViewport
+      if (!vv || !containerRef.current) return
+
+      // Force window to top — prevents iOS from scrolling the page behind the keyboard
+      window.scrollTo(0, 0)
+
+      // Set container height to exactly the visible viewport
+      containerRef.current.style.height = `${vv.height}px`
+
+      // Offset the container to match where the visual viewport actually is
+      // This eliminates the gap between the input and the keyboard
+      containerRef.current.style.top = `${vv.offsetTop}px`
     }
 
-    setHeight()
+    const fallbackUpdate = () => {
+      if (!containerRef.current) return
+      window.scrollTo(0, 0)
+      containerRef.current.style.height = `${window.innerHeight}px`
+      containerRef.current.style.top = '0px'
+    }
 
     if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', setHeight)
-      window.visualViewport.addEventListener('scroll', setHeight)
+      updateLayout()
+      window.visualViewport.addEventListener('resize', updateLayout)
+      window.visualViewport.addEventListener('scroll', updateLayout)
+    } else {
+      fallbackUpdate()
+      window.addEventListener('resize', fallbackUpdate)
     }
-    window.addEventListener('resize', setHeight)
 
     return () => {
       if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', setHeight)
-        window.visualViewport.removeEventListener('scroll', setHeight)
+        window.visualViewport.removeEventListener('resize', updateLayout)
+        window.visualViewport.removeEventListener('scroll', updateLayout)
+      } else {
+        window.removeEventListener('resize', fallbackUpdate)
       }
-      window.removeEventListener('resize', setHeight)
     }
   }, [])
 
