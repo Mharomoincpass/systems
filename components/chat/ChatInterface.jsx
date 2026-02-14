@@ -24,28 +24,19 @@ export default function ChatInterface({ conversationId }) {
   const scrollRef = useRef(null)
   const inputRef = useRef(null)
 
-  // ── lock body scroll while chat is mounted ──
+  // ── lock body scroll while chat is mounted (no position:fixed — it kills keyboard on iOS) ──
   useEffect(() => {
     const html = document.documentElement
     const body = document.body
-    const prevHtmlOverflow = html.style.overflow
-    const prevBodyOverflow = body.style.overflow
-    const prevBodyPosition = body.style.position
-    const prevBodyWidth = body.style.width
-    const prevBodyHeight = body.style.height
+    const prevHtml = html.style.overflow
+    const prevBody = body.style.overflow
 
     html.style.overflow = 'hidden'
     body.style.overflow = 'hidden'
-    body.style.position = 'fixed'
-    body.style.width = '100%'
-    body.style.height = '100%'
 
     return () => {
-      html.style.overflow = prevHtmlOverflow
-      body.style.overflow = prevBodyOverflow
-      body.style.position = prevBodyPosition
-      body.style.width = prevBodyWidth
-      body.style.height = prevBodyHeight
+      html.style.overflow = prevHtml
+      body.style.overflow = prevBody
     }
   }, [])
 
