@@ -11,21 +11,46 @@ export default function ChatInterface({ conversationId }) {
   const [isLoading, setIsLoading] = useState(true)
   const scrollRef = useRef(null)
   const inputRef = useRef(null)
-  
-  // Lock body scroll to prevent background scrolling (mobile only)
+  const containerRef = useRef(null)
+
+  // Dynamically set container height based on visualViewport (iOS keyboard fix)
   useEffect(() => {
+    const setHeight = () => {
+      const vh = window.visualViewport?.height ?? window.innerHeight
+      if (containerRef.current) {
+        containerRef.current.style.height = `${vh}px`
+      }
+    }
+
+    setHeight()
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', setHeight)
+      window.visualViewport.addEventListener('scroll', setHeight)
+    }
+    window.addEventListener('resize', setHeight)
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', setHeight)
+        window.visualViewport.removeEventListener('scroll', setHeight)
+      }
+      window.removeEventListener('resize', setHeight)
+    }
+  }, [])
+
+  // Lock body scroll to prevent background scrolling (mobile only)
+  // DO NOT use position:fixed on body — it breaks input visibility on iOS
+  useEffect(() => {
+    if (typeof window === 'undefined') return
     if (window.innerWidth >= 768) return
-    // Lock both html and body to be safe on iOS
+
     document.documentElement.style.overflow = 'hidden'
     document.body.style.overflow = 'hidden'
-    document.body.style.position = 'fixed' // This sometimes helps lock it in place, but can be risky. Let's try just overflow first.
-    document.body.style.width = '100%'
-    
+
     return () => {
       document.documentElement.style.overflow = ''
       document.body.style.overflow = ''
-      document.body.style.position = ''
-      document.body.style.width = ''
     }
   }, [])
 
@@ -45,7 +70,7 @@ export default function ChatInterface({ conversationId }) {
     if (!conversationId) return
     let cancelled = false
     setIsLoading(true)
-    
+
     fetch(`/api/chat/messages?conversationId=${conversationId}`)
       .then((r) => r.json())
       .then((data) => {
@@ -54,10 +79,10 @@ export default function ChatInterface({ conversationId }) {
         }
       })
       .catch((err) => console.error('Load messages failed:', err))
-      .finally(() => { 
-        if (!cancelled) setIsLoading(false) 
+      .finally(() => {
+        if (!cancelled) setIsLoading(false)
       })
-      
+
     return () => { cancelled = true }
   }, [conversationId])
 
@@ -155,8 +180,10 @@ export default function ChatInterface({ conversationId }) {
   }
 
   return (
-    <div 
-      className="flex flex-col w-full h-screen h-[100dvh] bg-[#030014] text-white font-sans overflow-hidden md:h-screen"
+    <div
+      ref={containerRef}
+      className="fixed inset-x-0 top-0 flex flex-col bg-[#030014] text-white font-sans overflow-hidden"
+      style={{ height: '100dvh' }}
     >
       {/* Header */}
       <div className="shrink-0 bg-[#030014] border-b border-white/10 z-10">
@@ -172,7 +199,7 @@ export default function ChatInterface({ conversationId }) {
               <span className="font-bold text-lg">SLM Chat</span>
             </div>
           </div>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="px-3 py-1.5 text-xs font-medium text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 rounded-lg active:scale-95 transition-transform"
           >
@@ -182,9 +209,10 @@ export default function ChatInterface({ conversationId }) {
       </div>
 
       {/* Messages */}
-      <div 
-        ref={scrollRef} 
+      <div
+        ref={scrollRef}
         className="flex-1 overflow-y-auto px-4 py-4 overscroll-contain"
+        style={{ WebkitOverflowScrolling: 'touch' }}
       >
         <div className="max-w-3xl mx-auto w-full space-y-4">
           {messages.length === 0 ? (
@@ -206,8 +234,8 @@ export default function ChatInterface({ conversationId }) {
                 <div
                   onClick={() => copy(msg.content)}
                   className={`max-w-[88%] px-4 py-3 rounded-2xl text-[15px] leading-relaxed break-words whitespace-pre-wrap shadow-sm ${
-                    msg.role === 'user' 
-                      ? 'bg-indigo-600 text-white rounded-tr-sm' 
+                    msg.role === 'user'
+                      ? 'bg-indigo-600 text-white rounded-tr-sm'
                       : 'bg-white/5 text-gray-200 border border-white/5 rounded-tl-sm'
                   }`}
                 >
@@ -251,8 +279,8 @@ export default function ChatInterface({ conversationId }) {
             type="submit"
             disabled={isStreaming || !input.trim()}
             className={`shrink-0 w-12 h-12 flex items-center justify-center rounded-2xl transition-all ${
-              isStreaming || !input.trim() 
-                ? 'bg-gray-800 text-gray-500 opacity-50 cursor-not-allowed' 
+              isStreaming || !input.trim()
+                ? 'bg-gray-800 text-gray-500 opacity-50 cursor-not-allowed'
                 : 'bg-indigo-600 text-white active:scale-95 shadow-lg shadow-indigo-600/20'
             }`}
           >
