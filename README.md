@@ -112,8 +112,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### API Endpoints
 
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Login user
 - `POST /api/auth/logout` - Logout user
 - `GET /api/user` - Get current user (protected)
 

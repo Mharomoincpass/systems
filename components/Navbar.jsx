@@ -20,13 +20,13 @@ export function Navbar() {
           : 'bg-transparent border-transparent'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative w-10 h-10 border border-white/20 flex items-center justify-center bg-black group-hover:bg-white transition-colors duration-500 overflow-hidden">
-            <span className="relative z-10 text-white font-bold text-lg group-hover:text-black transition-colors duration-500">M</span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
+          <div className="relative w-8 h-8 sm:w-10 sm:h-10 border border-white/20 flex items-center justify-center bg-black group-hover:bg-white transition-colors duration-500 overflow-hidden">
+            <span className="relative z-10 text-white text-sm sm:text-lg font-bold group-hover:text-black transition-colors duration-500">M</span>
           </div>
-          <span className="text-white font-bold text-xl tracking-tight">
-            Mharomo<span className="text-zinc-600 text-sm">.systems</span>
+          <span className="text-white font-bold text-sm sm:text-xl tracking-tight">
+            Mharomo<span className="text-zinc-600 text-xs sm:text-sm">.systems</span>
           </span>
         </Link>
       </div>
