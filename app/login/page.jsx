@@ -39,28 +39,31 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-[#030014] overflow-hidden">
+    <div className="relative min-h-screen flex items-center justify-center bg-black overflow-hidden">
+      {/* Noise texture overlay */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+      
       {/* Background effects */}
-      <div className="absolute inset-0 bg-grid" />
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-indigo-600/10 rounded-full blur-[128px]" />
-      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-purple-600/10 rounded-full blur-[128px]" />
+      <div className="absolute inset-0 bg-grid opacity-5" />
+      <div className="absolute top-1/4 -left-32 w-64 sm:w-96 h-64 sm:h-96 bg-white/5 rounded-full blur-[128px]" />
+      <div className="absolute bottom-1/4 -right-32 w-64 sm:w-96 h-64 sm:h-96 bg-white/5 rounded-full blur-[128px]" />
 
-      <div className="relative z-10 w-full max-w-md px-6">
+      <div className="relative z-10 w-full max-w-sm sm:max-w-md px-4 sm:px-6">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Mharomo</h1>
-          <p className="text-zinc-400">Sign in to your account</p>
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">Mharomo</h1>
+          <p className="text-sm sm:text-base text-gray-400">Sign in to your account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+            <div className="p-3 sm:p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs sm:text-sm transition-all duration-300">
               {error}
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-zinc-200 mb-2">
+            <label className="block text-xs sm:text-sm font-medium text-white mb-2 transition-all duration-300">
               Email
             </label>
             <input
@@ -68,13 +71,13 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-zinc-500 focus:outline-none focus:border-indigo-500/50 transition-colors"
+              className="w-full px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-gray-500 focus:outline-none focus:border-white/20 focus:bg-white/[0.08] transition-all duration-300"
               placeholder="your@email.com"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-zinc-200 mb-2">
+            <label className="block text-xs sm:text-sm font-medium text-white mb-2 transition-all duration-300">
               Password
             </label>
             <input
@@ -82,7 +85,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-zinc-500 focus:outline-none focus:border-indigo-500/50 transition-colors"
+              className="w-full px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-gray-500 focus:outline-none focus:border-white/20 focus:bg-white/[0.08] transition-all duration-300"
               placeholder="••••••••"
             />
           </div>
@@ -90,16 +93,16 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl bg-white text-black font-semibold hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-white/20 hover:shadow-white/30 text-sm sm:text-base"
           >
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-zinc-400 text-sm">
+          <p className="text-gray-400 text-xs sm:text-sm transition-all duration-300">
             Don&apos;t have an account?{' '}
-            <Link href="/register" className="text-indigo-400 hover:text-indigo-300 font-medium">
+            <Link href="/register" className="text-white hover:text-gray-200 font-semibold transition-colors duration-300">
               Create one
             </Link>
           </p>

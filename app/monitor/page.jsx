@@ -86,18 +86,21 @@ export default function MonitorPage() {
 
   return (
     <div className="min-h-screen bg-[#030014] text-white p-4 sm:p-6 md:p-8">
-      <div className="max-w-7xl mx-auto">
+      {/* Noise texture overlay */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+      
+      <div className="max-w-7xl mx-auto relative z-10">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
           <div className="flex items-center gap-4">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Session Monitor</h1>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">Session Monitor</h1>
             <button 
               onClick={handleLogout}
-              className="px-3 py-1 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold rounded-lg hover:bg-red-500/20 transition-all uppercase tracking-wider"
+              className="px-3 py-1.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold rounded-lg hover:bg-red-500/20 hover:scale-105 transition-all duration-300 uppercase tracking-wider"
             >
               Logout
             </button>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-400 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
+          <div className="flex items-center gap-2 text-sm text-gray-400 bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
             <span>Live · Auto-refresh 5s</span>
           </div>
@@ -106,28 +109,28 @@ export default function MonitorPage() {
         {/* Numbered Stats + Search */}
         <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-6 mb-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent p-4">
+            <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent backdrop-blur-sm p-4 transition-all duration-300 hover:border-white/20 hover:scale-[1.02]">
               <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.3em] text-gray-500">
                 <span>01</span>
                 <span>Total</span>
               </div>
               <div className="mt-3 text-3xl font-semibold text-white">{sessions.length}</div>
             </div>
-            <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-b from-emerald-500/10 to-transparent p-4">
+            <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-b from-emerald-500/10 to-transparent backdrop-blur-sm p-4 transition-all duration-300 hover:border-emerald-500/30 hover:scale-[1.02]">
               <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.3em] text-emerald-300/80">
                 <span>02</span>
                 <span>Active</span>
               </div>
               <div className="mt-3 text-3xl font-semibold text-emerald-300">{activeCount}</div>
             </div>
-            <div className="rounded-2xl border border-rose-500/20 bg-gradient-to-b from-rose-500/10 to-transparent p-4">
+            <div className="rounded-2xl border border-rose-500/20 bg-gradient-to-b from-rose-500/10 to-transparent backdrop-blur-sm p-4 transition-all duration-300 hover:border-rose-500/30 hover:scale-[1.02]">
               <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.3em] text-rose-300/80">
                 <span>03</span>
                 <span>Inactive</span>
               </div>
               <div className="mt-3 text-3xl font-semibold text-rose-300">{inactiveCount}</div>
             </div>
-            <div className="rounded-2xl border border-indigo-500/20 bg-gradient-to-b from-indigo-500/10 to-transparent p-4">
+            <div className="rounded-2xl border border-indigo-500/20 bg-gradient-to-b from-indigo-500/10 to-transparent backdrop-blur-sm p-4 transition-all duration-300 hover:border-indigo-500/30 hover:scale-[1.02]">
               <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.3em] text-indigo-300/80">
                 <span>04</span>
                 <span>Matched</span>
@@ -136,9 +139,9 @@ export default function MonitorPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-transparent p-4">
+          <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-transparent backdrop-blur-sm p-4 transition-all duration-300 hover:border-white/20">
             <div className="text-xs uppercase tracking-[0.25em] text-gray-500">Filter</div>
-            <label className="mt-3 flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-3 py-2.5">
+            <label className="mt-3 flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 backdrop-blur-sm px-3 py-2.5 transition-all duration-300 hover:border-white/20">
               <svg className="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -159,7 +162,7 @@ export default function MonitorPage() {
           {filteredSessions.map((session) => {
             const active = isSessionActive(session.lastAccessed)
             return (
-              <div key={session._id} className={`border rounded-lg p-4 transition-all ${active ? 'bg-white/5 border-green-500/30' : 'bg-white/5 border-red-500/30'}`}>
+              <div key={session._id} className={`border rounded-xl p-4 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] ${active ? 'bg-white/5 border-green-500/30 hover:border-green-500/40' : 'bg-white/5 border-red-500/30 hover:border-red-500/40'}`}>
                 <div className="flex justify-between items-start mb-2">
                   <p className="text-sm font-mono text-indigo-300">{session.ip}</p>
                   <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
@@ -185,7 +188,7 @@ export default function MonitorPage() {
         </div>
 
         {/* Desktop table view */}
-        <div className="hidden md:block overflow-hidden bg-white/5 border border-white/10 rounded-xl backdrop-blur-sm">
+        <div className="hidden md:block overflow-hidden bg-white/5 border border-white/10 rounded-2xl backdrop-blur-xl transition-all duration-300 hover:border-white/20">
           <table className="w-full text-sm text-left">
             <thead className="bg-white/5 border-b border-white/10">
               <tr>
@@ -201,7 +204,7 @@ export default function MonitorPage() {
               {filteredSessions.map((session) => {
                 const active = isSessionActive(session.lastAccessed)
                 return (
-                  <tr key={session._id} className={`group transition-colors ${active ? 'hover:bg-green-500/5' : 'hover:bg-red-500/5'}`}>
+                  <tr key={session._id} className={`group transition-all duration-300 ${active ? 'hover:bg-green-500/5' : 'hover:bg-red-500/5'}`}>
                     <td className="px-6 py-4 font-mono text-indigo-300/80 group-hover:text-indigo-300 transition-colors">{session.ip}</td>
                     <td className="px-6 py-4">
                       {session.location ? (
@@ -247,12 +250,12 @@ export default function MonitorPage() {
         </div>
 
         {filteredSessions.length === 0 && (
-          <div className="text-center py-20 bg-white/5 border border-white/10 rounded-xl mt-4">
+          <div className="text-center py-20 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl mt-4">
             <svg className="mx-auto h-12 w-12 text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <p className="text-gray-400 text-lg">No sessions match your search</p>
-            <button onClick={() => setSearchTerm('')} className="mt-2 text-indigo-400 hover:text-indigo-300 underline text-sm">Clear search</button>
+            <button onClick={() => setSearchTerm('')} className="mt-2 text-indigo-400 hover:text-indigo-300 underline text-sm transition-all duration-300 hover:scale-105">Clear search</button>
           </div>
         )}
       </div>

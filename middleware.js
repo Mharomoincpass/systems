@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 // Paths that require session authentication
-const sessionProtectedPaths = ['/systems']
+const sessionProtectedPaths = ['/agents']
 
 // Paths that require admin authentication
 const adminProtectedPaths = ['/monitor']
