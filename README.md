@@ -70,8 +70,14 @@ MONGODB_URI="mongodb://localhost:27017/myapp"
 # OR MongoDB Atlas (cloud):
 # MONGODB_URI="mongodb+srv://username:password@cluster.mongodb.net/myapp"
 
-# JWT Secret (generate a strong random string)
+# JWT Secret (REQUIRED - generate a strong random string)
+# Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 JWT_SECRET="your-secret-key-change-this-in-production"
+
+# Admin Password Hash (REQUIRED - bcrypt hash of your admin password)
+# Generate with: node -e "console.log(require('bcryptjs').hashSync('YOUR_STRONG_PASSWORD', 12))"
+# Replace 'YOUR_STRONG_PASSWORD' with a strong password of your choice
+ADMIN_PASSWORD="$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIRSLbUkoi"
 
 # Node Environment
 NODE_ENV="development"
@@ -79,6 +85,13 @@ NODE_ENV="development"
 # App URL
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 ```
+
+**⚠️ IMPORTANT SECURITY NOTES:**
+- The `JWT_SECRET` is **REQUIRED** and must be set to a strong random value in production
+- The `ADMIN_PASSWORD` is **REQUIRED** and must be a bcrypt hash, not a plain text password
+- Never commit your actual `.env` file to version control
+- Use strong, unique values for all secrets in production
+
 
 ### 3. Set Up MongoDB
 
