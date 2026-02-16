@@ -8,7 +8,7 @@ export default function DocumentationPage() {
   const router = useRouter()
 
   const systems = [
-    { id: 'slm', name: 'Multi Chat Models', desc: 'Conversational AI assistant', path: '/systems/documentation/slm' },
+    { id: 'mcm', name: 'Multi Chat Models', desc: 'Conversational AI assistant', path: '/systems/documentation/mcm' },
     { id: 'images', name: 'Image Generation', desc: 'Text-to-image with affordable models', path: '/systems/documentation/images' },
     { id: 'videos', name: 'Video Generation', desc: 'Text-to-video with Grok', path: '/systems/documentation/videos' },
     { id: 'music', name: 'Music Generation', desc: 'Royalty-free music from text', path: '/systems/documentation/music' },

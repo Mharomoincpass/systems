@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Script from 'next/script'
 import ChatInterface from '@/components/chat/ChatInterface'
 
-export default function SLMPage() {
+export default function MCMPage() {
   const [conversationId, setConversationId] = useState(null)
   const [isInitializing, setIsInitializing] = useState(true)
 

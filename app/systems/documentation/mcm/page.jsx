@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import Script from 'next/script'
 
-export default function SLMDocPage() {
+export default function MCMDocPage() {
   const router = useRouter()
 
   return (
@@ -114,7 +114,7 @@ export default function SLMDocPage() {
         <section className="bg-blue-50 border border-blue-200 rounded-lg p-8 text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">Ready to Chat?</h2>
           <p className="text-gray-700 mb-6">Start a conversation with one of our AI models now.</p>
-          <button onClick={() => router.push('/SLM')} className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
+          <button onClick={() => router.push('/MCM')} className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
             Launch Multi Chat Models
           </button>
         </section>

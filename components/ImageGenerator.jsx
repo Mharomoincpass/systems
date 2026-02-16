@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
@@ -246,10 +247,13 @@ export default function ImageGenerator() {
             {generatedImage ? (
               <div ref={scrollRef} className="bg-gray-800 rounded-xl overflow-hidden shadow-2xl">
                 <div className="relative w-full bg-gray-900 flex items-center justify-center" style={{ aspectRatio: `${width}/${height}` }}>
-                  <img
+                  <Image
                     src={generatedImage.url}
                     alt="Generated"
+                    width={width}
+                    height={height}
                     className="w-full h-full object-cover"
+                    unoptimized
                   />
                 </div>
                 <div className="p-6 border-t border-gray-700">
