@@ -27,7 +27,7 @@ export default function CTA() {
         throw new Error('Failed to start session')
       }
       
-      window.location.href = '/agents'
+      window.location.href = '/systems'
     } catch (error) {
       console.error('Failed to start session:', error)
       setLoading(false)

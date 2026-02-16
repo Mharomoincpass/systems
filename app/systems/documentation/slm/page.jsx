@@ -1,12 +1,31 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import Script from 'next/script'
 
 export default function SLMDocPage() {
   const router = useRouter()
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
+    <>
+      <Script
+        async
+        src="https://www.googletagmanager.com/gtag/js?id=G-DEN9D68RFH"
+        strategy="afterInteractive"
+      />
+      <Script
+        id="google-analytics"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-DEN9D68RFH');
+          `,
+        }}
+      />
+      <div className="min-h-screen bg-white text-gray-900">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py-16">
         <button onClick={() => router.back()} className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 mb-8">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
@@ -101,5 +120,6 @@ export default function SLMDocPage() {
         </section>
       </div>
     </div>
+    </>
   )
 }

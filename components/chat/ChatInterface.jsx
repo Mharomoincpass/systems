@@ -229,7 +229,7 @@ export default function ChatInterface({ conversationId }) {
       <div className="shrink-0 bg-black/50 backdrop-blur-xl border-b border-white/10 z-10">
         <div className="max-w-4xl mx-auto w-full flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center gap-2 sm:gap-3">
-            <Link href="/agents" className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg sm:rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/30 active:scale-95 transition-all duration-300">
+            <Link href="/systems" className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg sm:rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/30 active:scale-95 transition-all duration-300">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-gray-400 hover:text-white">
                 <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
               </svg>

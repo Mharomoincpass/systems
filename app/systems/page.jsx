@@ -2,9 +2,10 @@
 
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
+import Script from 'next/script'
 import CreditsDisplay from '@/components/CreditsDisplay'
 
-export default function AgentsPage() {
+export default function SystemsPage() {
   const [sessionToken, setSessionToken] = useState(null)
   const [lastActivityTime, setLastActivityTime] = useState(Date.now())
   const activityTimeoutRef = useRef(null)
@@ -46,7 +47,7 @@ export default function AgentsPage() {
     }
   }
 
-  const agents = [
+  const systems = [
     { href: '/SLM', name: 'SLM Chat', desc: 'AI assistant', icon: (
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
     )},
@@ -71,21 +72,39 @@ export default function AgentsPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <>
+      <Script
+        async
+        src="https://www.googletagmanager.com/gtag/js?id=G-DEN9D68RFH"
+        strategy="afterInteractive"
+      />
+      <Script
+        id="google-analytics"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-DEN9D68RFH');
+          `,
+        }}
+      />
+      <div className="min-h-screen bg-black text-white">
       <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
 
       <div className="max-w-3xl mx-auto px-4 py-6 sm:py-10 relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 sm:mb-8">
           <div>
-            <h1 className="text-lg sm:text-xl font-semibold tracking-tight text-white/90">Agents</h1>
+            <h1 className="text-lg sm:text-xl font-semibold tracking-tight text-white/90">Systems</h1>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
               <span className="text-[11px] text-gray-500">Session active</span>
             </div>
           </div>
           <div className="flex items-center gap-2.5">
-            <Link href="/agents/documentation" className="text-[12px] text-gray-500 hover:text-gray-300 transition-colors">
+            <Link href="/systems/documentation" className="text-[12px] text-gray-500 hover:text-gray-300 transition-colors">
               Docs
             </Link>
             <span className="text-gray-700">|</span>
@@ -93,22 +112,22 @@ export default function AgentsPage() {
           </div>
         </div>
 
-        {/* Agent Grid */}
+        {/* Systems Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-          {agents.map((agent) => (
+          {systems.map((system) => (
             <Link
-              key={agent.href}
-              href={agent.href}
+              key={system.href}
+              href={system.href}
               className="group flex flex-col justify-between p-3 sm:p-4 rounded-lg bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/[0.12] transition-all duration-200"
             >
               <div>
                 <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-md bg-white/[0.05] border border-white/[0.08] flex items-center justify-center mb-3">
                   <svg className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    {agent.icon}
+                    {system.icon}
                   </svg>
                 </div>
-                <h2 className="text-[13px] sm:text-sm font-medium text-white/80 mb-0.5">{agent.name}</h2>
-                <p className="text-[11px] sm:text-xs text-gray-500 leading-snug">{agent.desc}</p>
+                <h2 className="text-[13px] sm:text-sm font-medium text-white/80 mb-0.5">{system.name}</h2>
+                <p className="text-[11px] sm:text-xs text-gray-500 leading-snug">{system.desc}</p>
               </div>
               <div className="mt-3 flex items-center gap-1 text-[11px] text-gray-600 group-hover:text-gray-400 transition-colors">
                 <span>Open</span>
@@ -121,6 +140,7 @@ export default function AgentsPage() {
         </div>
       </div>
     </div>
+    </>
   )
 }
 

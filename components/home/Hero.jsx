@@ -34,10 +34,10 @@ export default function Hero() {
       
       const data = await response.json()
       console.log('Session created:', data)
-      console.log('Redirecting to /agents...')
+      console.log('Redirecting to /systems...')
       
       // Use window.location for hard redirect
-      window.location.href = '/agents'
+      window.location.href = '/systems'
     } catch (error) {
       console.error('Failed to start session:', error)
       alert('Error: ' + error.message)

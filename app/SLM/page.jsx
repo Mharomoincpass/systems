@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Script from 'next/script'
 import ChatInterface from '@/components/chat/ChatInterface'
 
 export default function SLMPage() {
@@ -35,7 +36,25 @@ export default function SLMPage() {
 
   if (isInitializing) {
     return (
-      <div className="w-full h-screen bg-black flex items-center justify-center">
+      <>
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-DEN9D68RFH"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-DEN9D68RFH');
+            `,
+          }}
+        />
+        <div className="w-full h-screen bg-black flex items-center justify-center">
         {/* Noise texture overlay */}
         <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
         
@@ -44,24 +63,65 @@ export default function SLMPage() {
           <p className="text-xs sm:text-sm text-gray-400">Initializing chat...</p>
         </div>
       </div>
+      </>
     )
   }
 
   if (!conversationId) {
     return (
-      <div className="w-full h-screen bg-black flex items-center justify-center">
+      <>
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-DEN9D68RFH"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-DEN9D68RFH');
+            `,
+          }}
+        />
+        <div className="w-full h-screen bg-black flex items-center justify-center">
         {/* Noise texture overlay */}
         <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
         
         <div className="relative z-10 text-center px-4">
           <p className="text-red-400 text-sm sm:text-base mb-4">Failed to initialize chat. Please refresh.</p>
-          <Link href="/agents" className="inline-block px-4 sm:px-6 py-2 sm:py-2.5 bg-white text-black rounded-lg hover:bg-gray-200 font-medium text-sm sm:text-base transition-all duration-300 hover:scale-105">
+          <Link href="/systems" className="inline-block px-4 sm:px-6 py-2 sm:py-2.5 bg-white text-black rounded-lg hover:bg-gray-200 font-medium text-sm sm:text-base transition-all duration-300 hover:scale-105">
             Go Back
           </Link>
         </div>
       </div>
+      </>
     )
   }
 
-  return <ChatInterface conversationId={conversationId} />
+  return (
+    <>
+      <Script
+        async
+        src="https://www.googletagmanager.com/gtag/js?id=G-DEN9D68RFH"
+        strategy="afterInteractive"
+      />
+      <Script
+        id="google-analytics"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-DEN9D68RFH');
+          `,
+        }}
+      />
+      <ChatInterface conversationId={conversationId} />
+    </>
+  )
 }

@@ -11,10 +11,13 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "checkJs": false,
+    "noEmit": true,
+    "types": [],
     "paths": {
       "@/*": ["./*"]
     }
   },
-  "include": ["**/*.js", "**/*.jsx", ".next/types/**/*.js"],
+  "include": ["**/*.js", "**/*.jsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }
