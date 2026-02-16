@@ -14,7 +14,13 @@ echo "Building project..."
 npm run build
 
 echo "Restarting app..."
-pm2 restart ai-tools-systems --update-env || pm2 start ecosystem.config.js
+if pm2 describe ai-tools-systems > /dev/null 2>&1; then
+  echo "Process exists, restarting..."
+  pm2 restart ai-tools-systems --update-env
+else
+  echo "Process not found, starting..."
+  pm2 start ecosystem.config.js
+fi
 
 pm2 save
 

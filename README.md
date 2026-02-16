@@ -184,7 +184,7 @@ POLLINATIONS_API_KEY="your-pollinations-secret-key-here"
 # Install MongoDB Community Edition from mongodb.com
 # Start MongoDB service
 # Database will be created automatically on first connection
-sudo systemctl start mongodb  # Linux
+sudo systemctl start mongod  # Linux
 brew services start mongodb-community  # macOS
 ```
 
