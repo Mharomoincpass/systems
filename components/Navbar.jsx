@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -42,8 +43,8 @@ export function Navbar() {
           : 'bg-transparent border-transparent'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-4 flex items-center justify-between gap-4">
+        <Link href="/" className="flex items-center gap-2 sm:gap-3 group flex-shrink-0">
           <div className="relative w-8 h-8 sm:w-10 sm:h-10 border border-white/20 flex items-center justify-center bg-black group-hover:bg-white transition-colors duration-500 overflow-hidden">
             <span className="relative z-10 text-white text-sm sm:text-lg font-bold group-hover:text-black transition-colors duration-500">M</span>
           </div>
@@ -52,30 +53,31 @@ export function Navbar() {
           </span>
         </Link>
 
-        <div className="flex items-center gap-3">
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-4 lg:gap-6">
           <Link
             href="/ai-tools"
-            className="text-xs sm:text-sm text-zinc-300 hover:text-white transition-colors"
+            className="text-sm text-zinc-300 hover:text-white transition-colors"
           >
             AI Tools
           </Link>
           <Link
             href="/blogs"
-            className="text-xs sm:text-sm text-zinc-300 hover:text-white transition-colors"
+            className="text-sm text-zinc-300 hover:text-white transition-colors"
           >
             Blogs
           </Link>
           <button 
             onClick={handleAction}
             disabled={loading}
-            className="group relative flex items-center gap-2 px-4 py-1.5 sm:px-6 sm:py-2.5 rounded-full bg-white/5 border border-white/10 hover:bg-white transition-all duration-500 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="group relative flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/5 border border-white/10 hover:bg-white transition-all duration-500 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <span className="text-white group-hover:text-black text-xs sm:text-sm font-medium transition-colors duration-500 whitespace-nowrap">
+            <span className="text-white group-hover:text-black text-sm font-medium transition-colors duration-500 whitespace-nowrap">
               {loading ? 'Starting...' : 'Check Systems'}
             </span>
             {!loading && (
               <svg 
-                className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white group-hover:text-black transition-all duration-500 group-hover:translate-x-0.5" 
+                className="w-4 h-4 text-white group-hover:text-black transition-all duration-500 group-hover:translate-x-0.5" 
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
@@ -85,7 +87,67 @@ export function Navbar() {
             )}
           </button>
         </div>
+
+        {/* Mobile Navigation */}
+        <div className="flex md:hidden items-center gap-3">
+          <button 
+            onClick={handleAction}
+            disabled={loading}
+            className="group relative flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white transition-all duration-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span className="text-white group-hover:text-black text-xs font-medium transition-colors duration-500 whitespace-nowrap">
+              {loading ? 'Starting...' : 'Systems'}
+            </span>
+            {!loading && (
+              <svg 
+                className="w-3 h-3 text-white group-hover:text-black transition-all duration-500" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            )}
+          </button>
+          
+          {/* Hamburger Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 text-white hover:text-zinc-300 transition-colors"
+            aria-label="Toggle menu"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {mobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Menu Dropdown */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-white/10 bg-black/95 backdrop-blur-xl">
+          <div className="px-4 py-4 space-y-3">
+            <Link
+              href="/ai-tools"
+              className="block py-2 text-sm text-zinc-300 hover:text-white transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              AI Tools
+            </Link>
+            <Link
+              href="/blogs"
+              className="block py-2 text-sm text-zinc-300 hover:text-white transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Blogs
+            </Link>
+          </div>
+        </div>
+      )}
     </nav>
   )
 }
