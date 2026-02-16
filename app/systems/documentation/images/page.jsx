@@ -38,9 +38,9 @@ export default function ImagesDocPage() {
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-12 p-6 bg-gray-50 rounded-lg border border-gray-200">
-          <div><div className="text-sm font-medium text-gray-600">Models</div><div className="text-2xl font-bold text-gray-900">4</div></div>
+          <div><div className="text-sm font-medium text-gray-600">Models</div><div className="text-2xl font-bold text-gray-900">6</div></div>
           <div><div className="text-sm font-medium text-gray-600">Speed</div><div className="text-2xl font-bold text-gray-900">5-60s</div></div>
-          <div><div className="text-sm font-medium text-gray-600">Resolution</div><div className="text-2xl font-bold text-gray-900">1024x1024</div></div>
+          <div><div className="text-sm font-medium text-gray-600">Resolution</div><div className="text-2xl font-bold text-gray-900">512-1024</div></div>
         </div>
 
         <section className="mb-12">
@@ -53,11 +53,13 @@ export default function ImagesDocPage() {
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Available Models</h2>
           <div className="space-y-4">
-            {[
-              { name: 'FLUX Schnell', speed: 'Fastest', quality: 'Good', cost: 'Free', desc: 'Ultra-fast, great for quick iterations' },
+            [
+              { name: 'FLUX Schnell', speed: 'Fastest', quality: 'Good', cost: 'Low', desc: 'Ultra-fast, great for quick iterations' },
               { name: 'Z-Image Turbo', speed: 'Very Fast', quality: 'Good', cost: 'Low', desc: 'Optimized for speed without sacrificing quality' },
-              { name: 'Klein 4B', speed: 'Fast', quality: 'High', cost: 'Medium', desc: 'Balanced option for most use cases' },
-              { name: 'Imagen-4', speed: 'Medium', quality: 'Highest', cost: 'High', desc: 'Google\'s model for maximum quality' },
+              { name: 'Imagen 4', speed: 'Medium', quality: 'High', cost: 'Medium', desc: 'Google model for sharp detail' },
+              { name: 'FLUX.2 Klein 4B', speed: 'Fast', quality: 'High', cost: 'Medium', desc: 'Balanced option for most use cases' },
+              { name: 'FLUX.2 Klein 9B', speed: 'Medium', quality: 'High', cost: 'Medium', desc: 'Higher fidelity results' },
+              { name: 'GPT Image 1 Mini', speed: 'Medium', quality: 'High', cost: 'Medium', desc: 'Strong prompt-following' },
             ].map((model, i) => (
               <div key={i} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
                 <div className="flex justify-between items-start mb-2">

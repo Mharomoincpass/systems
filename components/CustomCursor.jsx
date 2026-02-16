@@ -1,26 +1,35 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 
 export default function CustomCursor() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isPointer, setIsPointer] = useState(false)
+  const mouseRef = useRef({ x: 0, y: 0 })
+  const pointerRef = useRef(false)
+  const rafRef = useRef(null)
 
   useEffect(() => {
-    const mouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY })
-
-      const target = e.target
-      setIsPointer(
-        window.getComputedStyle(target).cursor === 'pointer' ||
-        target.tagName === 'BUTTON' ||
-        target.tagName === 'A'
-      )
+    const flush = () => {
+      rafRef.current = null
+      setMousePosition({ ...mouseRef.current })
+      setIsPointer(pointerRef.current)
     }
 
-    window.addEventListener('mousemove', mouseMove)
-    return () => window.removeEventListener('mousemove', mouseMove)
+    const mouseMove = (e) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY }
+      pointerRef.current = Boolean(e.target?.closest?.('button, a, [role="button"]'))
+      if (!rafRef.current) {
+        rafRef.current = requestAnimationFrame(flush)
+      }
+    }
+
+    window.addEventListener('mousemove', mouseMove, { passive: true })
+    return () => {
+      window.removeEventListener('mousemove', mouseMove)
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    }
   }, [])
 
   return (

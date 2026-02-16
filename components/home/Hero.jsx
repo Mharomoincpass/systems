@@ -46,6 +46,10 @@ export default function Hero() {
   }
 
   useGSAP(() => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const isMobile = window.matchMedia('(max-width: 767px)').matches
+    if (reduceMotion || isMobile) return
+
     const tl = gsap.timeline()
 
     // Background reveal

@@ -9,65 +9,24 @@ import { useNotification } from '@/components/Notifications'
 export default function VideoGenerator() {
   const router = useRouter()
   const { addNotification, removeNotification } = useNotification()
-  const [imageFile, setImageFile] = useState(null)
-  const [imagePreview, setImagePreview] = useState(null)
   const [prompt, setPrompt] = useState('')
-  const [model, setModel] = useState('LTX-2')
+  const [model, setModel] = useState('grok-video')
   const [duration, setDuration] = useState(5)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [generatedVideo, setGeneratedVideo] = useState(null)
   const [uploadProgress, setUploadProgress] = useState(0)
-  const fileInputRef = useRef(null)
   const scrollRef = useRef(null)
 
   const models = [
-    { id: 'LTX-2', name: 'LTX-2 (Latest, Best Quality)', description: 'Lightricks latest video model' },
-    { id: 'seedance', name: 'Seedance (Fast & Free)', description: '2-10 seconds generation' },
+    { id: 'grok-video', name: 'Grok Video', description: 'Grok video generation' },
   ]
-
-  const handleImageSelect = (e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      setError('Please select a valid image file (JPG, PNG, etc.)')
-      return
-    }
-
-    // Validate file size (max 50MB)
-    if (file.size > 50 * 1024 * 1024) {
-      setError('Image file must be smaller than 50MB')
-      return
-    }
-
-    setImageFile(file)
-    setError(null)
-
-    // Create preview
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      setImagePreview(e.target?.result)
-    }
-    reader.readAsDataURL(file)
-  }
 
   const generateVideo = async (e) => {
     e.preventDefault()
 
-    if (!imageFile) {
-      addNotification('Please select an image first', 'warning')
-      return
-    }
-
-    if (!imagePreview) {
-      addNotification('Image preview failed. Try selecting again.', 'error')
-      return
-    }
-
     if (!prompt.trim()) {
-      addNotification('Please enter a motion prompt to describe the video animation', 'warning')
+      addNotification('Please enter a prompt to describe the video', 'warning')
       return
     }
 
@@ -85,7 +44,6 @@ export default function VideoGenerator() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          imageUrl: imagePreview,
           prompt: prompt.trim(),
           model,
           duration,
@@ -131,14 +89,6 @@ export default function VideoGenerator() {
     }
   }
 
-  const removeImage = () => {
-    setImageFile(null)
-    setImagePreview(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
-  }
-
   return (
     <div className="min-h-screen bg-black pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16">
       {/* Noise texture overlay */}
@@ -162,7 +112,7 @@ export default function VideoGenerator() {
             AI Video Generator
           </h1>
           <p className="text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl">
-            Transform static images into dynamic videos using advanced AI models.
+            Turn text prompts into dynamic videos using advanced AI models.
           </p>
         </div>
 
@@ -170,55 +120,10 @@ export default function VideoGenerator() {
           {/* Form Section */}
           <div className="lg:col-span-1">
             <form onSubmit={generateVideo} className="space-y-6">
-              {/* Image Upload */}
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
-                  Upload Image
-                </label>
-                <div className="relative">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageSelect}
-                    disabled={isLoading}
-                    className="hidden"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isLoading}
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border-2 border-dashed border-white/20 rounded-lg text-sm sm:text-base text-gray-300 hover:border-white/40 hover:bg-white/5 transition disabled:opacity-50"
-                  >
-                    {imageFile ? '📁 ' + imageFile.name : '📤 Click to select image'}
-                  </button>
-                </div>
-                <p className="text-xs text-gray-500 mt-2">Max size: 50MB (JPG, PNG, etc.)</p>
-              </div>
-
-              {/* Image Preview */}
-              {imagePreview && (
-                <div className="relative">
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-full h-32 object-cover rounded-lg border border-white/20"
-                  />
-                  <button
-                    type="button"
-                    onClick={removeImage}
-                    disabled={isLoading}
-                    className="absolute top-2 right-2 bg-white/10 hover:bg-white/20 text-white rounded-full p-1.5 sm:p-2 transition disabled:opacity-50 border border-white/20 backdrop-blur-sm"
-                  >
-                    ✕
-                  </button>
-                </div>
-              )}
-
-              {/* Motion Prompt */}
+              {/* Prompt */}
               <div>
                 <Input
-                  label="Motion Prompt (Required)"
+                  label="Prompt (Required)"
                   placeholder="e.g., person walking, waves crashing, clouds moving..."
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
@@ -299,7 +204,7 @@ export default function VideoGenerator() {
                 fullWidth
                 loading={isLoading}
                 className="!py-3"
-                disabled={!imageFile}
+                disabled={!prompt.trim() || isLoading}
               >
                 {isLoading ? 'Generating Video...' : 'Generate Video'}
               </Button>

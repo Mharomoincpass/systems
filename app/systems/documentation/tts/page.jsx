@@ -38,7 +38,7 @@ export default function TTSDocPage() {
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-12 p-6 bg-gray-50 rounded-lg border border-gray-200">
-          <div><div className="text-sm font-medium text-gray-600">Voices</div><div className="text-2xl font-bold text-gray-900">6+</div></div>
+          <div><div className="text-sm font-medium text-gray-600">Voices</div><div className="text-2xl font-bold text-gray-900">6</div></div>
           <div><div className="text-sm font-medium text-gray-600">Char Limit</div><div className="text-2xl font-bold text-gray-900">5000</div></div>
           <div><div className="text-sm font-medium text-gray-600">Quality</div><div className="text-2xl font-bold text-gray-900">Natural</div></div>
         </div>
@@ -53,13 +53,13 @@ export default function TTSDocPage() {
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Available Voices</h2>
           <div className="space-y-3">
-            {[
-              { name: 'Aria', style: 'Professional, neutral tone' },
-              { name: 'Roger', style: 'Deep, authoritative voice' },
-              { name: 'Sarah', style: 'Warm, engaging tone' },
-              { name: 'Chris', style: 'Casual, conversational' },
-              { name: 'Maya', style: 'Bright, friendly' },
-              { name: 'Leo', style: 'Natural, expressive' },
+            [
+              { name: 'Rachel', style: 'Female, calm' },
+              { name: 'Adam', style: 'Male, deep' },
+              { name: 'Bella', style: 'Female, energetic' },
+              { name: 'Josh', style: 'Male, young' },
+              { name: 'Emily', style: 'Female, soft' },
+              { name: 'Sam', style: 'Male, narrator' },
             ].map((voice, i) => (
               <div key={i} className="p-3 bg-gray-50 border border-gray-200 rounded-lg flex justify-between items-center">
                 <span className="font-semibold text-gray-900">{voice.name}</span>
@@ -72,9 +72,7 @@ export default function TTSDocPage() {
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Features</h2>
           <ul className="space-y-3 text-gray-700">
-            <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Natural Voices:</strong> 6+ realistic voice options</span></li>
-            <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Speed Control:</strong> Adjust playback speed 0.5x - 2x</span></li>
-            <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Multiple Languages:</strong> English, Spanish, French, German, and more</span></li>
+            <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Natural Voices:</strong> Six curated voice options</span></li>
             <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>5000 Chars/Request:</strong> Split longer content into segments</span></li>
             <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Instant Generation:</strong> Audio ready to download immediately</span></li>
           </ul>

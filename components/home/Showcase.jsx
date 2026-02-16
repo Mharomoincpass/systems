@@ -39,6 +39,10 @@ export default function Showcase() {
   const container = useRef(null)
 
   useGSAP(() => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const isMobile = window.matchMedia('(max-width: 767px)').matches
+    if (reduceMotion || isMobile) return
+
     const panels = gsap.utils.toArray('.project-panel')
     
     panels.forEach((panel, i) => {
@@ -89,7 +93,7 @@ export default function Showcase() {
 
       <div className="w-full">
         {products.map((product, i) => (
-          <div key={i} className="project-panel relative w-full h-screen flex items-center justify-center bg-black overflow-hidden">
+          <div key={i} className="project-panel relative w-full min-h-[70vh] md:h-screen flex items-center justify-center bg-black overflow-hidden">
             
             <div className={`grid lg:grid-cols-[1.5fr_1fr] gap-12 items-center w-full px-6 lg:px-12 max-w-[90vw] ${i % 2 === 1 ? 'lg:grid-cols-[1fr_1.5fr]' : ''}`}>
                 
@@ -98,7 +102,7 @@ export default function Showcase() {
                 {product.images.map((img, idx) => (
                   <div 
                     key={idx} 
-                    className="project-img-card absolute inset-0 rounded-lg overflow-hidden border border-white/10"
+                    className={`project-img-card absolute inset-0 rounded-lg overflow-hidden border border-white/10${idx === 0 ? '' : ' hidden md:block'}`}
                   >
                     <Image
                       src={img}

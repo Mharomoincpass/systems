@@ -8,9 +8,9 @@ export default function DocumentationPage() {
   const router = useRouter()
 
   const systems = [
-    { id: 'slm', name: 'SLM Chat', desc: 'Conversational AI assistant', path: '/systems/documentation/slm' },
-    { id: 'images', name: 'Image Generation', desc: 'Text-to-image with multiple models', path: '/systems/documentation/images' },
-    { id: 'videos', name: 'Video Generation', desc: 'AI-powered video creation', path: '/systems/documentation/videos' },
+    { id: 'slm', name: 'Multi Chat Models', desc: 'Conversational AI assistant', path: '/systems/documentation/slm' },
+    { id: 'images', name: 'Image Generation', desc: 'Text-to-image with affordable models', path: '/systems/documentation/images' },
+    { id: 'videos', name: 'Video Generation', desc: 'Text-to-video with Grok', path: '/systems/documentation/videos' },
     { id: 'music', name: 'Music Generation', desc: 'Royalty-free music from text', path: '/systems/documentation/music' },
     { id: 'transcribe', name: 'Transcription', desc: 'Speech-to-text conversion', path: '/systems/documentation/transcribe' },
     { id: 'tts', name: 'Text-to-Speech', desc: 'Natural voice synthesis', path: '/systems/documentation/tts' },

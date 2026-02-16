@@ -33,12 +33,12 @@ export default function SLMDocPage() {
         </button>
 
         <div className="mb-12">
-          <h1 className="text-4xl font-bold mb-2">SLM Chat</h1>
-          <p className="text-lg text-gray-600">Multi-agent AI assistant for conversation, coding, analysis, and creative tasks</p>
+          <h1 className="text-4xl font-bold mb-2">Multi Chat Models</h1>
+          <p className="text-lg text-gray-600">Multi-model AI assistant for conversation, coding, analysis, and creative tasks</p>
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-12 p-6 bg-gray-50 rounded-lg border border-gray-200">
-          <div><div className="text-sm font-medium text-gray-600">Agents</div><div className="text-2xl font-bold text-gray-900">6</div></div>
+          <div><div className="text-sm font-medium text-gray-600">Models</div><div className="text-2xl font-bold text-gray-900">6</div></div>
           <div><div className="text-sm font-medium text-gray-600">Cost</div><div className="text-2xl font-bold text-gray-900">Free</div></div>
           <div><div className="text-sm font-medium text-gray-600">Speed</div><div className="text-2xl font-bold text-gray-900">Instant</div></div>
         </div>
@@ -46,24 +46,24 @@ export default function SLMDocPage() {
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-4">Overview</h2>
           <p className="text-gray-700 leading-relaxed">
-            SLM Chat provides access to multiple specialized AI agents optimized for different tasks. Each agent is pre-configured for specific use cases, from general conversation to technical assistance and creative work. All responses are instant and unlimited.
+            Multi Chat Models provides access to multiple specialized AI models optimized for different tasks. Each model is pre-configured for specific use cases, from general conversation to technical assistance and creative work. All responses are instant and unlimited.
           </p>
         </section>
 
         <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">Available Agents</h2>
+          <h2 className="text-2xl font-bold mb-6">Available Models</h2>
           <div className="space-y-4">
             {[
               { name: 'General Chat', desc: 'Conversation, answering questions, brainstorming' },
               { name: 'Code Assistant', desc: 'Programming help, debugging, code review' },
-              { name: 'Research Agent', desc: 'Information synthesis, analysis, summaries' },
-              { name: 'Creative Writer', desc: 'Content creation, storytelling, copywriting' },
-              { name: 'Math Tutor', desc: 'Problem solving, equations, mathematical concepts' },
+              { name: 'Research', desc: 'Information synthesis, analysis, summaries' },
+              { name: 'Creative Writing', desc: 'Content creation, storytelling, copywriting' },
+              { name: 'Math Help', desc: 'Problem solving, equations, mathematical concepts' },
               { name: 'Technical Explainer', desc: 'Complex concepts explained simply' },
-            ].map((agent, i) => (
+            ].map((model, i) => (
               <div key={i} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-                <h3 className="font-semibold text-gray-900">{agent.name}</h3>
-                <p className="text-sm text-gray-600 mt-1">{agent.desc}</p>
+                <h3 className="font-semibold text-gray-900">{model.name}</h3>
+                <p className="text-sm text-gray-600 mt-1">{model.desc}</p>
               </div>
             ))}
           </div>
@@ -74,7 +74,7 @@ export default function SLMDocPage() {
           <ul className="space-y-3 text-gray-700">
             <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Unlimited Conversations:</strong> No limits on message count or conversation length</span></li>
             <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Real-time Responses:</strong> Instant replies with no queue delays</span></li>
-            <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Multi-turn Context:</strong> Agents maintain conversation history</span></li>
+            <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Multi-turn Context:</strong> Models maintain conversation history</span></li>
             <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Session Persistence:</strong> Your conversations are saved per session</span></li>
             <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Code Formatting:</strong> Syntax highlighting for programming assistance</span></li>
           </ul>
@@ -113,9 +113,9 @@ export default function SLMDocPage() {
 
         <section className="bg-blue-50 border border-blue-200 rounded-lg p-8 text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">Ready to Chat?</h2>
-          <p className="text-gray-700 mb-6">Start a conversation with one of our AI agents now.</p>
+          <p className="text-gray-700 mb-6">Start a conversation with one of our AI models now.</p>
           <button onClick={() => router.push('/SLM')} className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
-            Launch SLM Chat
+            Launch Multi Chat Models
           </button>
         </section>
       </div>

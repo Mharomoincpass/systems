@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic'
 const sendMessageSchema = z.object({
   conversationId: z.string(),
   content: z.string().min(1, 'Message cannot be empty'),
+  model: z.string().optional().default('openai-fast'),
 })
 
 export async function POST(request) {
@@ -15,12 +16,12 @@ export async function POST(request) {
     await connectDB()
 
     const body = await request.json()
-    const { conversationId, content } = sendMessageSchema.parse(body)
+    const { conversationId, content, model = 'openai-fast' } = sendMessageSchema.parse(body)
 
-    const hfToken = process.env.NEXT_PUBLIC_HF_TOKEN
-    if (!hfToken) {
+    const pollinationsKey = process.env.POLLINATIONS_API_KEY
+    if (!pollinationsKey) {
       return Response.json(
-        { error: 'Hugging Face API token not configured' },
+        { error: 'Pollinations API key not configured' },
         { status: 500 }
       )
     }
@@ -72,69 +73,78 @@ export async function POST(request) {
              messages.push({ role: 'user', content })
           }
 
-          console.log('Calling HF Router API (OpenAI Compatible)')
+          console.log(`Calling Pollinations Gateway with model: ${model || 'openai'}`)
 
-          const hfResponse = await fetch(
-            'https://router.huggingface.co/v1/chat/completions',
+          const pollinationsResponse = await fetch(
+            'https://gen.pollinations.ai/v1/chat/completions',
             {
               method: 'POST',
               headers: {
-                Authorization: `Bearer ${hfToken}`,
+                Authorization: `Bearer ${pollinationsKey}`,
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                model: 'meta-llama/Llama-3.1-8B-Instruct',
+                model: model || 'openai',
                 messages: [
                   { role: 'system', content: 'You are a helpful AI assistant. Provide concise and accurate responses.' },
                   ...messages
                 ],
-                max_tokens: 500,
+                max_tokens: 1000,
                 temperature: 0.7,
                 stream: true,
               }),
             }
           )
 
-          if (!hfResponse.ok) {
-            const errorText = await hfResponse.text()
-            console.error('HF API error:', errorText)
+          if (!pollinationsResponse.ok) {
+            const errorText = await pollinationsResponse.text()
+            console.error('Pollinations API error:', errorText)
+            let errorMessage = errorText
+            try {
+              const errorData = JSON.parse(errorText)
+              errorMessage = errorData.error?.message || errorData.error || errorText
+            } catch (e) {}
+            
             controller.enqueue(
               encoder.encode(
-                `data: ${JSON.stringify({ error: `HF API error: ${errorText}` })}\n\n`
+                `data: ${JSON.stringify({ error: `Pollinations API error: ${errorMessage}` })}\n\n`
               )
             )
             controller.close()
             return
           }
 
-          const reader = hfResponse.body.getReader()
+          const reader = pollinationsResponse.body.getReader()
           let assistantText = ''
+          let streamBuffer = ''
 
           while (true) {
             const { done, value } = await reader.read()
             if (done) break
 
-            const chunk = new TextDecoder().decode(value)
-            const lines = chunk.split('\n')
+            streamBuffer += new TextDecoder().decode(value, { stream: true })
+            const lines = streamBuffer.split('\n')
+            streamBuffer = lines.pop() || ''
 
             for (const line of lines) {
-              if (line.trim() === 'data: [DONE]') {
-                continue
-              }
-              if (line.startsWith('data: ')) {
+              const trimmedLine = line.trim()
+              if (!trimmedLine || trimmedLine === 'data: [DONE]') continue
+              
+              if (trimmedLine.startsWith('data: ')) {
                 try {
-                  const parsed = JSON.parse(line.slice(6))
+                  const data = trimmedLine.slice(6)
+                  if (data === '[DONE]') continue
+                  
+                  const parsed = JSON.parse(data)
                   const delta = parsed.choices?.[0]?.delta?.content
                   if (delta) {
                     assistantText += delta
                     controller.enqueue(
-                      encoder.encode(
-                        `data: ${JSON.stringify({ content: delta })}\n\n`
-                      )
+                      encoder.encode(`data: ${JSON.stringify({ content: delta })}\n\n`)
                     )
                   }
                 } catch (e) {
-                  // Ignore parse errors for partial chunks
+                  // Partial JSON, will be handled in next chunk or ignored if invalid
                 }
               }
             }

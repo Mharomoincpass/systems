@@ -6,19 +6,18 @@ import Script from 'next/script'
 import CreditsDisplay from '@/components/CreditsDisplay'
 
 export default function SystemsPage() {
-  const [sessionToken, setSessionToken] = useState(null)
-  const [lastActivityTime, setLastActivityTime] = useState(Date.now())
   const activityTimeoutRef = useRef(null)
+  const lastActivityRef = useRef(0)
 
   useEffect(() => {
     const cookies = document.cookie.split('; ')
     const token = cookies.find(c => c.startsWith('sessionToken='))?.split('=')[1]
-    setSessionToken(token)
     if (!token) return
 
     const handleActivity = () => {
       const now = Date.now()
-      setLastActivityTime(now)
+      if (now - lastActivityRef.current < 300) return
+      lastActivityRef.current = now
       if (activityTimeoutRef.current) clearTimeout(activityTimeoutRef.current)
       activityTimeoutRef.current = setTimeout(() => {
         pingSession(token)
@@ -48,7 +47,7 @@ export default function SystemsPage() {
   }
 
   const systems = [
-    { href: '/SLM', name: 'SLM Chat', desc: 'AI assistant', icon: (
+    { href: '/SLM', name: 'Multi Chat Models', desc: 'AI assistant', icon: (
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
     )},
     { href: '/images', name: 'Images', desc: 'Image generation', icon: (
@@ -91,7 +90,7 @@ export default function SystemsPage() {
         }}
       />
       <div className="min-h-screen bg-black text-white">
-      <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+      <div className="fixed inset-0 pointer-events-none opacity-[0.02] sm:opacity-[0.03] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
 
       <div className="max-w-3xl mx-auto px-4 py-6 sm:py-10 relative z-10">
         {/* Header */}

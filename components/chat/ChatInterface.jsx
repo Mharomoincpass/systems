@@ -9,9 +9,23 @@ export default function ChatInterface({ conversationId }) {
   const [isStreaming, setIsStreaming] = useState(false)
   const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [selectedModel, setSelectedModel] = useState('openai-fast')
   const scrollRef = useRef(null)
   const inputRef = useRef(null)
   const containerRef = useRef(null)
+  const streamTextRef = useRef('')
+  const streamRafRef = useRef(null)
+  const scrollRafRef = useRef(null)
+
+  const models = [
+    { id: 'openai', name: 'OpenAI GPT', info: 'Standard & Smart' },
+    { id: 'openai-fast', name: 'OpenAI Fast', info: 'Optimized for speed' },
+    { id: 'openai-large', name: 'OpenAI Large', info: 'Highest intelligence' },
+    { id: 'mistral', name: 'Mistral', info: 'Fast open-weights' },
+    { id: 'gemini', name: 'Gemini 2.0', info: 'Google - Logic & Creative' },
+    { id: 'gemini-search', name: 'Gemini Search', info: 'Real-time Web Access' },
+    { id: 'qwen-coder', name: 'Qwen Coder', info: 'Specialized in Programming' },
+  ]
 
   // Dynamically set container height and position based on visualViewport (iOS keyboard fix)
   useEffect(() => {
@@ -119,7 +133,11 @@ export default function ChatInterface({ conversationId }) {
 
   // Scroll on new messages
   useEffect(() => {
-    scrollToBottom(isStreaming)
+    if (scrollRafRef.current) return
+    scrollRafRef.current = requestAnimationFrame(() => {
+      scrollRafRef.current = null
+      scrollToBottom(isStreaming)
+    })
   }, [messages, isStreaming, scrollToBottom])
 
   // Send message
@@ -144,12 +162,13 @@ export default function ChatInterface({ conversationId }) {
 
     setIsStreaming(true)
     const asstId = `a_${Date.now()}`
+    streamTextRef.current = ''
 
     try {
       const res = await fetch('/api/chat/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ conversationId, content: text }),
+        body: JSON.stringify({ conversationId, content: text, model: selectedModel }),
       })
 
       if (!res.ok) {
@@ -183,13 +202,29 @@ export default function ChatInterface({ conversationId }) {
             if (parsed.error) { setError(parsed.error); break }
             if (parsed.content) {
               fullText += parsed.content
-              const snap = fullText
-              setMessages((prev) =>
-                prev.map((m) => (m._id === asstId ? { ...m, content: snap } : m))
-              )
+              streamTextRef.current = fullText
+              if (!streamRafRef.current) {
+                streamRafRef.current = requestAnimationFrame(() => {
+                  const snap = streamTextRef.current
+                  streamRafRef.current = null
+                  setMessages((prev) =>
+                    prev.map((m) => (m._id === asstId ? { ...m, content: snap } : m))
+                  )
+                })
+              }
             }
           } catch { /* skip partial */ }
         }
+      }
+      if (streamRafRef.current) {
+        cancelAnimationFrame(streamRafRef.current)
+        streamRafRef.current = null
+      }
+      if (streamTextRef.current) {
+        const snap = streamTextRef.current
+        setMessages((prev) =>
+          prev.map((m) => (m._id === asstId ? { ...m, content: snap } : m))
+        )
       }
     } catch (err) {
       console.error('Send error:', err)
@@ -236,15 +271,28 @@ export default function ChatInterface({ conversationId }) {
             </Link>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="font-bold text-base sm:text-lg">SLM Chat</span>
+              <span className="font-bold text-base sm:text-lg">Multi Chat Models</span>
             </div>
           </div>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-3 py-1.5 text-xs sm:text-sm font-medium text-white bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg sm:rounded-xl hover:bg-white/15 hover:border-white/30 hover:scale-105 active:scale-95 transition-all duration-300"
-          >
-            New Chat
-          </button>
+          <div className="flex items-center gap-2">
+            <select
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+              className="block px-2 py-1.5 text-xs font-medium bg-white/10 text-white border border-white/20 rounded-lg hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
+            >
+              {models.map((model) => (
+                <option key={model.id} value={model.id} className="bg-black">
+                  {model.name}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-3 py-1.5 text-xs sm:text-sm font-medium text-white bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg sm:rounded-xl hover:bg-white/15 hover:border-white/30 hover:scale-105 active:scale-95 transition-all duration-300"
+            >
+              New Chat
+            </button>
+          </div>
         </div>
       </div>
 
@@ -260,7 +308,7 @@ export default function ChatInterface({ conversationId }) {
               <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 mb-4 text-3xl backdrop-blur-sm">
                 🤖
               </div>
-              <h3 className="text-lg font-bold text-gray-200 mb-2">Welcome to SLM</h3>
+              <h3 className="text-lg font-bold text-gray-200 mb-2">Welcome to Multi Chat Models</h3>
               <p className="text-sm text-gray-400 max-w-[240px]">
                 Your private AI assistant. Send a message to start.
               </p>
@@ -280,15 +328,32 @@ export default function ChatInterface({ conversationId }) {
                   }`}
                 >
                   {msg.content || (
-                    <div className="flex gap-1 py-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.32s]" />
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.16s]" />
-                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" />
+                    <div className="flex items-center gap-2 py-1">
+                      <div className="flex gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.32s]" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.16s]" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" />
+                      </div>
+                      <span className="text-xs text-gray-400 font-medium">Multi Chat Models is thinking...</span>
                     </div>
                   )}
                 </div>
               </div>
             ))
+          )}
+          {isStreaming && (
+            <div className="flex justify-start">
+              <div className="max-w-[88%] px-4 py-3 rounded-2xl text-[15px] leading-relaxed break-words whitespace-pre-wrap bg-white/5 text-gray-200 border border-white/10 backdrop-blur-sm rounded-tl-sm">
+                <div className="flex items-center gap-2 py-1">
+                  <div className="flex gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.32s]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.16s]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" />
+                  </div>
+                  <span className="text-xs text-gray-400 font-medium">Multi Chat Models is thinking...</span>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>
@@ -311,7 +376,7 @@ export default function ChatInterface({ conversationId }) {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Message SLM..."
+            placeholder="Message Multi Chat Models..."
             disabled={isStreaming}
             autoComplete="off"
             autoCorrect="off"

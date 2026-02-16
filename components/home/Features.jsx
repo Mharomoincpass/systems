@@ -19,6 +19,10 @@ export default function Features() {
   const container = useRef(null)
 
   useGSAP(() => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const isMobile = window.matchMedia('(max-width: 767px)').matches
+    if (reduceMotion || isMobile) return
+
     // Horizontal scroll for specific expertise cards or just a nice stagger
     const cards = gsap.utils.toArray('.feature-card');
     

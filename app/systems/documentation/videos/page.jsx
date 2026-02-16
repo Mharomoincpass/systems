@@ -38,21 +38,20 @@ export default function VideosDocPage() {
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-12 p-6 bg-gray-50 rounded-lg border border-gray-200">
-          <div><div className="text-sm font-medium text-gray-600">Models</div><div className="text-2xl font-bold text-gray-900">2</div></div>
-          <div><div className="text-sm font-medium text-gray-600">Max Length</div><div className="text-2xl font-bold text-gray-900">60s</div></div>
-          <div><div className="text-sm font-medium text-gray-600">Resolution</div><div className="text-2xl font-bold text-gray-900">720p</div></div>
+          <div><div className="text-sm font-medium text-gray-600">Models</div><div className="text-2xl font-bold text-gray-900">1</div></div>
+          <div><div className="text-sm font-medium text-gray-600">Target Length</div><div className="text-2xl font-bold text-gray-900">2-10s</div></div>
+          <div><div className="text-sm font-medium text-gray-600">Output</div><div className="text-2xl font-bold text-gray-900">MP4</div></div>
         </div>
 
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-4">Overview</h2>
           <p className="text-gray-700 leading-relaxed">
-            Generate high-quality videos from detailed text descriptions. Choose between fast generation for rapid iteration or higher quality for professional output. Perfect for marketing, social media, product demos, and creative projects.
+            Generate short videos from detailed text descriptions. The current model focuses on fast iterations for creative exploration and quick content creation.
           </p>
         </section>
-
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">Available Models</h2>
-          <div className="space-y-4">
+            [
+              { name: 'Grok Video', speed: 'Fast', quality: 'High', desc: 'Text-to-video generation optimized for quick results' },
+            ].map((model, i) => (
             {[
               { name: 'LTX-2', speed: 'Fast', quality: 'High', desc: 'Open-source model optimized for speed' },
               { name: 'Seedance', speed: 'Faster', quality: 'Good', desc: 'Ultra-fast generation for quick iteration' },
@@ -76,9 +75,8 @@ export default function VideosDocPage() {
           <h2 className="text-2xl font-bold mb-6">Features</h2>
           <ul className="space-y-3 text-gray-700">
             <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Text-to-Video:</strong> Generate videos from descriptions</span></li>
-            <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Motion Control:</strong> Detailed motion prompts for precise results</span></li>
-            <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Up to 60 seconds:</strong> Generate longer content</span></li>
-            <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>720p Resolution:</strong> High-quality output</span></li>
+            <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Short Clips:</strong> Best for 2-10 second outputs</span></li>
+            <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>MP4 Output:</strong> Ready to share or edit</span></li>
             <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Instant Download:</strong> Save and edit immediately</span></li>
           </ul>
         </section>
@@ -106,9 +104,8 @@ export default function VideosDocPage() {
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Best Practices</h2>
           <ul className="space-y-2 text-gray-700">
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span><strong>Start Short:</strong> Begin with 5-10 second videos before longer ones</span></li>
+            <li className="flex gap-3"><span className="text-gray-400">•</span><span><strong>Start Short:</strong> Begin with 2-6 second clips before longer ones</span></li>
             <li className="flex gap-3"><span className="text-gray-400">•</span><span><strong>Detail-Oriented:</strong> More specific prompts = better results</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span><strong>Test Both Models:</strong> Compare LTX-2 vs Seedance</span></li>
             <li className="flex gap-3"><span className="text-gray-400">•</span><span><strong>Iterate:</strong> Small prompt changes can improve results</span></li>
           </ul>
         </section>
@@ -116,10 +113,10 @@ export default function VideosDocPage() {
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-4">Limitations</h2>
           <ul className="space-y-2 text-gray-700">
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Maximum 60 seconds per video</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>720p resolution (1280x720)</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Text rendering not supported in video</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Processing takes 1-2 minutes</span></li>
+            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Target duration is 2-10 seconds and may vary by prompt</span></li>
+            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Length control is best-effort and not guaranteed</span></li>
+            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Text rendering may be inconsistent</span></li>
+            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Processing can take up to a minute</span></li>
           </ul>
         </section>
 

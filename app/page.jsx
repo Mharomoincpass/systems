@@ -22,7 +22,7 @@ export default function Home() {
           </div>
 
           {/* Noise overlay for texture */}
-          <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+            <div className="fixed inset-0 pointer-events-none opacity-[0.03] sm:opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
         </main>
       </SmoothScroll>
     </>

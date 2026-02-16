@@ -19,10 +19,12 @@ export default function ImageGenerator() {
   const scrollRef = useRef(null)
 
   const models = [
-    { id: 'flux', name: 'FLUX Schnell (Fast & Free)', description: '5K images per credit' },
-    { id: 'imagen-4', name: 'Imagen 4 (Google, High Quality)', description: '300 images per credit' },
-    { id: 'klein', name: 'FLUX.2 Klein 4B (Balanced)', description: '150 images per credit' },
-    { id: 'zimage', name: 'Z-Image Turbo (Ultra Fast)', description: '5K images per credit' },
+    { id: 'flux', name: 'Flux Schnell', description: 'Fast & affordable' },
+    { id: 'zimage', name: 'Z-Image Turbo', description: 'Ultra fast' },
+    { id: 'imagen-4', name: 'Imagen 4', description: 'High quality (alpha)' },
+    { id: 'klein', name: 'FLUX.2 Klein 4B', description: 'Balanced quality' },
+    { id: 'klein-large', name: 'FLUX.2 Klein 9B', description: 'Higher quality' },
+    { id: 'gptimage', name: 'GPT Image 1 Mini', description: 'Prompt-following' },
   ]
 
   const dimensions = [

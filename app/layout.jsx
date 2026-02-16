@@ -6,9 +6,34 @@ import { NotificationProvider } from '@/components/Notifications'
 
 const inter = Inter({ subsets: ['latin'] })
 
+const siteName = 'AI Tools and Systems'
+const siteDescription = 'AI tools and systems for chat, images, video, music, transcription, and speech.'
+const siteUrl = 'https://mharomo.systems'
+
 export const metadata = {
-  title: 'Mharomo.systems',
-  description: 'Full-stack developer & tech lead. Building scalable systems with Node.js, React, Python, and AI.',
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: siteName,
+    template: `%s | ${siteName}`,
+  },
+  description: siteDescription,
+  applicationName: siteName,
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: siteName,
+    description: siteDescription,
+    url: '/',
+    siteName,
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteName,
+    description: siteDescription,
+  },
   icons: {
     icon: '/icon.svg',
   },
@@ -46,6 +71,20 @@ export default function RootLayout({
               gtag('js', new Date());
               gtag('config', 'G-DEN9D68RFH');
             `,
+          }}
+        />
+        <Script
+          id="json-ld"
+          type="application/ld+json"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              name: siteName,
+              url: siteUrl,
+              description: siteDescription,
+            }),
           }}
         />
       </head>

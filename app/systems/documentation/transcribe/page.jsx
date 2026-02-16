@@ -39,33 +39,33 @@ export default function TranscribeDocPage() {
 
         <div className="grid grid-cols-3 gap-4 mb-12 p-6 bg-gray-50 rounded-lg border border-gray-200">
           <div><div className="text-sm font-medium text-gray-600">Languages</div><div className="text-2xl font-bold text-gray-900">99+</div></div>
-          <div><div className="text-sm font-medium text-gray-600">Max File</div><div className="text-2xl font-bold text-gray-900">25 MB</div></div>
+          <div><div className="text-sm font-medium text-gray-600">Max File</div><div className="text-2xl font-bold text-gray-900">50 MB</div></div>
           <div><div className="text-sm font-medium text-gray-600">Accuracy</div><div className="text-2xl font-bold text-gray-900">High</div></div>
         </div>
 
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-4">Overview</h2>
           <p className="text-gray-700 leading-relaxed">
-            Convert audio files to text using OpenAI&apos;s Whisper model. Automatically transcribe podcasts, interviews, meetings, or any audio content. The model handles multiple languages and works well with background noise.
+            Convert audio files to text using the Whisper model. Automatically transcribe podcasts, interviews, meetings, or any audio content. The model handles multiple languages and works well with background noise.
           </p>
         </section>
 
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Supported Formats</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {['MP3', 'WAV', 'M4A', 'FLAC', 'OGG', 'WEBM', 'AAC', 'OPUS'].map((fmt) => (
+            {['MP3', 'WAV', 'M4A', 'FLAC', 'OGG'].map((fmt) => (
               <div key={fmt} className="p-3 text-center rounded-lg bg-gray-100 border border-gray-200 text-sm font-medium text-gray-700">
                 {fmt}
               </div>
             ))}
           </div>
-          <p className="text-sm text-gray-600 mt-4">Maximum file size: 25 MB</p>
+          <p className="text-sm text-gray-600 mt-4">Maximum file size: 50 MB</p>
         </section>
 
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Features</h2>
           <ul className="space-y-3 text-gray-700">
-            <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>High Accuracy:</strong> OpenAI Whisper model trained on diverse audio</span></li>
+            <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>High Accuracy:</strong> Whisper model trained on diverse audio</span></li>
             <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Multilingual:</strong> Recognizes 99+ languages automatically</span></li>
             <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Noise Handling:</strong> Works with background noise</span></li>
             <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Fast Processing:</strong> Quick turnaround for most files</span></li>
@@ -96,11 +96,12 @@ export default function TranscribeDocPage() {
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-4">Limitations</h2>
           <ul className="space-y-2 text-gray-700">
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Limited to 25 MB file size</span></li>
+            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Limited to 50 MB file size</span></li>
             <li className="flex gap-3"><span className="text-gray-400">•</span><span>May struggle with heavy accents or dialects</span></li>
             <li className="flex gap-3"><span className="text-gray-400">•</span><span>Background music can reduce accuracy</span></li>
             <li className="flex gap-3"><span className="text-gray-400">•</span><span>Multiple speakers may need manual editing</span></li>
             <li className="flex gap-3"><span className="text-gray-400">•</span><span>Technical jargon may be misheard</span></li>
+            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Currently requires a public audio URL (local uploads are being improved)</span></li>
           </ul>
         </section>
 
