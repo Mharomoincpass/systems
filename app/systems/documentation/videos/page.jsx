@@ -49,12 +49,11 @@ export default function VideosDocPage() {
             Generate short videos from detailed text descriptions. The current model focuses on fast iterations for creative exploration and quick content creation.
           </p>
         </section>
-            [
-              { name: 'Grok Video', speed: 'Fast', quality: 'High', desc: 'Text-to-video generation optimized for quick results' },
-            ].map((model, i) => (
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold mb-6">Available Models</h2>
+          <div className="space-y-4">
             {[
-              { name: 'LTX-2', speed: 'Fast', quality: 'High', desc: 'Open-source model optimized for speed' },
-              { name: 'Seedance', speed: 'Faster', quality: 'Good', desc: 'Ultra-fast generation for quick iteration' },
+              { name: 'Grok Video', speed: 'Fast', quality: 'High', desc: 'Text-to-video generation optimized for quick results' },
             ].map((model, i) => (
               <div key={i} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
                 <div className="flex justify-between items-start mb-2">

@@ -53,7 +53,7 @@ export default function TTSDocPage() {
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Available Voices</h2>
           <div className="space-y-3">
-            [
+            {[
               { name: 'Rachel', style: 'Female, calm' },
               { name: 'Adam', style: 'Male, deep' },
               { name: 'Bella', style: 'Female, energetic' },

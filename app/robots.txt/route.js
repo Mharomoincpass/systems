@@ -5,6 +5,7 @@ Disallow: /admin
 Disallow: /monitor
 Disallow: /api
 Sitemap: https://mharomo.systems/sitemap.xml
+  Allow: /blogs
 `
 
   return new Response(content, {

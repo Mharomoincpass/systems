@@ -53,7 +53,7 @@ export default function ImagesDocPage() {
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Available Models</h2>
           <div className="space-y-4">
-            [
+            {[
               { name: 'FLUX Schnell', speed: 'Fastest', quality: 'Good', cost: 'Low', desc: 'Ultra-fast, great for quick iterations' },
               { name: 'Z-Image Turbo', speed: 'Very Fast', quality: 'Good', cost: 'Low', desc: 'Optimized for speed without sacrificing quality' },
               { name: 'Imagen 4', speed: 'Medium', quality: 'High', cost: 'Medium', desc: 'Google model for sharp detail' },

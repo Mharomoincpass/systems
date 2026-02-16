@@ -52,26 +52,33 @@ export function Navbar() {
           </span>
         </Link>
 
-        {/* Action Button */}
-        <button 
-          onClick={handleAction}
-          disabled={loading}
-          className="group relative flex items-center gap-2 px-4 py-1.5 sm:px-6 sm:py-2.5 rounded-full bg-white/5 border border-white/10 hover:bg-white transition-all duration-500 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <span className="text-white group-hover:text-black text-xs sm:text-sm font-medium transition-colors duration-500 whitespace-nowrap">
-            {loading ? 'Starting...' : 'Check Systems'}
-          </span>
-          {!loading && (
-            <svg 
-              className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white group-hover:text-black transition-all duration-500 group-hover:translate-x-0.5" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          )}
-        </button>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/blogs"
+            className="text-xs sm:text-sm text-zinc-300 hover:text-white transition-colors"
+          >
+            Blogs
+          </Link>
+          <button 
+            onClick={handleAction}
+            disabled={loading}
+            className="group relative flex items-center gap-2 px-4 py-1.5 sm:px-6 sm:py-2.5 rounded-full bg-white/5 border border-white/10 hover:bg-white transition-all duration-500 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span className="text-white group-hover:text-black text-xs sm:text-sm font-medium transition-colors duration-500 whitespace-nowrap">
+              {loading ? 'Starting...' : 'Check Systems'}
+            </span>
+            {!loading && (
+              <svg 
+                className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white group-hover:text-black transition-all duration-500 group-hover:translate-x-0.5" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            )}
+          </button>
+        </div>
       </div>
     </nav>
   )

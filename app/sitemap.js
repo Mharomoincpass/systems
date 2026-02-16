@@ -4,6 +4,7 @@ export default function sitemap() {
   const routes = [
     '/',
     '/systems',
+    '/blogs',
     '/systems/documentation',
     '/systems/documentation/slm',
     '/systems/documentation/images',
