@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers'
-import { generateToken } from '@/lib/auth'
+import { generateToken, comparePasswords } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,9 +15,21 @@ export async function POST(request) {
       )
     }
 
-    const adminPassword = process.env.ADMIN_PASSWORD || '123456'
+    // ADMIN_PASSWORD must be set as a bcrypt hash in environment variables
+    const adminPasswordHash = process.env.ADMIN_PASSWORD
+    
+    if (!adminPasswordHash) {
+      console.error('ADMIN_PASSWORD environment variable is not set')
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error' }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
 
-    if (password !== adminPassword) {
+    // Use bcrypt compare for timing-safe password comparison
+    const isValid = await comparePasswords(password, adminPasswordHash)
+    
+    if (!isValid) {
       return new Response(
         JSON.stringify({ error: 'Invalid password' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }
@@ -38,12 +50,14 @@ export async function POST(request) {
     return new Response(
       JSON.stringify({
         message: 'Admin authenticated',
-        adminToken,
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     )
   } catch (error) {
-    console.error('Admin auth error:', error)
+    // Log error details only in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Admin auth error:', error)
+    }
     return new Response(
       JSON.stringify({ error: 'Authentication failed' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }

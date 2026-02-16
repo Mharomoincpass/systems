@@ -11,24 +11,18 @@ export function middleware(request) {
   const adminToken = request.cookies.get('adminToken')?.value
   const { pathname } = request.nextUrl
 
-  console.log(`🚦 Middleware: ${request.method} ${pathname}`)
-
   // Protect admin routes
   if (adminProtectedPaths.some((path) => pathname.startsWith(path))) {
     if (!adminToken) {
-      console.log(`   ❌ No admin token for monitor, redirecting to /admin`)
       return NextResponse.redirect(new URL('/admin', request.url))
     }
-    console.log(`   ✅ Admin token present`)
   }
 
   // Protect session routes
   if (sessionProtectedPaths.some((path) => pathname.startsWith(path))) {
     if (!sessionToken) {
-      console.log(`   ❌ No session token for systems, redirecting to /`)
       return NextResponse.redirect(new URL('/', request.url))
     }
-    console.log(`   ✅ Session token present`)
   }
 
   return NextResponse.next()

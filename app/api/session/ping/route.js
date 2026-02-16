@@ -30,8 +30,6 @@ export async function POST(request) {
       )
     }
 
-    console.log(`🔄 Session ping - IP: ${session.ip}, Updated: ${new Date().toLocaleTimeString()}`)
-
     return new Response(
       JSON.stringify({
         message: 'Session updated',
@@ -40,7 +38,9 @@ export async function POST(request) {
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     )
   } catch (error) {
-    console.error('Session ping error:', error)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Session ping error:', error)
+    }
     return new Response(
       JSON.stringify({ error: 'Failed to ping session' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }

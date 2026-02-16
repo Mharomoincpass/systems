@@ -25,29 +25,20 @@ function getClientIP(request) {
     cleanIp = '127.0.0.1'
   }
 
-  console.log('🔍 Client IP extracted:', cleanIp)
   return cleanIp
 }
 
 export async function POST(request) {
   try {
-    console.log('📍 POST /api/session/start called')
-    
-    console.log('🔗 Connecting to MongoDB...')
     await connectDB()
-    console.log('✅ MongoDB connected')
 
     const ip = getClientIP(request)
     const userAgent = request.headers.get('user-agent') || ''
-    console.log('📱 User Agent:', userAgent)
     
     const sessionToken = generateToken({ ip, timestamp: Date.now() })
-    console.log('🔐 Generated token:', sessionToken)
 
     // Fetch geolocation data
-    console.log('🗺️ Fetching geolocation...')
     const location = await getIPLocation(ip)
-    console.log('📍 Location data:', location)
 
     const session = await Session.create({
       ip,
@@ -55,10 +46,8 @@ export async function POST(request) {
       userAgent,
       location,
     })
-    console.log('💾 Session saved to DB:', session._id)
 
     const cookieStore = await cookies()
-    console.log('🍪 Setting cookie...')
     cookieStore.set('sessionToken', sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -66,9 +55,7 @@ export async function POST(request) {
       maxAge: 86400 * 7,
       path: '/',
     })
-    console.log('✅ Cookie set successfully')
 
-    console.log('📤 Sending response...')
     return new Response(
       JSON.stringify({
         message: 'Session started',
@@ -79,10 +66,13 @@ export async function POST(request) {
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     )
   } catch (error) {
-    console.error('❌ Session start error:', error.message)
-    console.error('Stack:', error.stack)
+    // Only log detailed errors in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Session start error:', error.message)
+      console.error('Stack:', error.stack)
+    }
     return new Response(
-      JSON.stringify({ error: error.message || 'Failed to start session' }),
+      JSON.stringify({ error: 'Failed to start session' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     )
   }

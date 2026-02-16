@@ -52,7 +52,7 @@ export default function AdminPage() {
             </svg>
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">Admin Portal</h1>
-          <p className="text-gray-400 text-xs sm:text-sm md:text-base transition-all duration-300">Enter 6-digit access code</p>
+          <p className="text-gray-400 text-xs sm:text-sm md:text-base transition-all duration-300">Enter your secure admin password</p>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 transition-all duration-300 hover:border-white/20 hover:bg-white/[0.07]">
@@ -60,9 +60,8 @@ export default function AdminPage() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="• • • • • •"
-            maxLength="6"
-            className="w-full bg-white/10 border border-white/20 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 md:py-4 text-white placeholder-gray-500 text-lg sm:text-xl md:text-2xl tracking-[0.5em] text-center focus:outline-none focus:border-white/30 focus:bg-white/[0.15] mb-4 sm:mb-6 transition-all duration-300"
+            placeholder="Enter admin password"
+            className="w-full bg-white/10 border border-white/20 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 md:py-4 text-white placeholder-gray-500 text-base sm:text-lg text-center focus:outline-none focus:border-white/30 focus:bg-white/[0.15] mb-4 sm:mb-6 transition-all duration-300"
             disabled={loading}
           />
 
@@ -79,7 +78,7 @@ export default function AdminPage() {
 
           <button
             type="submit"
-            disabled={loading || password.length !== 6}
+            disabled={loading || password.length === 0}
             className="w-full bg-white text-black font-semibold py-2 sm:py-3 md:py-4 rounded-lg sm:rounded-xl hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 text-xs sm:text-sm md:text-base shadow-lg shadow-white/20 hover:shadow-white/40 hover:scale-[1.02] active:scale-[0.98]"
           >
             {loading ? (
