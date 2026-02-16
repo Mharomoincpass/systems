@@ -286,16 +286,16 @@ npm install -g pm2
 # Start the application
 pm2 start ecosystem.config.js
 
-# View logs
+# View logs (using app name)
 pm2 logs ai-tools-systems
 
-# Monitor
+# Monitor all processes
 pm2 monit
 
-# Restart
-pm2 restart ai-tools-systems
+# Restart with updated environment variables
+pm2 restart ai-tools-systems --update-env
 
-# Stop
+# Stop the application
 pm2 stop ai-tools-systems
 
 # Save PM2 configuration

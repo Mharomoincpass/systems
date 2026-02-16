@@ -14,7 +14,7 @@ echo "Building project..."
 npm run build
 
 echo "Restarting app..."
-pm2 restart ecosystem.config.js || pm2 start ecosystem.config.js
+pm2 restart ai-tools-systems --update-env || pm2 start ecosystem.config.js
 
 pm2 save
 
