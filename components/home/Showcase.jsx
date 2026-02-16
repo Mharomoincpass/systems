@@ -40,9 +40,9 @@ export default function Showcase() {
 
   useGSAP(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const isMobile = window.matchMedia('(max-width: 767px)').matches
-    if (reduceMotion || isMobile) return
+    if (reduceMotion) return
 
+    const isMobile = window.matchMedia('(max-width: 767px)').matches
     const panels = gsap.utils.toArray('.project-panel')
     
     panels.forEach((panel, i) => {
@@ -52,33 +52,49 @@ export default function Showcase() {
       gsap.set(images, { opacity: 0, scale: 0.9 })
       gsap.set(images[0], { opacity: 1, scale: 1 }) // First image visible
       
-      // Create a timeline for this project's images
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: panel,
-          start: "top top",
-          end: `+=${images.length * 60}%`, // Reduced scroll distance
-          scrub: 1,
-          pin: true, 
-          pinSpacing: true,
-          anticipatePin: 1
-        }
-      })
+      // On mobile, only animate the first image if there are multiple
+      if (isMobile && images.length > 1) {
+        // Simple fade-in animation for mobile
+        gsap.from(images[0], {
+          scrollTrigger: {
+            trigger: panel,
+            start: "top 80%",
+          },
+          opacity: 0,
+          scale: 0.95,
+          duration: 0.8,
+          ease: "power2.out"
+        })
+      } else if (!isMobile) {
+        // Full animation for desktop
+        const scrollDistance = images.length * 60
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: panel,
+            start: "top top",
+            end: `+=${scrollDistance}%`,
+            scrub: 1,
+            pin: true, 
+            pinSpacing: true,
+            anticipatePin: 1
+          }
+        })
 
-      // Animate images one by one
-      images.forEach((img, idx) => {
-        if (idx === 0) return // Skip first (already visible)
-        
-        tl.to(images[idx - 1], 
-          { opacity: 0, scale: 1.1, duration: 0.5 },
-          "+=0.5"
-        )
-        .fromTo(img, 
-          { opacity: 0, scale: 0.9 },
-          { opacity: 1, scale: 1, duration: 1 },
-          "<"
-        )
-      })
+        // Animate images one by one
+        images.forEach((img, idx) => {
+          if (idx === 0) return // Skip first (already visible)
+          
+          tl.to(images[idx - 1], 
+            { opacity: 0, scale: 1.1, duration: 0.5 },
+            "+=0.5"
+          )
+          .fromTo(img, 
+            { opacity: 0, scale: 0.9 },
+            { opacity: 1, scale: 1, duration: 1 },
+            "<"
+          )
+        })
+      }
     })
   }, { scope: container })
 
