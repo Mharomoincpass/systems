@@ -18,4 +18,5 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd ~/systems
+            chmod +x deploy.sh
             ./deploy.sh
