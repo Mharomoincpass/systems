@@ -57,7 +57,7 @@ export default function Showcase() {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: panel,
-          start: "top top",
+          start: isMobile ? "top 15%" : "top top", // Pin a bit lower on mobile
           end: `+=${scrollDistance}%`,
           scrub: 1,
           pin: true, 
@@ -94,12 +94,12 @@ export default function Showcase() {
 
       <div className="w-full">
         {products.map((product, i) => (
-          <div key={i} className="project-panel relative w-full min-h-[70vh] md:h-screen flex items-center justify-center bg-black overflow-hidden">
+          <div key={i} className="project-panel relative w-full min-h-[80vh] md:h-screen flex items-center justify-center bg-black overflow-hidden">
             
-            <div className={`grid lg:grid-cols-[1.5fr_1fr] gap-12 items-center w-full px-6 lg:px-12 max-w-[90vw] ${i % 2 === 1 ? 'lg:grid-cols-[1fr_1.5fr]' : ''}`}>
+            <div className={`grid lg:grid-cols-[1.5fr_1fr] gap-8 md:gap-12 items-center w-full px-4 sm:px-6 lg:px-12 max-w-[90vw] ${i % 2 === 1 ? 'lg:grid-cols-[1fr_1.5fr]' : ''}`}>
                 
                 {/* Image Container - Absolutely positioned images stack */}
-              <div className={`relative w-full aspect-video ${i % 2 === 1 ? 'lg:order-2' : ''}`}>
+              <div className={`relative w-full aspect-video max-w-full ${i % 2 === 1 ? 'lg:order-2' : ''}`}>
                 {product.images.map((img, idx) => (
                   <div 
                     key={idx} 
