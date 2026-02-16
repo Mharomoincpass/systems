@@ -20,10 +20,9 @@ export default function Features() {
 
   useGSAP(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const isMobile = window.matchMedia('(max-width: 767px)').matches
-    if (reduceMotion || isMobile) return
+    if (reduceMotion) return
 
-    // Horizontal scroll for specific expertise cards or just a nice stagger
+    const isMobile = window.matchMedia('(max-width: 767px)').matches
     const cards = gsap.utils.toArray('.feature-card');
     
     gsap.from(cards, {
@@ -31,10 +30,10 @@ export default function Features() {
         trigger: container.current,
         start: "top 80%",
       },
-      y: 100,
+      y: isMobile ? 50 : 100,
       opacity: 0,
-      stagger: 0.1,
-      duration: 1,
+      stagger: isMobile ? 0.15 : 0.1,
+      duration: isMobile ? 0.8 : 1,
       ease: "power4.out"
     })
   }, { scope: container })

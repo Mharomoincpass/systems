@@ -47,21 +47,21 @@ export default function Hero() {
 
   useGSAP(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const isMobile = window.matchMedia('(max-width: 767px)').matches
-    if (reduceMotion || isMobile) return
+    if (reduceMotion) return
 
+    const isMobile = window.matchMedia('(max-width: 767px)').matches
     const tl = gsap.timeline()
 
-    // Background reveal
+    // Background reveal - adjusted for mobile
     tl.fromTo(bgRef.current,
-      { scale: 1.2, opacity: 0 },
-      { scale: 1, opacity: 1, duration: 2, ease: "power3.out" }
+      { scale: isMobile ? 1.1 : 1.2, opacity: 0 },
+      { scale: 1, opacity: 1, duration: isMobile ? 1.5 : 2, ease: "power3.out" }
     )
 
-    // Text stagger reveal
+    // Text stagger reveal - reduced animation on mobile
     .fromTo(".hero-text-line",
-      { y: 100, opacity: 0, rotateX: -20 },
-      { y: 0, opacity: 1, rotateX: 0, duration: 1.2, stagger: 0.1, ease: "power4.out" },
+      { y: isMobile ? 50 : 100, opacity: 0, rotateX: isMobile ? 0 : -20 },
+      { y: 0, opacity: 1, rotateX: 0, duration: isMobile ? 1 : 1.2, stagger: 0.1, ease: "power4.out" },
       "-=1.5"
     )
     
@@ -72,21 +72,22 @@ export default function Hero() {
       "-=0.8"
     )
 
-    // Parallax effect on scroll
+    // Parallax effect on scroll - reduced intensity on mobile
     ScrollTrigger.create({
       trigger: container.current,
       start: "top top",
       end: "bottom top",
       scrub: 1,
       onUpdate: (self) => {
+        const parallaxIntensity = isMobile ? 0.5 : 1
         gsap.to(textRef.current, {
-          y: self.progress * 200,
+          y: self.progress * 200 * parallaxIntensity,
           opacity: 1 - self.progress,
           overwrite: true
         })
         gsap.to(bgRef.current, {
-          y: self.progress * 100,
-          scale: 1 + self.progress * 0.1,
+          y: self.progress * 100 * parallaxIntensity,
+          scale: 1 + self.progress * 0.1 * parallaxIntensity,
           overwrite: true
         })
       }
