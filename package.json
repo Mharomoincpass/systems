@@ -1,6 +1,7 @@
 {
-  "name": "myapp",
+  "name": "ai-tools-systems",
   "version": "1.0.0",
+  "description": "AI Tools and Systems platform featuring chat, image generation, video generation, music generation, speech-to-text, and text-to-speech capabilities",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -8,6 +9,25 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "keywords": [
+    "ai",
+    "nextjs",
+    "mongodb",
+    "image-generation",
+    "video-generation",
+    "music-generation",
+    "text-to-speech",
+    "speech-to-text",
+    "huggingface",
+    "pollinations"
+  ],
+  "author": "Mharomoincpass",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mharomoincpass/systems"
+  },
+  "homepage": "https://mharomo.systems",
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@huggingface/inference": "^4.13.12",
