@@ -83,7 +83,7 @@ export async function POST(request) {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                model: 'meta-llama/Llama-3.2-3B-Instruct',
+                model: 'meta-llama/Llama-3.1-8B-Instruct',
                 messages: [
                   { role: 'system', content: 'You are a helpful AI assistant. Provide concise and accurate responses.' },
                   ...messages

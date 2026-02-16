@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 export async function GET(request) {
   try {
     const pollinationsKey = process.env.POLLINATIONS_API_KEY
@@ -21,6 +23,7 @@ export async function GET(request) {
         'Authorization': `Bearer ${pollinationsKey}`,
         'Content-Type': 'application/json',
       },
+      next: { revalidate: 0 } // Disable Next.js caching for this request
     })
 
     if (!response.ok) {
