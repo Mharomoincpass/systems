@@ -14,7 +14,7 @@ echo "Building project..."
 npm run build
 
 echo "Restarting app..."
-pm2 restart mharomo --update-env || pm2 start npm --name "mharomo" -- start
+pm2 restart ecosystem.config.js || pm2 start ecosystem.config.js
 
 pm2 save
 

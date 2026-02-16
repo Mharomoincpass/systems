@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'myapp',
+      name: 'ai-tools-systems',
       script: 'node_modules/next/dist/bin/next',
       args: 'start',
       instances: 'max',
