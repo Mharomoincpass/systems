@@ -5,6 +5,8 @@ export default function sitemap() {
     '/',
     '/systems',
     '/blogs',
+    '/blogs/free-ai-chat-guide',
+    '/blogs/ai-photo-generator-free',
     '/ai-tools',
     '/ai-tools/mcm',
     '/ai-image-generator',

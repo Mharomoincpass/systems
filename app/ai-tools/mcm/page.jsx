@@ -10,7 +10,7 @@ const siteUrl = 'https://mharomo.systems'
 
 export default function MultiChatModelsPage() {
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen bg-white text-black">
       <Script
         id="json-ld-mcm"
         type="application/ld+json"
@@ -31,19 +31,19 @@ export default function MultiChatModelsPage() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         <div className="mb-10">
-          <Link href="/ai-tools" className="text-xs text-zinc-400 hover:text-white transition-colors">
+          <Link href="/ai-tools" className="text-xs text-zinc-600 hover:text-black transition-colors">
             Back to AI Tools
           </Link>
           <h1 className="text-3xl sm:text-4xl font-bold mt-3">What is Multi Chat Models (MCM)?</h1>
-          <p className="text-sm sm:text-base text-zinc-400 mt-3">
+          <p className="text-sm sm:text-base text-zinc-700 mt-3">
             Multi Chat Models (MCM) is a multi-model AI assistant that lets you choose the best model for your task.
             Use it for everyday questions, coding help, research summaries, and content drafting. The focus is
             speed, clarity, and reliable answers with a simple UI.
           </p>
         </div>
 
-        <section className="space-y-4 text-sm sm:text-base text-zinc-300">
-          <h2 className="text-xl sm:text-2xl font-semibold text-white">How it works</h2>
+        <section className="space-y-4 text-sm sm:text-base text-zinc-700">
+          <h2 className="text-xl sm:text-2xl font-semibold text-black">How it works</h2>
           <ul className="list-disc list-inside space-y-2">
             <li>Select a model that matches your use case (fast, large, or specialized).</li>
             <li>Send a message and stream responses in real time.</li>
@@ -57,29 +57,29 @@ export default function MultiChatModelsPage() {
         </section>
 
         <section className="mt-10 space-y-4">
-          <h2 className="text-xl sm:text-2xl font-semibold text-white">Use cases</h2>
-          <div className="grid sm:grid-cols-2 gap-4 text-sm text-zinc-300">
-            <div className="p-4 rounded-lg border border-white/10 bg-white/5">
-              <h3 className="font-semibold text-white">Coding help</h3>
+          <h2 className="text-xl sm:text-2xl font-semibold text-black">Use cases</h2>
+          <div className="grid sm:grid-cols-2 gap-4 text-sm text-zinc-700">
+            <div className="p-4 rounded-lg border border-zinc-200 bg-zinc-50">
+              <h3 className="font-semibold text-black">Coding help</h3>
               <p className="mt-2">Explain errors, generate snippets, or review logic with a fast feedback loop.</p>
             </div>
-            <div className="p-4 rounded-lg border border-white/10 bg-white/5">
-              <h3 className="font-semibold text-white">Research summaries</h3>
+            <div className="p-4 rounded-lg border border-zinc-200 bg-zinc-50">
+              <h3 className="font-semibold text-black">Research summaries</h3>
               <p className="mt-2">Turn long notes into concise, structured summaries.</p>
             </div>
-            <div className="p-4 rounded-lg border border-white/10 bg-white/5">
-              <h3 className="font-semibold text-white">Product writing</h3>
+            <div className="p-4 rounded-lg border border-zinc-200 bg-zinc-50">
+              <h3 className="font-semibold text-black">Product writing</h3>
               <p className="mt-2">Draft product copy, specs, and feature lists.</p>
             </div>
-            <div className="p-4 rounded-lg border border-white/10 bg-white/5">
-              <h3 className="font-semibold text-white">Brainstorming</h3>
+            <div className="p-4 rounded-lg border border-zinc-200 bg-zinc-50">
+              <h3 className="font-semibold text-black">Brainstorming</h3>
               <p className="mt-2">Generate ideas, variations, and alternatives quickly.</p>
             </div>
           </div>
         </section>
 
-        <section className="mt-10 space-y-4 text-sm text-zinc-300">
-          <h2 className="text-xl sm:text-2xl font-semibold text-white">Step-by-step example</h2>
+        <section className="mt-10 space-y-4 text-sm text-zinc-700">
+          <h2 className="text-xl sm:text-2xl font-semibold text-black">Step-by-step example</h2>
           <ol className="list-decimal list-inside space-y-2">
             <li>Open the Multi Chat Models tool.</li>
             <li>Pick a fast model for quick iteration.</li>
@@ -89,8 +89,8 @@ export default function MultiChatModelsPage() {
           </ol>
         </section>
 
-        <section className="mt-10 space-y-4 text-sm text-zinc-300">
-          <h2 className="text-xl sm:text-2xl font-semibold text-white">Comparison to alternatives</h2>
+        <section className="mt-10 space-y-4 text-sm text-zinc-700">
+          <h2 className="text-xl sm:text-2xl font-semibold text-black">Comparison to alternatives</h2>
           <p>
             Many chat tools lock you into a single model. Multi Chat Models gives you multiple model choices in one place.
             This means you can trade speed for depth without switching platforms. It is ideal for teams or power users who
@@ -99,35 +99,35 @@ export default function MultiChatModelsPage() {
         </section>
 
         <section className="mt-10">
-          <h2 className="text-xl sm:text-2xl font-semibold text-white">FAQ</h2>
-          <div className="mt-4 space-y-4 text-sm text-zinc-300">
+          <h2 className="text-xl sm:text-2xl font-semibold text-black">FAQ</h2>
+          <div className="mt-4 space-y-4 text-sm text-zinc-700">
             <div>
-              <h3 className="font-semibold text-white">Is Multi Chat Models free to try?</h3>
+              <h3 className="font-semibold text-black">Is Multi Chat Models free to try?</h3>
               <p className="mt-1">Yes. You can explore the tool and test models with available credits.</p>
             </div>
             <div>
-              <h3 className="font-semibold text-white">Can I switch models mid-chat?</h3>
+              <h3 className="font-semibold text-black">Can I switch models mid-chat?</h3>
               <p className="mt-1">Yes. Switch models anytime to compare responses or improve accuracy.</p>
             </div>
             <div>
-              <h3 className="font-semibold text-white">Does it support code formatting?</h3>
+              <h3 className="font-semibold text-black">Does it support code formatting?</h3>
               <p className="mt-1">Yes. Responses support structured text and code blocks.</p>
             </div>
             <div>
-              <h3 className="font-semibold text-white">Where can I learn more?</h3>
+              <h3 className="font-semibold text-black">Where can I learn more?</h3>
               <p className="mt-1">Visit the documentation or read related posts on the blog.</p>
             </div>
           </div>
         </section>
 
         <section className="mt-10 flex flex-col sm:flex-row gap-3">
-          <Link href="/api/tools/launch?path=/MCM" className="px-5 py-2 rounded-lg bg-white text-black text-sm font-semibold hover:scale-105 hover:shadow-xl hover:shadow-white/20 transition-all duration-300 ease-out">
+          <Link href="/api/tools/launch?path=/MCM" className="px-5 py-2 rounded-lg bg-black text-white text-sm font-semibold hover:scale-105 hover:shadow-xl hover:shadow-black/20 transition-all duration-300 ease-out">
             Try the tool
           </Link>
-          <Link href="/blogs" className="px-5 py-2 rounded-lg border border-white/20 text-sm font-semibold hover:bg-white hover:text-black hover:scale-105 transition-all duration-300 ease-out">
+          <Link href="/blogs" className="px-5 py-2 rounded-lg border border-zinc-300 text-black text-sm font-semibold hover:bg-black hover:text-white hover:scale-105 transition-all duration-300 ease-out">
             Read the blog
           </Link>
-          <Link href="/systems/documentation/mcm" className="px-5 py-2 rounded-lg border border-white/20 text-sm font-semibold hover:bg-white hover:text-black hover:scale-105 transition-all duration-300 ease-out">
+          <Link href="/systems/documentation/mcm" className="px-5 py-2 rounded-lg border border-zinc-300 text-black text-sm font-semibold hover:bg-black hover:text-white hover:scale-105 transition-all duration-300 ease-out">
             View documentation
           </Link>
         </section>

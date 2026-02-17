@@ -43,7 +43,7 @@ export default function CTA() {
         <h2 className="text-[14vw] sm:text-8xl md:text-9xl font-black mb-10 sm:mb-16 text-white tracking-tighter leading-[0.85] select-none">
             TRY <br/>
             <span className="text-transparent bg-clip-text bg-gradient-to-b from-zinc-500 to-zinc-800 uppercase">
-                SYSTEMS
+                FREE AI TOOLS
             </span>
         </h2>
         
@@ -54,7 +54,7 @@ export default function CTA() {
                   disabled={loading}
                   className="w-full sm:w-auto min-w-[200px] px-10 py-5 bg-white text-black text-sm sm:text-base font-bold rounded-sm hover:bg-zinc-200 transition-all duration-300 disabled:opacity-50 uppercase tracking-[0.25em]"
                 >
-                    {loading ? 'Starting...' : 'Try Systems'}
+                    {loading ? 'Starting...' : 'Try Free AI Tools'}
                 </button>
             </MagneticButton>
             <MagneticButton className="w-full sm:w-auto">
