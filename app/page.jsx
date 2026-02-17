@@ -5,24 +5,25 @@ import ScrollStory from '@/components/home/ScrollStory'
 import Features from '@/components/home/Features'
 import Showcase from '@/components/home/Showcase'
 import CTA from '@/components/home/CTA'
+import ToolsPreview from '@/components/home/ToolsPreview'
 
 const siteUrl = 'https://mharomo.systems'
 
 export const metadata = {
-  title: 'Mharomo - AI Tools for Chat, Images, Video, Music & More',
-  description: 'Free AI tools for content creation. Generate images, videos, music, transcribe audio, and chat with multiple AI models. Fast, affordable, and easy to use.',
+  title: 'Free AI Tools - Chat, Image, Video, Music & Voice | Mharomo Systems',
+  description: 'Use free AI tools for chat, image generation, video, music, text-to-speech, and speech-to-text. All in one place.',
   keywords: ['AI tools', 'AI image generator', 'AI video generator', 'AI music generator', 'text to speech', 'speech to text', 'AI chat', 'free AI tools'],
   openGraph: {
-    title: 'Mharomo - AI Tools for Chat, Images, Video, Music & More',
-    description: 'Free AI tools for content creation. Generate images, videos, music, transcribe audio, and chat with multiple AI models.',
+    title: 'Free AI Tools - Chat, Image, Video, Music & Voice | Mharomo Systems',
+    description: 'Use free AI tools for chat, image generation, video, music, text-to-speech, and speech-to-text. All in one place.',
     url: siteUrl,
     siteName: 'Mharomo',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Mharomo - AI Tools for Chat, Images, Video, Music & More',
-    description: 'Free AI tools for content creation. Generate images, videos, music, transcribe audio, and chat with multiple AI models.',
+    title: 'Free AI Tools - Chat, Image, Video, Music & Voice | Mharomo Systems',
+    description: 'Use free AI tools for chat, image generation, video, music, text-to-speech, and speech-to-text. All in one place.',
   },
   alternates: {
     canonical: siteUrl,
@@ -85,6 +86,14 @@ export default function Home() {
           
           <div className="relative z-10">
             <Hero />
+            <div className="bg-black border-y border-white/10">
+              <div className="max-w-6xl mx-auto px-6 py-4 text-center">
+                <p className="text-sm sm:text-base text-zinc-400">
+                  No sign-up required. Free AI tools for chat, images, video, music, and voice.
+                </p>
+              </div>
+            </div>
+            <ToolsPreview />
             <ScrollStory />
             <Features />
             <Showcase />

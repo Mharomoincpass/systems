@@ -84,7 +84,7 @@ export default function Showcase() {
   }, { scope: container })
 
   return (
-    <section ref={container} className="relative bg-black z-10 overflow-hidden">
+    <section id="projects" ref={container} className="relative bg-black z-10 overflow-hidden">
       <div className="container mx-auto px-6 py-32">
         <h2 className="text-4xl md:text-6xl font-bold text-white mb-4">
           Top <span className="text-zinc-500">Projects by yours truly</span>

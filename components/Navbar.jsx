@@ -62,10 +62,28 @@ export function Navbar() {
             AI Tools
           </Link>
           <Link
+            href="#projects"
+            className="text-sm text-zinc-300 hover:text-white transition-colors"
+          >
+            Projects
+          </Link>
+          <Link
+            href="/author"
+            className="text-sm text-zinc-300 hover:text-white transition-colors"
+          >
+            About
+          </Link>
+          <Link
+            href="#contact"
+            className="text-sm text-zinc-300 hover:text-white transition-colors"
+          >
+            Contact
+          </Link>
+          <Link
             href="/blogs"
             className="text-sm text-zinc-300 hover:text-white transition-colors"
           >
-            Blogs
+            Blog
           </Link>
           <button 
             onClick={handleAction}
@@ -139,11 +157,32 @@ export function Navbar() {
               AI Tools
             </Link>
             <Link
+              href="#projects"
+              className="block py-2 text-sm text-zinc-300 hover:text-white transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Projects
+            </Link>
+            <Link
+              href="/author"
+              className="block py-2 text-sm text-zinc-300 hover:text-white transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              About
+            </Link>
+            <Link
+              href="#contact"
+              className="block py-2 text-sm text-zinc-300 hover:text-white transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Contact
+            </Link>
+            <Link
               href="/blogs"
               className="block py-2 text-sm text-zinc-300 hover:text-white transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Blogs
+              Blog
             </Link>
           </div>
         </div>

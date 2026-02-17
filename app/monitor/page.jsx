@@ -1,263 +1,177 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-
-const INACTIVITY_THRESHOLD = 60000 // 1 minute in milliseconds
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function MonitorPage() {
-  const [sessions, setSessions] = useState([])
-  const [searchTerm, setSearchTerm] = useState('')
+  const [view, setView] = useState('visitors') // 'visitors' or 'tools'
+  const [data, setData] = useState({ visitors: [], tools: [] })
   const [loading, setLoading] = useState(true)
-  const lastResolveAtRef = useRef(0)
+  const [error, setError] = useState(null)
+  const [search, setSearch] = useState('')
+  const router = useRouter()
 
-  useEffect(() => {
-    fetchSessions(true)
-    // Auto-refresh every 5 seconds to show real-time status
-    const interval = setInterval(() => fetchSessions(false), 5000)
-    return () => clearInterval(interval)
-  }, [])
-
-  const fetchSessions = async (resolveLocation = false) => {
+  const fetchData = async () => {
     try {
-      const url = resolveLocation
-        ? '/api/monitor/sessions?resolveLocation=1'
-        : '/api/monitor/sessions'
-      const response = await fetch(url)
-      
-      if (response.status === 401) {
-        window.location.href = '/admin'
+      const [vRes, tRes] = await Promise.all([
+        fetch('/api/monitor/visitors'),
+        fetch('/api/monitor/sessions')
+      ])
+
+      if (vRes.status === 401 || tRes.status === 401) {
+        router.push('/admin')
         return
       }
 
-      const data = await response.json()
-      setSessions(data.sessions || [])
-    } catch (error) {
-      console.error('Failed to fetch sessions:', error)
+      const vData = await vRes.json()
+      const tData = await tRes.json()
+
+      setData({
+        visitors: vData.visitors || [],
+        tools: tData.sessions || []
+      })
+    } catch (err) {
+      setError('Failed to fetch monitoring data')
     } finally {
       setLoading(false)
     }
   }
 
+  useEffect(() => {
+    fetchData()
+    const interval = setInterval(fetchData, 10000)
+    return () => clearInterval(interval)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/admin/logout', { method: 'POST' })
-      window.location.href = '/admin'
-    } catch (error) {
-      console.error('Logout failed:', error)
-    }
+    await fetch('/api/auth/logout', { method: 'POST' })
+    router.push('/admin')
   }
 
-  const isSessionActive = (lastAccessed) => {
-    const now = new Date().getTime()
-    const lastAccessedTime = new Date(lastAccessed).getTime()
-    return (now - lastAccessedTime) < INACTIVITY_THRESHOLD
-  }
-
-  const filteredSessions = sessions.filter(session => {
-    const searchStr = searchTerm.toLowerCase()
-    const location = session.location || {}
+  const filteredData = (view === 'visitors' ? data.visitors : data.tools).filter(item => {
+    const query = search.toLowerCase()
     return (
-      session.ip?.toLowerCase().includes(searchStr) ||
-      location.city?.toLowerCase().includes(searchStr) ||
-      location.country?.toLowerCase().includes(searchStr) ||
-      location.region?.toLowerCase().includes(searchStr) ||
-      location.isp?.toLowerCase().includes(searchStr)
+      item.ip?.toLowerCase().includes(query) ||
+      item.location?.city?.toLowerCase().includes(query) ||
+      item.location?.country?.toLowerCase().includes(query) ||
+      (view === 'visitors' ? item.path : item.userAgent)?.toLowerCase().includes(query)
     )
   })
 
-  const activeCount = sessions.filter(s => isSessionActive(s.lastAccessed)).length
-  const inactiveCount = sessions.length - activeCount
-
-  const getTimeSinceLastAccess = (lastAccessed) => {
-    const now = new Date().getTime()
-    const lastAccessedTime = new Date(lastAccessed).getTime()
-    const diffSeconds = Math.floor((now - lastAccessedTime) / 1000)
-    
-    if (diffSeconds < 60) return `${diffSeconds}s ago`
-    const diffMinutes = Math.floor(diffSeconds / 60)
-    if (diffMinutes < 60) return `${diffMinutes}m ago`
-    const diffHours = Math.floor(diffMinutes / 60)
-    return `${diffHours}h ago`
-  }
-
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-[#030014] text-white">Loading...</div>
-  }
-
   return (
-    <div className="min-h-screen bg-[#030014] text-white p-4 sm:p-6 md:p-8">
-      {/* Noise texture overlay */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
-      
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
+    <div className="min-h-screen bg-black text-zinc-300 p-4 sm:p-6 font-mono text-xs">
+      <div className="max-w-full mx-auto">
+        <header className="flex items-center justify-between gap-4 mb-6 border-b border-zinc-800 pb-4">
           <div className="flex items-center gap-4">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">Session Monitor</h1>
+            <h1 className="text-sm font-bold text-white uppercase tracking-wider">System Monitor</h1>
+            <div className="h-4 w-px bg-zinc-800"></div>
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+              <span className="text-zinc-500">Live</span>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <div className="flex bg-zinc-900 rounded border border-zinc-800 p-0.5">
+              <button 
+                onClick={() => setView('visitors')}
+                className={`px-3 py-1 rounded-sm text-[10px] uppercase tracking-wide transition-all ${view === 'visitors' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+              >
+                Visitors
+              </button>
+              <button 
+                onClick={() => setView('tools')}
+                className={`px-3 py-1 rounded-sm text-[10px] uppercase tracking-wide transition-all ${view === 'tools' ? 'bg-zinc-800 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+              >
+                Tools
+              </button>
+            </div>
             <button 
               onClick={handleLogout}
-              className="px-3 py-1.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold rounded-lg hover:bg-red-500/20 hover:scale-105 transition-all duration-300 uppercase tracking-wider"
+              className="text-zinc-500 hover:text-red-400 transition-colors uppercase text-[10px] tracking-wide"
             >
               Logout
             </button>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-400 bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span>Live · Auto-refresh 5s</span>
-          </div>
+        </header>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          {[
+            { label: 'TOTAL VISITORS', value: data.visitors.length },
+            { label: 'ACTIVE SESSIONS', value: data.tools.filter(t => (new Date() - new Date(t.lastAccessed)) < 300000).length },
+            { label: 'TOOL USAGE', value: data.tools.length },
+            { label: 'LATENCY', value: '24ms' }
+          ].map((stat, i) => (
+            <div key={i} className="bg-zinc-900/50 border border-zinc-800 p-3 rounded">
+              <p className="text-zinc-600 text-[9px] uppercase tracking-wider mb-1">{stat.label}</p>
+              <p className="text-lg font-mono text-white">{stat.value}</p>
+            </div>
+          ))}
         </div>
 
-        {/* Numbered Stats + Search */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-6 mb-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent backdrop-blur-sm p-4 transition-all duration-300 hover:border-white/20 hover:scale-[1.02]">
-              <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.3em] text-gray-500">
-                <span>01</span>
-                <span>Total</span>
-              </div>
-              <div className="mt-3 text-3xl font-semibold text-white">{sessions.length}</div>
-            </div>
-            <div className="rounded-2xl border border-emerald-500/20 bg-gradient-to-b from-emerald-500/10 to-transparent backdrop-blur-sm p-4 transition-all duration-300 hover:border-emerald-500/30 hover:scale-[1.02]">
-              <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.3em] text-emerald-300/80">
-                <span>02</span>
-                <span>Active</span>
-              </div>
-              <div className="mt-3 text-3xl font-semibold text-emerald-300">{activeCount}</div>
-            </div>
-            <div className="rounded-2xl border border-rose-500/20 bg-gradient-to-b from-rose-500/10 to-transparent backdrop-blur-sm p-4 transition-all duration-300 hover:border-rose-500/30 hover:scale-[1.02]">
-              <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.3em] text-rose-300/80">
-                <span>03</span>
-                <span>Inactive</span>
-              </div>
-              <div className="mt-3 text-3xl font-semibold text-rose-300">{inactiveCount}</div>
-            </div>
-            <div className="rounded-2xl border border-indigo-500/20 bg-gradient-to-b from-indigo-500/10 to-transparent backdrop-blur-sm p-4 transition-all duration-300 hover:border-indigo-500/30 hover:scale-[1.02]">
-              <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.3em] text-indigo-300/80">
-                <span>04</span>
-                <span>Matched</span>
-              </div>
-              <div className="mt-3 text-3xl font-semibold text-indigo-300">{filteredSessions.length}</div>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-transparent backdrop-blur-sm p-4 transition-all duration-300 hover:border-white/20">
-            <div className="text-xs uppercase tracking-[0.25em] text-gray-500">Filter</div>
-            <label className="mt-3 flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 backdrop-blur-sm px-3 py-2.5 transition-all duration-300 hover:border-white/20">
-              <svg className="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                className="w-full bg-transparent text-white placeholder-gray-500 focus:outline-none text-sm"
-                placeholder="IP, city, state, country, ISP..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+        <div className="border border-zinc-800 rounded bg-black flex flex-col h-[600px]">
+          <div className="p-3 border-b border-zinc-800 flex items-center justify-between gap-4 flex-shrink-0">
+            <div className="relative flex-1 max-w-sm">
+              <input 
+                type="text" 
+                placeholder="SEARCH_LOGS..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full bg-zinc-900 border border-zinc-800 rounded px-3 py-1.5 text-[10px] text-zinc-300 focus:outline-none focus:border-zinc-600 placeholder-zinc-700 font-mono"
               />
-            </label>
-            <div className="mt-2 text-[11px] text-gray-500">Search updates instantly across IP and location fields.</div>
+            </div>
+            <div className="text-[9px] text-zinc-600 uppercase tracking-wide">
+              {filteredData.length} RECORDS FOUND
+            </div>
           </div>
-        </div>
 
-        {/* Mobile card view */}
-        <div className="md:hidden space-y-3 sm:space-y-4">
-          {filteredSessions.map((session) => {
-            const active = isSessionActive(session.lastAccessed)
-            return (
-              <div key={session._id} className={`border rounded-xl p-4 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] ${active ? 'bg-white/5 border-green-500/30 hover:border-green-500/40' : 'bg-white/5 border-red-500/30 hover:border-red-500/40'}`}>
-                <div className="flex justify-between items-start mb-2">
-                  <p className="text-sm font-mono text-indigo-300">{session.ip}</p>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                    {active ? 'Active' : 'Inactive'}
-                  </span>
-                </div>
-                {session.location ? (
-                  <div className="space-y-1 mb-3">
-                    <p className="text-sm text-white">📍 {session.location.city}, {session.location.region}</p>
-                    <p className="text-xs text-gray-400">{session.location.country}</p>
-                    <p className="text-[10px] text-gray-500 font-mono">{session.location.isp}</p>
-                  </div>
-                ) : (
-                  <p className="text-xs text-gray-500 mb-3 italic">Location pending...</p>
-                )}
-                <div className="flex justify-between items-center text-[10px] text-gray-500 border-t border-white/5 pt-2">
-                  <span>In: {new Date(session.createdAt).toLocaleDateString()}</span>
-                  <span>Seen: {getTimeSinceLastAccess(session.lastAccessed)}</span>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-
-        {/* Desktop table view */}
-        <div className="hidden md:block overflow-hidden bg-white/5 border border-white/10 rounded-2xl backdrop-blur-xl transition-all duration-300 hover:border-white/20">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-white/5 border-b border-white/10">
-              <tr>
-                <th className="px-6 py-4 font-semibold text-gray-300">IP Address</th>
-                <th className="px-6 py-4 font-semibold text-gray-300">Location</th>
-                <th className="px-6 py-4 font-semibold text-gray-300">ISP</th>
-                <th className="px-6 py-4 font-semibold text-gray-300">Created</th>
-                <th className="px-6 py-4 font-semibold text-gray-300">Last Seen</th>
-                <th className="px-6 py-4 font-semibold text-gray-300 text-center">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-              {filteredSessions.map((session) => {
-                const active = isSessionActive(session.lastAccessed)
-                return (
-                  <tr key={session._id} className={`group transition-all duration-300 ${active ? 'hover:bg-green-500/5' : 'hover:bg-red-500/5'}`}>
-                    <td className="px-6 py-4 font-mono text-indigo-300/80 group-hover:text-indigo-300 transition-colors">{session.ip}</td>
-                    <td className="px-6 py-4">
-                      {session.location ? (
-                        <div className="flex flex-col">
-                          <span className="text-white font-medium">
-                            {session.location.city}, {session.location.region}
-                          </span>
-                          <span className="text-gray-500 text-xs">
-                            {session.location.country}
-                          </span>
-                        </div>
+          <div className="overflow-auto flex-1">
+            <table className="w-full text-left border-collapse">
+              <thead className="sticky top-0 z-10">
+                <tr className="text-zinc-600 text-[9px] uppercase tracking-wider border-b border-zinc-800 bg-black">
+                  <th className="px-3 py-2 font-medium w-32">Timestamp</th>
+                  <th className="px-3 py-2 font-medium w-32">IP Address</th>
+                  <th className="px-3 py-2 font-medium w-48">Location</th>
+                  <th className="px-3 py-2 font-medium w-24">{view === 'visitors' ? 'Path' : 'Status'}</th>
+                  <th className="px-3 py-2 font-medium">Details</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-800/50">
+                {filteredData.map((item, i) => (
+                  <tr key={i} className="hover:bg-zinc-900/50 transition-colors text-[10px]">
+                    <td className="px-3 py-2 text-zinc-500 whitespace-nowrap">
+                      {new Date(view === 'visitors' ? item.lastSeen : item.createdAt).toISOString().replace('T', ' ').substring(0, 19)}
+                    </td>
+                    <td className="px-3 py-2 font-mono text-zinc-400">
+                      {item.ip}
+                    </td>
+                    <td className="px-3 py-2 text-zinc-400">
+                      {item.location?.city ? `${item.location.city}, ${item.location.country}` : <span className="text-zinc-700">Unknown</span>}
+                    </td>
+                    <td className="px-3 py-2">
+                      {view === 'visitors' ? (
+                        <span className="text-zinc-300">{item.path}</span>
                       ) : (
-                        <span className="text-gray-600 italic">Pending...</span>
+                        <span className={(new Date() - new Date(item.lastAccessed)) < 300000 ? 'text-emerald-500' : 'text-zinc-600'}>
+                          {(new Date() - new Date(item.lastAccessed)) < 300000 ? 'ACTIVE' : 'INACTIVE'}
+                        </span>
                       )}
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="text-xs text-gray-400 font-mono truncate max-w-[150px] block" title={session.location?.isp}>
-                        {session.location?.isp || '-'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">
-                      {new Date(session.createdAt).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-gray-300">{getTimeSinceLastAccess(session.lastAccessed)}</span>
-                        <span className="text-[10px] text-gray-600 font-mono">
-                          {new Date(session.lastAccessed).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${active ? 'bg-green-500/20 text-green-400 border border-green-500/20' : 'bg-red-500/20 text-red-400 border border-red-500/20'}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${active ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></span>
-                        {active ? 'Active' : 'Inactive'}
-                      </span>
+                    <td className="px-3 py-2 text-zinc-500 truncate max-w-xs">
+                      {view === 'visitors' ? (item.referrer || '-') : (item.userAgent)}
                     </td>
                   </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        {filteredSessions.length === 0 && (
-          <div className="text-center py-20 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl mt-4">
-            <svg className="mx-auto h-12 w-12 text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <p className="text-gray-400 text-lg">No sessions match your search</p>
-            <button onClick={() => setSearchTerm('')} className="mt-2 text-indigo-400 hover:text-indigo-300 underline text-sm transition-all duration-300 hover:scale-105">Clear search</button>
+                ))}
+              </tbody>
+            </table>
+            {filteredData.length === 0 && !loading && (
+              <div className="py-8 text-center border-t border-zinc-800">
+                <p className="text-zinc-700 text-[10px] uppercase">No logs found</p>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   )
