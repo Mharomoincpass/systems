@@ -2,6 +2,7 @@
 
 import { useRef } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -10,27 +11,27 @@ gsap.registerPlugin(ScrollTrigger)
 
 const products = [
   {
-    name: 'Grocliq GEO',
-    category: 'SEO & Automation',
-    images: ['/images/grocliq.png', '/images/grocliqq.png', '/images/grocliqqq.png', '/images/grocliqqqq.png'],
-    desc: 'GEO monitoring platform with AI agents that automate the SEO process and track brand presence across search engines.',
-    url: 'https://grocliq.ai/',
+    name: 'Multi Chat Models',
+    category: 'AI Assistant',
+    images: ['/images/grocliq.png'],
+    desc: 'Multi-model chat assistant for fast, accurate answers and workflows. Chat with multiple AI models simultaneously for the best results.',
+    url: '/ai-tools/mcm',
     color: 'from-zinc-800 to-black'
   },
   {
-    name: 'OpenSignals.ai',
-    category: 'Ad Intelligence',
-    images: ['/images/opensignals.png', '/images/opensignalss.png'],
-    desc: 'Competitor ad analysis platform with AI-powered video, image, and paid ads generation for market research.',
-    url: 'https://opensignals.ai/',
+    name: 'AI Image Generator',
+    category: 'Visual Creation',
+    images: ['/images/opensignals.png'],
+    desc: 'Create stunning images from text prompts with affordable AI models. Generate professional-quality visuals in seconds.',
+    url: '/ai-image-generator',
     color: 'from-zinc-800 to-black'
   },
   {
-    name: 'Incpass',
-    category: 'Process Automation',
-    images: ['/images/incpass.png', '/images/incpasss.png'],
-    desc: 'Business process automation platform streamlining workflows, compliance, and operational efficiency.',
-    url: 'https://incpass.co/',
+    name: 'AI Video Generator',
+    category: 'Video Creation',
+    images: ['/images/incpass.png'],
+    desc: 'Generate short videos from detailed text prompts. Create engaging video content for social media, marketing, and more.',
+    url: '/ai-video-generator',
     color: 'from-zinc-800 to-black'
   }
 ]
@@ -87,7 +88,7 @@ export default function Showcase() {
     <section ref={container} className="relative bg-black z-10 overflow-hidden">
       <div className="container mx-auto px-6 py-32">
         <h2 className="text-4xl md:text-6xl font-bold text-white mb-4">
-          Top <span className="text-zinc-500">Projects by yours truly</span>
+          Featured <span className="text-zinc-500">AI Tools</span>
         </h2>
         <div className="w-full h-px bg-white/10 mt-8"></div>
       </div>
@@ -127,14 +128,12 @@ export default function Showcase() {
                 <p className="text-lg text-zinc-400 leading-relaxed mb-8">
                   {product.desc}
                 </p>
-                <a
+                <Link
                   href={product.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="inline-block px-8 py-3 border border-white/20 text-white hover:bg-white hover:text-black transition-all duration-300"
                 >
-                  View Project →
-                </a>
+                  Try Now →
+                </Link>
               </div>
             </div>
           </div>

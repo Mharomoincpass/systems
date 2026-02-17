@@ -5,7 +5,6 @@ import ScrollStory from '@/components/home/ScrollStory'
 import Features from '@/components/home/Features'
 import Showcase from '@/components/home/Showcase'
 import CTA from '@/components/home/CTA'
-import Script from 'next/script'
 
 const siteUrl = 'https://mharomo.systems'
 
@@ -35,57 +34,53 @@ export const metadata = {
 }
 
 export default function Home() {
+  const websiteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Mharomo',
+    url: siteUrl,
+    description: 'AI Tools for Chat, Images, Video, Music, Speech-to-Text and Text-to-Speech',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${siteUrl}/ai-tools?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  }
+
+  const webPageSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: 'Mharomo - AI Tools Platform',
+    url: siteUrl,
+    description: 'Explore free AI tools for generating images, videos, music, transcribing audio, and chatting with multiple AI models.',
+    breadcrumb: {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: siteUrl,
+        },
+      ],
+    },
+  }
+
   return (
     <>
-      <Script
-        id="json-ld-website"
-        type="application/ld+json"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'WebSite',
-            name: 'Mharomo',
-            url: siteUrl,
-            description: 'AI Tools for Chat, Images, Video, Music, Speech-to-Text and Text-to-Speech',
-            potentialAction: {
-              '@type': 'SearchAction',
-              target: {
-                '@type': 'EntryPoint',
-                urlTemplate: `${siteUrl}/ai-tools?q={search_term_string}`,
-              },
-              'query-input': 'required name=search_term_string',
-            },
-          }),
-        }}
-      />
-      <Script
-        id="json-ld-webpage"
-        type="application/ld+json"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'WebPage',
-            name: 'Mharomo - AI Tools Platform',
-            url: siteUrl,
-            description: 'Explore free AI tools for generating images, videos, music, transcribing audio, and chatting with multiple AI models.',
-            breadcrumb: {
-              '@type': 'BreadcrumbList',
-              itemListElement: [
-                {
-                  '@type': 'ListItem',
-                  position: 1,
-                  name: 'Home',
-                  item: siteUrl,
-                },
-              ],
-            },
-          }),
-        }}
-      />
       <SmoothScroll>
         <main className="bg-black text-white selection:bg-white selection:text-black">
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+          />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }}
+          />
           <Navbar />
           
           <div className="relative z-10">

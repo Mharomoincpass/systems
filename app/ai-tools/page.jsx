@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Script from 'next/script'
 
 const siteUrl = 'https://mharomo.systems'
 
@@ -68,110 +67,108 @@ const tools = [
 ]
 
 export default function AIToolsPage() {
+  const collectionPageSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'AI Tools',
+    description: 'A comprehensive suite of AI-powered tools for content creation, chat, and productivity.',
+    url: `${siteUrl}/ai-tools`,
+    breadcrumb: {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: siteUrl,
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: 'AI Tools',
+          item: `${siteUrl}/ai-tools`,
+        },
+      ],
+    },
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: 6,
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          item: {
+            '@type': 'SoftwareApplication',
+            name: 'Multi Chat Models (MCM)',
+            description: 'Multi-model chat assistant for fast, accurate answers and workflows.',
+            url: `${siteUrl}/ai-tools/mcm`,
+            applicationCategory: 'AIApplication',
+          },
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          item: {
+            '@type': 'SoftwareApplication',
+            name: 'AI Image Generator',
+            description: 'Create images from text prompts with affordable model options.',
+            url: `${siteUrl}/ai-image-generator`,
+            applicationCategory: 'AIApplication',
+          },
+        },
+        {
+          '@type': 'ListItem',
+          position: 3,
+          item: {
+            '@type': 'SoftwareApplication',
+            name: 'AI Video Generator',
+            description: 'Generate short videos from detailed text prompts.',
+            url: `${siteUrl}/ai-video-generator`,
+            applicationCategory: 'AIApplication',
+          },
+        },
+        {
+          '@type': 'ListItem',
+          position: 4,
+          item: {
+            '@type': 'SoftwareApplication',
+            name: 'AI Music Generator',
+            description: 'Make royalty-free music from text descriptions.',
+            url: `${siteUrl}/ai-music-generator`,
+            applicationCategory: 'AIApplication',
+          },
+        },
+        {
+          '@type': 'ListItem',
+          position: 5,
+          item: {
+            '@type': 'SoftwareApplication',
+            name: 'Speech to Text',
+            description: 'Transcribe audio to text with high accuracy.',
+            url: `${siteUrl}/speech-to-text`,
+            applicationCategory: 'AIApplication',
+          },
+        },
+        {
+          '@type': 'ListItem',
+          position: 6,
+          item: {
+            '@type': 'SoftwareApplication',
+            name: 'Text to Speech',
+            description: 'Generate natural-sounding voice audio from text.',
+            url: `${siteUrl}/text-to-speech`,
+            applicationCategory: 'AIApplication',
+          },
+        },
+      ],
+    },
+  }
+
   return (
     <main className="min-h-screen bg-white text-black">
-      <Script
-        id="json-ld-collectionpage"
+      <script
         type="application/ld+json"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'CollectionPage',
-            name: 'AI Tools',
-            description: 'A comprehensive suite of AI-powered tools for content creation, chat, and productivity.',
-            url: `${siteUrl}/ai-tools`,
-            breadcrumb: {
-              '@type': 'BreadcrumbList',
-              itemListElement: [
-                {
-                  '@type': 'ListItem',
-                  position: 1,
-                  name: 'Home',
-                  item: siteUrl,
-                },
-                {
-                  '@type': 'ListItem',
-                  position: 2,
-                  name: 'AI Tools',
-                  item: `${siteUrl}/ai-tools`,
-                },
-              ],
-            },
-            mainEntity: {
-              '@type': 'ItemList',
-              numberOfItems: 6,
-              itemListElement: [
-                {
-                  '@type': 'ListItem',
-                  position: 1,
-                  item: {
-                    '@type': 'SoftwareApplication',
-                    name: 'Multi Chat Models (MCM)',
-                    description: 'Multi-model chat assistant for fast, accurate answers and workflows.',
-                    url: `${siteUrl}/ai-tools/mcm`,
-                    applicationCategory: 'AIApplication',
-                  },
-                },
-                {
-                  '@type': 'ListItem',
-                  position: 2,
-                  item: {
-                    '@type': 'SoftwareApplication',
-                    name: 'AI Image Generator',
-                    description: 'Create images from text prompts with affordable model options.',
-                    url: `${siteUrl}/ai-image-generator`,
-                    applicationCategory: 'AIApplication',
-                  },
-                },
-                {
-                  '@type': 'ListItem',
-                  position: 3,
-                  item: {
-                    '@type': 'SoftwareApplication',
-                    name: 'AI Video Generator',
-                    description: 'Generate short videos from detailed text prompts.',
-                    url: `${siteUrl}/ai-video-generator`,
-                    applicationCategory: 'AIApplication',
-                  },
-                },
-                {
-                  '@type': 'ListItem',
-                  position: 4,
-                  item: {
-                    '@type': 'SoftwareApplication',
-                    name: 'AI Music Generator',
-                    description: 'Make royalty-free music from text descriptions.',
-                    url: `${siteUrl}/ai-music-generator`,
-                    applicationCategory: 'AIApplication',
-                  },
-                },
-                {
-                  '@type': 'ListItem',
-                  position: 5,
-                  item: {
-                    '@type': 'SoftwareApplication',
-                    name: 'Speech to Text',
-                    description: 'Transcribe audio to text with high accuracy.',
-                    url: `${siteUrl}/speech-to-text`,
-                    applicationCategory: 'AIApplication',
-                  },
-                },
-                {
-                  '@type': 'ListItem',
-                  position: 6,
-                  item: {
-                    '@type': 'SoftwareApplication',
-                    name: 'Text to Speech',
-                    description: 'Generate natural-sounding voice audio from text.',
-                    url: `${siteUrl}/text-to-speech`,
-                    applicationCategory: 'AIApplication',
-                  },
-                },
-              ],
-            },
-          }),
-        }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageSchema) }}
       />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         <div className="mb-12">

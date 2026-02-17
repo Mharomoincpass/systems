@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Script from 'next/script'
 
 const siteUrl = 'https://mharomo.systems'
 
@@ -46,33 +45,31 @@ const posts = [
 ]
 
 export default function BlogsPage() {
+  const blogSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: 'Mharomo.systems Blog',
+    description: 'Expert insights on AI tools, tutorials, and industry best practices.',
+    url: `${siteUrl}/blogs`,
+    publisher: {
+      '@type': 'Organization',
+      name: 'Mharomo.systems',
+      url: siteUrl,
+    },
+    blogPost: posts.map((post) => ({
+      '@type': 'BlogPosting',
+      headline: post.title,
+      description: post.excerpt,
+      url: `${siteUrl}/blogs/${post.slug}`,
+      datePublished: post.date,
+    })),
+  }
+
   return (
     <main className="min-h-screen bg-white text-black">
-      <Script
-        id="json-ld-blog-listing"
+      <script
         type="application/ld+json"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Blog',
-            name: 'Mharomo.systems Blog',
-            description: 'Expert insights on AI tools, tutorials, and industry best practices.',
-            url: `${siteUrl}/blogs`,
-            publisher: {
-              '@type': 'Organization',
-              name: 'Mharomo.systems',
-              url: siteUrl,
-            },
-            blogPost: posts.map((post) => ({
-              '@type': 'BlogPosting',
-              headline: post.title,
-              description: post.excerpt,
-              url: `${siteUrl}/blogs/${post.slug}`,
-              datePublished: post.date,
-            })),
-          }),
-        }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchema) }}
       />
       
       <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16">

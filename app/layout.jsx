@@ -52,6 +52,29 @@ export const viewport = {
 export default function RootLayout({
   children,
 }) {
+  const organizationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Mharomo.systems',
+    url: siteUrl,
+    logo: `${siteUrl}/icon.svg`,
+    description: 'Smart AI tools and custom software solutions for businesses. Specializing in AI chat, image generation, video creation, and data integration.',
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'Customer Service',
+      email: 'mharomoezgs@gmail.com',
+      areaServed: 'Worldwide',
+    },
+    sameAs: [
+      'https://linkedin.com/in/mharomo-ezung-51b158191',
+    ],
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Delhi',
+      addressCountry: 'India',
+    },
+  }
+  
   return (
     <html lang="en">
       <head>
@@ -73,51 +96,12 @@ export default function RootLayout({
             `,
           }}
         />
-        <Script
-          id="json-ld"
-          type="application/ld+json"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'WebSite',
-              name: siteName,
-              url: siteUrl,
-              description: siteDescription,
-            }),
-          }}
-        />
-        <Script
-          id="json-ld-organization"
-          type="application/ld+json"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Organization',
-              name: 'Mharomo.systems',
-              url: siteUrl,
-              logo: `${siteUrl}/icon.svg`,
-              description: 'Smart AI tools and custom software solutions for businesses. Specializing in AI chat, image generation, video creation, and data integration.',
-              contactPoint: {
-                '@type': 'ContactPoint',
-                contactType: 'Customer Service',
-                email: 'mharomoezgs@gmail.com',
-                areaServed: 'Worldwide',
-              },
-              sameAs: [
-                'https://linkedin.com/in/mharomo-ezung-51b158191',
-              ],
-              address: {
-                '@type': 'PostalAddress',
-                addressLocality: 'Delhi',
-                addressCountry: 'India',
-              },
-            }),
-          }}
-        />
       </head>
       <body className={inter.className}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
         <NotificationProvider>
           <div className="hidden lg:block">
             <CustomCursor />

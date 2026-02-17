@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Script from 'next/script'
 
 const siteUrl = 'https://mharomo.systems'
 
@@ -582,10 +581,8 @@ export default function BlogPost({ params }) {
 
   return (
     <main className="min-h-screen bg-white text-black">
-      <Script
-        id={`json-ld-blog-${params.slug}`}
+      <script
         type="application/ld+json"
-        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',
@@ -613,10 +610,8 @@ export default function BlogPost({ params }) {
         }}
       />
 
-      <Script
-        id={`json-ld-faq-${params.slug}`}
+      <script
         type="application/ld+json"
-        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',
@@ -633,10 +628,8 @@ export default function BlogPost({ params }) {
         }}
       />
 
-      <Script
-        id={`json-ld-breadcrumb-${params.slug}`}
+      <script
         type="application/ld+json"
-        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',
