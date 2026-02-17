@@ -2,6 +2,13 @@ import Link from 'next/link'
 
 const siteUrl = 'https://mharomo.systems'
 
+// Generate static paths for all blog posts at build time
+export async function generateStaticParams() {
+  return Object.keys(blogPosts).map((slug) => ({
+    slug,
+  }))
+}
+
 const blogPosts = {
   'free-ai-chat-guide': {
     title: 'Free AI Chat: A Full Guide for 2026',
