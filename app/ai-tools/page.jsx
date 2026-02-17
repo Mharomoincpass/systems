@@ -188,7 +188,7 @@ export default function AIToolsPage() {
           <div>
             <h2 className="text-2xl font-bold mb-3">What We Offer</h2>
             <p className="text-zinc-700 leading-relaxed">
-              Our platform provides a unified ecosystem of AI tools that work together seamlessly. Whether you're generating images from text, creating videos, transcribing audio, or building multi-model chat applications, our system handles it all with precision and speed. We focus on delivering high-quality results while keeping the tools easy to use.
+              Our platform provides a unified ecosystem of AI tools that work together seamlessly. Whether you&apos;re generating images from text, creating videos, transcribing audio, or building multi-model chat applications, our system handles it all with precision and speed. We focus on delivering high-quality results while keeping the tools easy to use.
             </p>
           </div>
 
