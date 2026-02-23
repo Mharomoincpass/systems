@@ -3,6 +3,9 @@ import { NextResponse } from 'next/server'
 // Paths that require session authentication
 const sessionProtectedPaths = ['/systems']
 
+// Public routes within /systems that should remain crawlable
+const publicSystemsPaths = ['/systems/documentation']
+
 // Paths that require admin authentication
 const adminProtectedPaths = ['/monitor']
 
@@ -23,7 +26,12 @@ export function middleware(request) {
   }
 
   // Protect session routes
-  if (sessionProtectedPaths.some((path) => pathname.startsWith(path))) {
+  const isSessionProtectedPath = sessionProtectedPaths.some((path) => pathname.startsWith(path))
+  const isPublicSystemsPath = publicSystemsPaths.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  )
+
+  if (isSessionProtectedPath && !isPublicSystemsPath) {
     if (!sessionToken) {
       console.log(`   ❌ No session token for systems, redirecting to /`)
       return NextResponse.redirect(new URL('/', request.url))

@@ -22,7 +22,7 @@ export default function AIVideoGeneratorPage() {
             name: 'AI Video Generator',
             applicationCategory: 'AIApplication',
             operatingSystem: 'Web',
-            description: 'Generate short videos from text prompts using Grok Video.',
+            description: 'Generate short videos from text prompts using Advanced AI Models.',
             url: `${siteUrl}/ai-video-generator`,
             creator: { '@type': 'Person', name: 'Mharomo' },
           }),
@@ -37,7 +37,7 @@ export default function AIVideoGeneratorPage() {
           <h1 className="text-3xl sm:text-4xl font-bold mt-3">What is an AI Video Generator?</h1>
           <p className="text-sm sm:text-base text-zinc-400 mt-3">
             An AI video generator creates short video clips from text. Describe the scene, the motion, and the
-            camera behavior, and the model turns that description into a playable clip. This tool uses Grok Video
+            camera behavior, and the model turns that description into a playable clip. This tool uses Advanced AI Models
             for fast, creative iterations.
           </p>
         </div>

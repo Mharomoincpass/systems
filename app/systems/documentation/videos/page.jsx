@@ -53,7 +53,7 @@ export default function VideosDocPage() {
           <h2 className="text-2xl font-bold mb-6">Available Models</h2>
           <div className="space-y-4">
             {[
-              { name: 'Grok Video', speed: 'Fast', quality: 'High', desc: 'Text-to-video generation optimized for quick results' },
+              { name: 'Seedance Lite', speed: 'Fast', quality: 'Standard', desc: 'Fast and efficient video generation' },
             ].map((model, i) => (
               <div key={i} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
                 <div className="flex justify-between items-start mb-2">

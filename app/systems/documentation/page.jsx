@@ -68,7 +68,7 @@ export default function DocumentationPage() {
         <div className="mt-10 p-4 bg-gray-50 rounded-md border border-gray-200">
           <h3 className="text-sm font-medium text-gray-900 mb-2">Getting Started</h3>
           <ul className="space-y-1 text-xs text-gray-600">
-            <li>• Select a system from the <Link href="/systems" className="text-blue-600 hover:underline">/systems</Link> page to begin</li>
+            <li>• Select a system from the <Link href="/ai-tools" className="text-blue-600 hover:underline">/ai-tools</Link> page to begin</li>
             <li>• Check your credit balance before generating content</li>
             <li>• Each model has different cost and performance trade-offs</li>
           </ul>

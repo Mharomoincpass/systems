@@ -4,7 +4,7 @@ export const maxDuration = 300 // 5 minute timeout for video generation
 
 const generateVideoSchema = z.object({
   prompt: z.string().min(1, 'Prompt is required for video generation'),
-  model: z.string().optional().default('grok-video'),
+  model: z.string().optional().default('seedance'),
   duration: z.number().min(2).max(10).optional().default(5),
 })
 

@@ -3,7 +3,6 @@ const siteUrl = 'https://mharomo.systems'
 export default function sitemap() {
   const routes = [
     '/',
-    '/systems',
     '/blogs',
     '/blogs/free-ai-chat-guide',
     '/blogs/ai-photo-generator-free',

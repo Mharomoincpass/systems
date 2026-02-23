@@ -3,8 +3,10 @@ export function GET() {
 Allow: /
 Allow: /blogs
 Allow: /ai-tools
+Allow: /systems/documentation
 Disallow: /admin
 Disallow: /monitor
+Disallow: /systems
 Disallow: /api
 
 Sitemap: https://mharomo.systems/sitemap.xml

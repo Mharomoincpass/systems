@@ -93,7 +93,7 @@ export default function MCMPage() {
         
         <div className="relative z-10 text-center px-4">
           <p className="text-red-400 text-sm sm:text-base mb-4">Failed to initialize chat. Please refresh.</p>
-          <Link href="/systems" className="inline-block px-4 sm:px-6 py-2 sm:py-2.5 bg-white text-black rounded-lg hover:bg-gray-200 font-medium text-sm sm:text-base transition-all duration-300 hover:scale-105">
+          <Link href="/ai-tools" className="inline-block px-4 sm:px-6 py-2 sm:py-2.5 bg-white text-black rounded-lg hover:bg-gray-200 font-medium text-sm sm:text-base transition-all duration-300 hover:scale-105">
             Go Back
           </Link>
         </div>

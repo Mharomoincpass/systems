@@ -19,9 +19,6 @@ export const metadata = {
   },
   description: siteDescription,
   applicationName: siteName,
-  alternates: {
-    canonical: '/',
-  },
   openGraph: {
     title: siteName,
     description: siteDescription,

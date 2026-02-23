@@ -10,7 +10,7 @@ export default function VideoGenerator() {
   const router = useRouter()
   const { addNotification, removeNotification } = useNotification()
   const [prompt, setPrompt] = useState('')
-  const [model, setModel] = useState('grok-video')
+  const [model, setModel] = useState('seedance')
   const [duration, setDuration] = useState(5)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -19,7 +19,7 @@ export default function VideoGenerator() {
   const scrollRef = useRef(null)
 
   const models = [
-    { id: 'grok-video', name: 'Grok Video', description: 'Grok video generation' },
+    { id: 'seedance', name: 'Seedance Lite', description: 'Fast and efficient video generation' },
   ]
 
   const generateVideo = async (e) => {
