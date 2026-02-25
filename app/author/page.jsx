@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import EmailLink from '@/components/EmailLink'
 
 const siteUrl = 'https://mharomo.systems'
 
@@ -93,7 +94,7 @@ export default function AuthorPage() {
             <h1 className="text-3xl sm:text-4xl font-bold">Mharomo Ezung</h1>
             <p className="text-sm text-zinc-600 mt-2">Software Developer</p>
             <p className="text-xs text-zinc-500 mt-1">Delhi, India</p>
-            <p className="text-xs text-zinc-500 mt-1">
+            <p EmailLink email="mharomolotha6@gmail.com" className="underline hover:text-black" /
               <a className="underline hover:text-black" href="mailto:mharomolotha6@gmail.com">mharomolotha6@gmail.com</a>
             </p>
             <div className="mt-4 flex flex-wrap gap-3 text-xs">

@@ -39,7 +39,7 @@ export default function ToolsPreview() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="mb-10">
           <h2 className="text-3xl sm:text-5xl font-black text-white">
-            Free <span className="text-zinc-500">AI Tools</span>
+            Generative <span className="text-zinc-500">AI Suite</span>
           </h2>
           <p className="text-zinc-400 mt-3 max-w-2xl">
             Instant access to multi-modal tools for chat, images, video, music, and voice.

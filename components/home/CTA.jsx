@@ -21,7 +21,7 @@ export default function CTA() {
         <div className="max-w-6xl mx-auto mb-12">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-left">
             <div>
-              <h3 className="text-zinc-400 text-xs uppercase tracking-wider mb-4 font-semibold">AI Tools</h3>
+              <h3 className="text-zinc-400 text-xs uppercase tracking-wider mb-4 font-semibold">Tool Categories</h3>
               <ul className="space-y-2 text-zinc-600 text-xs">
                 <li><Link href="/ai-tools" className="hover:text-white transition-colors">All Tools</Link></li>
                 <li><Link href="/ai-tools/mcm" className="hover:text-white transition-colors">Multi Chat Models</Link></li>
@@ -33,7 +33,7 @@ export default function CTA() {
               </ul>
             </div>
             <div>
-              <h3 className="text-zinc-400 text-xs uppercase tracking-wider mb-4 font-semibold">Blog</h3>
+              <h3 className="text-zinc-400 text-xs uppercase tracking-wider mb-4 font-semibold">Latest Insights</h3>
               <ul className="space-y-2 text-zinc-600 text-xs">
                 <li><Link href="/blogs" className="hover:text-white transition-colors">All Posts</Link></li>
                 <li><Link href="/blogs/free-ai-chat-guide" className="hover:text-white transition-colors">Free AI Chat Guide</Link></li>
@@ -41,7 +41,7 @@ export default function CTA() {
               </ul>
             </div>
             <div>
-              <h3 className="text-zinc-400 text-xs uppercase tracking-wider mb-4 font-semibold">Resources</h3>
+              <h3 className="text-zinc-400 text-xs uppercase tracking-wider mb-4 font-semibold">Platform Links</h3>
               <ul className="space-y-2 text-zinc-600 text-xs">
                 <li><Link href="/systems/documentation" className="hover:text-white transition-colors">Documentation</Link></li>
                 <li><Link href="/" className="hover:text-white transition-colors">Home</Link></li>
@@ -49,10 +49,12 @@ export default function CTA() {
               </ul>
             </div>
             <div>
-              <h3 className="text-zinc-400 text-xs uppercase tracking-wider mb-4 font-semibold">Connect</h3>
+              <h3 className="text-zinc-400 text-xs uppercase tracking-wider mb-4 font-semibold">Contact Info</h3>
               <ul className="space-y-2 text-zinc-600 text-xs">
                 <li><a href="https://linkedin.com/in/mharomo-ezung-51b158191" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">LinkedIn</a></li>
-                <li><a href="mailto:mharomolotha6@gmail.com" className="hover:text-white transition-colors">Email</a></li>
+                <li><a href="https://github.com/Mharomoincpass" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">GitHub</a></li>
+                <li><a href="https://x.com/mharomo" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">X (Twitter)</a></li>
+                <li><button onClick={() => window.location.href = 'mailto:' + 'mharomolotha6' + '@' + 'gmail.com'} className="hover:text-white transition-colors text-left">Email</button></li>
               </ul>
             </div>
           </div>
@@ -64,7 +66,9 @@ export default function CTA() {
         </p>
         <div className="text-zinc-500 text-[10px] sm:text-xs space-y-2 font-medium tracking-[0.1em] text-center">
           <p className="uppercase text-zinc-400">Delhi, India</p>
-          <p className="text-zinc-600 lowercase font-light">mharomolotha6@gmail.com</p>
+          <button onClick={() => window.location.href = 'mailto:' + 'mharomolotha6' + '@' + 'gmail.com'} className="text-zinc-600 lowercase font-light hover:text-zinc-400 transition-colors">
+            mharomolotha6<span className="hidden">null</span>@gmail.com
+          </button>
         </div>
       </div>
     </section>

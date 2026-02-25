@@ -1,7 +1,6 @@
 import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
-import CustomCursor from '@/components/CustomCursor'
 import { NotificationProvider } from '@/components/Notifications'
 import AnalyticsTracker from '@/components/AnalyticsTracker'
 

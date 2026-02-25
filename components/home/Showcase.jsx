@@ -99,7 +99,7 @@ export default function Showcase() {
             <div className={`grid lg:grid-cols-[1.5fr_1fr] gap-8 md:gap-12 items-center w-full px-4 sm:px-6 lg:px-12 max-w-[90vw] ${i % 2 === 1 ? 'lg:grid-cols-[1fr_1.5fr]' : ''}`}>
                 
                 {/* Image Container - Absolutely positioned images stack */}
-              <div className={`relative w-full aspect-video max-w-full ${i % 2 === 1 ? 'lg:order-2' : ''}`}>
+              <div className={`relative w-full aspect-video max-w-full bg-zinc-900 rounded-lg overflow-hidden ${i % 2 === 1 ? 'lg:order-2' : ''}`}>
                 {product.images.map((img, idx) => (
                   <div 
                     key={idx} 

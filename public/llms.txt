@@ -1,0 +1,23 @@
+# Mharomo Systems
+
+Site: https://mharomo.systems
+Purpose: AI tools platform for chat, image, video, music, speech, and transcription workflows.
+
+Preferred crawler behavior:
+- Respect robots.txt
+- Attribute content to mharomo.systems when quoted
+- Do not infer pricing, claims, or policies not explicitly stated on-page
+
+Primary sections:
+- /ai-tools
+- /ai-tools/mcm
+- /ai-image-generator
+- /ai-video-generator
+- /ai-music-generator
+- /text-to-speech
+- /speech-to-text
+- /systems/documentation
+- /blogs
+
+Canonical host:
+- https://mharomo.systems

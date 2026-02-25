@@ -10,20 +10,20 @@ import ToolsPreview from '@/components/home/ToolsPreview'
 const siteUrl = 'https://mharomo.systems'
 
 export const metadata = {
-  title: 'Free AI Tools - Chat, Image, Video, Music & Voice | Mharomo Systems',
-  description: 'Use free AI tools for chat, image generation, video, music, text-to-speech, and speech-to-text. All in one place.',
+  title: 'Free AI Tools: Chat, Image, Video & Music | Mharomo',
+  description: 'Use free AI tools for chat, image generation, video creation, music, text-to-speech, and speech-to-text in one fast platform with no sign-up required.',
   keywords: ['AI tools', 'AI image generator', 'AI video generator', 'AI music generator', 'text to speech', 'speech to text', 'AI chat', 'free AI tools'],
   openGraph: {
-    title: 'Free AI Tools - Chat, Image, Video, Music & Voice | Mharomo Systems',
-    description: 'Use free AI tools for chat, image generation, video, music, text-to-speech, and speech-to-text. All in one place.',
+    title: 'Free AI Tools: Chat, Image, Video & Music | Mharomo',
+    description: 'Use free AI tools for chat, image generation, video creation, music, text-to-speech, and speech-to-text in one fast platform with no sign-up required.',
     url: siteUrl,
     siteName: 'Mharomo',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Free AI Tools - Chat, Image, Video, Music & Voice | Mharomo Systems',
-    description: 'Use free AI tools for chat, image generation, video, music, text-to-speech, and speech-to-text. All in one place.',
+    title: 'Free AI Tools: Chat, Image, Video & Music | Mharomo',
+    description: 'Use free AI tools for chat, image generation, video creation, music, text-to-speech, and speech-to-text in one fast platform with no sign-up required.',
   },
   alternates: {
     canonical: siteUrl,
@@ -70,6 +70,25 @@ export default function Home() {
     },
   }
 
+  const localBusinessSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: 'Mharomo Systems',
+    url: siteUrl,
+    image: `${siteUrl}/icon.svg`,
+    description: 'AI tools platform for chat, image generation, video, music, and voice workflows.',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Delhi',
+      addressCountry: 'India',
+    },
+    areaServed: 'Worldwide',
+    sameAs: [
+      'https://linkedin.com/in/mharomo-ezung-51b158191',
+      'https://github.com/Mharomoincpass',
+    ],
+  }
+
   return (
     <>
       <SmoothScroll>
@@ -81,6 +100,10 @@ export default function Home() {
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }}
+          />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
           />
           <Navbar />
           
