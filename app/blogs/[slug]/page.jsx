@@ -1,6 +1,30 @@
+import React from 'react'
 import Link from 'next/link'
 
 const siteUrl = 'https://mharomo.systems'
+
+function limitInternalLinks(node, tracker = { count: 0, max: 2 }) {
+  if (!React.isValidElement(node)) {
+    return node
+  }
+
+  const children = React.Children.map(node.props.children, (child) =>
+    limitInternalLinks(child, tracker)
+  )
+
+  const isInternalLink =
+    node.type === Link && typeof node.props.href === 'string' && node.props.href.startsWith('/')
+
+  if (isInternalLink) {
+    tracker.count += 1
+
+    if (tracker.count > tracker.max) {
+      return <span className={node.props.className}>{children}</span>
+    }
+  }
+
+  return React.cloneElement(node, { ...node.props }, children)
+}
 
 // Generate static paths for all blog posts at build time
 export async function generateStaticParams() {
@@ -586,6 +610,8 @@ export default function BlogPost({ params }) {
     )
   }
 
+  const contentWithLimitedLinks = limitInternalLinks(post.content, { count: 0, max: 2 })
+
   return (
     <main className="min-h-screen bg-white text-black">
       <script
@@ -700,7 +726,7 @@ export default function BlogPost({ params }) {
                 margin-bottom: 0.5rem;
               }
             `}</style>
-            {post.content}
+            {contentWithLimitedLinks}
           </div>
         </article>
       </div>

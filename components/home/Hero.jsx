@@ -95,20 +95,15 @@ export default function Hero() {
       </div>
 
       <div ref={textRef} className="relative z-20 text-center px-4 sm:px-6 max-w-7xl mx-auto mix-blend-difference">
-        <div className="overflow-hidden mb-2 mt-6">
-          <h1 className="hero-text-line text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter text-white">
-            Free AI Tools
-          </h1>
-        </div>
         <div className="overflow-hidden mb-6 sm:mb-8">
-          <h1 className="hero-text-line text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter text-zinc-500">
-            for Chat, Images, Video, Music and Voice
+          <h1 className="hero-text-line text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter text-white">
+            Free AI Tools <span className="block text-zinc-500 mt-2 sm:mt-4">for Chat, Images, Video, Music & Voice</span>
           </h1>
         </div>
 
-        <div className="hero-subtitle max-w-3xl mx-auto mt-6 sm:mt-8 backdrop-blur-sm bg-white/5 p-4 sm:p-6 rounded-xl border border-white/10">
-          <p className="text-lg sm:text-xl md:text-2xl text-zinc-400 font-light tracking-wide">
-            Generate images, videos, music, voice, and text using multiple AI models in one place.
+        <div className="hero-subtitle max-w-4xl mx-auto mt-6 sm:mt-8 backdrop-blur-sm bg-white/5 p-6 sm:p-8 rounded-xl border border-white/10">
+          <p className="text-lg sm:text-xl md:text-2xl text-zinc-400 font-light tracking-wide mb-6">
+            Mharomo Systems provides a complete suite of free AI tools. Generate high-quality images, create videos from text, compose original music, convert text to speech, and transcribe audio. Chat with advanced AI models like OpenAI and Claude without any sign-up required.
           </p>
           <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-center gap-4">
             <button

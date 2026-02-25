@@ -60,6 +60,30 @@ export default function ToolsPreview() {
             </div>
           ))}
         </div>
+
+        <div className="mt-20 max-w-4xl mx-auto space-y-8 text-zinc-400 leading-relaxed border-t border-white/10 pt-16">
+          <div>
+            <h3 className="text-xl font-semibold text-white mb-3">Why Use Mharomo AI Tools?</h3>
+            <p>
+              Mharomo Systems provides a unified platform for creative AI generation. Unlike other services that require multiple subscriptions, we offer a complete suite of tools in one place. Whether you need to generate realistic images for a project, compose background music for a video, or transcribe a meeting recording, our tools are designed for speed and ease of use. Our platform is built for creators, developers, and businesses looking to leverage the power of artificial intelligence without barriers.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            <div>
+              <h4 className="text-lg font-medium text-white mb-2">For Content Creators</h4>
+              <p className="text-sm">
+                Streamline your workflow by generating assets instantly. Create custom thumbnails with our Image Generator, write scripts with MCM Chat, and voice them over using our natural Text-to-Speech engine. Produce engaging short-form videos from simple text prompts to grow your social media presence.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-lg font-medium text-white mb-2">For Developers & Business</h4>
+              <p className="text-sm">
+                Automate repetitive tasks with our advanced AI integrations. Use Speech-to-Text to archive audio content, generate code snippets with multi-model chat assistance, and create professional assets for marketing campaigns. Our tools are optimized for reliability and performance.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   )
