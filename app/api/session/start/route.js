@@ -42,7 +42,6 @@ export async function POST(request) {
     console.log('📱 User Agent:', userAgent)
     
     const sessionToken = generateToken({ ip, timestamp: Date.now() })
-    console.log('🔐 Generated token:', sessionToken)
 
     // Fetch geolocation data
     console.log('🗺️ Fetching geolocation...')
@@ -72,7 +71,6 @@ export async function POST(request) {
     return new Response(
       JSON.stringify({
         message: 'Session started',
-        sessionToken,
         sessionId: session._id,
         location,
       }),

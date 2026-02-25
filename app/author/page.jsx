@@ -33,7 +33,7 @@ export default function AuthorPage() {
     name: 'Mharomo Ezung',
     url: `${siteUrl}/author`,
     jobTitle: 'Software Developer',
-    email: 'mailto:mharomoezgs@gmail.com',
+    email: 'mailto:mharomolotha6@gmail.com',
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Delhi',
@@ -94,7 +94,7 @@ export default function AuthorPage() {
             <p className="text-sm text-zinc-600 mt-2">Software Developer</p>
             <p className="text-xs text-zinc-500 mt-1">Delhi, India</p>
             <p className="text-xs text-zinc-500 mt-1">
-              <a className="underline hover:text-black" href="mailto:mharomoezgs@gmail.com">mharomoezgs@gmail.com</a>
+              <a className="underline hover:text-black" href="mailto:mharomolotha6@gmail.com">mharomolotha6@gmail.com</a>
             </p>
             <div className="mt-4 flex flex-wrap gap-3 text-xs">
               <a className="text-zinc-700 hover:text-black underline" href="https://linkedin.com/in/mharomo-ezung-51b158191" target="_blank" rel="noopener noreferrer">

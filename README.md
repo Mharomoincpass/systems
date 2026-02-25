@@ -73,6 +73,12 @@ MONGODB_URI="mongodb://localhost:27017/myapp"
 # JWT Secret (generate a strong random string)
 JWT_SECRET="your-secret-key-change-this-in-production"
 
+# Admin dashboard password (required for /admin login)
+ADMIN_PASSWORD="change-this-to-a-strong-password"
+
+# Pollinations server API key
+POLLINATIONS_API_KEY="your-pollinations-secret-key-here"
+
 # Node Environment
 NODE_ENV="development"
 
@@ -185,6 +191,12 @@ sudo systemctl reload nginx
 - `npm run build` - Build for production
 - `npm start` - Start production server
 - `npm run lint` - Run ESLint
+
+## 🤝 Powered by
+
+This project is powered by [pollinations.ai](https://pollinations.ai), providing free and unlimited access to state-of-the-art AI models.
+
+[![Built With pollinations.ai](https://img.shields.io/badge/Built%20With-pollinations.ai-blue)](https://pollinations.ai)
 
 ## 🤝 Contributing
 

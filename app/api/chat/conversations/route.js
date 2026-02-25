@@ -1,6 +1,7 @@
 import connectDB from '@/lib/mongodb'
 import Conversation from '@/models/Conversation'
 import { z } from 'zod'
+import { verifyToken } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,6 +39,15 @@ export async function POST(request) {
 
 export async function GET(request) {
   try {
+    const cookieHeader = request.headers.get('cookie') || ''
+    const match = cookieHeader.match(/adminToken=([^;]+)/)
+    const adminToken = match ? match[1] : null
+    const adminPayload = adminToken ? verifyToken(adminToken) : null
+
+    if (!adminPayload || adminPayload.role !== 'admin') {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     await connectDB()
 
     const { searchParams } = new URL(request.url)

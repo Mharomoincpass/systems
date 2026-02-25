@@ -5,13 +5,14 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request) {
   try {
-    const body = await request.json()
-    const { sessionToken } = body
+    const cookieHeader = request.headers.get('cookie') || ''
+    const match = cookieHeader.match(/sessionToken=([^;]+)/)
+    const sessionToken = match ? decodeURIComponent(match[1]) : null
 
     if (!sessionToken) {
       return new Response(
-        JSON.stringify({ error: 'Session token required' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Session cookie required' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
       )
     }
 

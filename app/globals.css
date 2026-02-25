@@ -14,12 +14,14 @@ body {
   overflow-x: hidden;
 }
 
-/* Custom cursor hiding - only on devices with a mouse */
+/* Custom cursor hiding removed - restoring default */
+/*
 @media (pointer: fine) {
   * {
     cursor: none !important;
   }
 }
+*/
 
 /* Safe area utilities if not present */
 @layer utilities {

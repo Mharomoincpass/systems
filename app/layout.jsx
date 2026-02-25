@@ -60,7 +60,7 @@ export default function RootLayout({
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'Customer Service',
-      email: 'mharomoezgs@gmail.com',
+      email: 'mharomolotha6@gmail.com',
       areaServed: 'Worldwide',
     },
     sameAs: [
@@ -109,9 +109,6 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
         <NotificationProvider>
-          <div className="hidden lg:block">
-            <CustomCursor />
-          </div>
           {children}
         </NotificationProvider>
       </body>

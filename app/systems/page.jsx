@@ -10,23 +10,19 @@ export default function SystemsPage() {
   const lastActivityRef = useRef(0)
 
   useEffect(() => {
-    const cookies = document.cookie.split('; ')
-    const token = cookies.find(c => c.startsWith('sessionToken='))?.split('=')[1]
-    if (!token) return
-
     const handleActivity = () => {
       const now = Date.now()
       if (now - lastActivityRef.current < 300) return
       lastActivityRef.current = now
       if (activityTimeoutRef.current) clearTimeout(activityTimeoutRef.current)
       activityTimeoutRef.current = setTimeout(() => {
-        pingSession(token)
+        pingSession()
       }, 2000)
     }
 
     const events = ['mousemove', 'scroll', 'click', 'keydown', 'touchstart', 'touchmove']
     events.forEach(event => window.addEventListener(event, handleActivity, { passive: true }))
-    pingSession(token)
+    pingSession()
 
     return () => {
       events.forEach(event => window.removeEventListener(event, handleActivity))
@@ -34,12 +30,11 @@ export default function SystemsPage() {
     }
   }, [])
 
-  const pingSession = async (token) => {
+  const pingSession = async () => {
     try {
       await fetch('/api/session/ping', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionToken: token }),
       })
     } catch (error) {
       console.error('Failed to ping session:', error)

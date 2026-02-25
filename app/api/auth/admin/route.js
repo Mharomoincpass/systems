@@ -15,7 +15,14 @@ export async function POST(request) {
       )
     }
 
-    const adminPassword = process.env.ADMIN_PASSWORD || '123456'
+    const adminPassword = process.env.ADMIN_PASSWORD
+
+    if (!adminPassword) {
+      return new Response(
+        JSON.stringify({ error: 'Admin authentication is not configured' }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
 
     if (password !== adminPassword) {
       return new Response(
@@ -38,7 +45,6 @@ export async function POST(request) {
     return new Response(
       JSON.stringify({
         message: 'Admin authenticated',
-        adminToken,
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     )

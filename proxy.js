@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { jwtVerify } from 'jose'
 
 // Paths that require session authentication
 const sessionProtectedPaths = ['/systems']
@@ -9,7 +10,18 @@ const publicSystemsPaths = ['/systems/documentation']
 // Paths that require admin authentication
 const adminProtectedPaths = ['/monitor']
 
-export function middleware(request) {
+async function verifyToken(token) {
+  if (!token) return null
+  try {
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+    const { payload } = await jwtVerify(token, secret)
+    return payload
+  } catch (error) {
+    return null
+  }
+}
+
+export async function proxy(request) {
   const sessionToken = request.cookies.get('sessionToken')?.value
   const adminToken = request.cookies.get('adminToken')?.value
   const { pathname } = request.nextUrl
@@ -18,11 +30,12 @@ export function middleware(request) {
 
   // Protect admin routes
   if (adminProtectedPaths.some((path) => pathname.startsWith(path))) {
-    if (!adminToken) {
-      console.log(`   ❌ No admin token for monitor, redirecting to /admin`)
+    const payload = await verifyToken(adminToken)
+    if (!payload || payload.role !== 'admin') {
+      console.log(`   ❌ Invalid or missing admin token for monitor, redirecting to /admin`)
       return NextResponse.redirect(new URL('/admin', request.url))
     }
-    console.log(`   ✅ Admin token present`)
+    console.log(`   ✅ Valid admin token present`)
   }
 
   // Protect session routes
@@ -32,11 +45,15 @@ export function middleware(request) {
   )
 
   if (isSessionProtectedPath && !isPublicSystemsPath) {
-    if (!sessionToken) {
-      console.log(`   ❌ No session token for systems, redirecting to /`)
-      return NextResponse.redirect(new URL('/', request.url))
+    const payload = await verifyToken(sessionToken)
+    if (!payload) {
+      console.log(`   ❌ Invalid or missing session token for systems, redirecting to /`)
+      const response = NextResponse.redirect(new URL('/', request.url))
+      // Clear invalid cookie
+      response.cookies.delete('sessionToken')
+      return response
     }
-    console.log(`   ✅ Session token present`)
+    console.log(`   ✅ Valid session token present`)
   }
 
   return NextResponse.next()

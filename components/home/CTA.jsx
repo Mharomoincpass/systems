@@ -45,13 +45,14 @@ export default function CTA() {
               <ul className="space-y-2 text-zinc-600 text-xs">
                 <li><Link href="/systems/documentation" className="hover:text-white transition-colors">Documentation</Link></li>
                 <li><Link href="/" className="hover:text-white transition-colors">Home</Link></li>
+                <li><a href="https://pollinations.ai" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Powered by Pollinations.ai</a></li>
               </ul>
             </div>
             <div>
               <h3 className="text-zinc-400 text-xs uppercase tracking-wider mb-4 font-semibold">Connect</h3>
               <ul className="space-y-2 text-zinc-600 text-xs">
                 <li><a href="https://linkedin.com/in/mharomo-ezung-51b158191" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">LinkedIn</a></li>
-                <li><a href="mailto:mharomoezgs@gmail.com" className="hover:text-white transition-colors">Email</a></li>
+                <li><a href="mailto:mharomolotha6@gmail.com" className="hover:text-white transition-colors">Email</a></li>
               </ul>
             </div>
           </div>
@@ -63,7 +64,7 @@ export default function CTA() {
         </p>
         <div className="text-zinc-500 text-[10px] sm:text-xs space-y-2 font-medium tracking-[0.1em] text-center">
           <p className="uppercase text-zinc-400">Delhi, India</p>
-          <p className="text-zinc-600 lowercase font-light">mharomoezgs@gmail.com</p>
+          <p className="text-zinc-600 lowercase font-light">mharomolotha6@gmail.com</p>
         </div>
       </div>
     </section>
