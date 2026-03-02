@@ -70,9 +70,34 @@ MONGODB_URI="mongodb://localhost:27017/myapp"
 JWT_SECRET="your-strong-jwt-secret"
 ADMIN_PASSWORD="your-strong-admin-password"
 POLLINATIONS_API_KEY="your-pollinations-secret-key"
+ZEPTOMAIL_API_KEY="your-zeptomail-encrypted-api-key"
+ZEPTOMAIL_FROM_ADDRESS="noreply@mharomo.systems"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 NODE_ENV="development"
 ```
+
+### 2.1) Email service (ZeptoMail)
+
+A server-side email service is available through:
+
+- `POST /api/email/send`
+
+Request body:
+
+```json
+{
+	"to": [{ "address": "mharomezgs@gmail.com", "name": "MHAROMO" }],
+	"subject": "Test Email",
+	"htmlbody": "<div><b>Test email sent successfully.</b></div>",
+	"fromAddress": "noreply@mharomo.systems"
+}
+```
+
+Notes:
+
+- `ZEPTOMAIL_API_KEY` must be the raw encrypted key value only.
+- The code automatically sends `Authorization: Zoho-enczapikey <key>`.
+- If `fromAddress` is omitted, `ZEPTOMAIL_FROM_ADDRESS` is used.
 
 ### 3) Run locally
 

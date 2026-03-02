@@ -56,6 +56,12 @@ export function Navbar() {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-4 lg:gap-6">
           <Link
+            href="/services"
+            className="text-sm text-zinc-300 hover:text-white transition-colors"
+          >
+            Services
+          </Link>
+          <Link
             href="/ai-tools"
             className="text-sm text-zinc-300 hover:text-white transition-colors"
           >
@@ -149,6 +155,13 @@ export function Navbar() {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-white/10 bg-black/95 backdrop-blur-xl">
           <div className="px-4 py-4 space-y-3">
+            <Link
+              href="/services"
+              className="block py-2 text-sm text-zinc-300 hover:text-white transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Services
+            </Link>
             <Link
               href="/ai-tools"
               className="block py-2 text-sm text-zinc-300 hover:text-white transition-colors"
