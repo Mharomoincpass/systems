@@ -1,6 +1,7 @@
 export function GET() {
   const content = `User-agent: *
 Allow: /
+Allow: /services
 Allow: /blogs
 Allow: /ai-tools
 Allow: /systems/documentation
