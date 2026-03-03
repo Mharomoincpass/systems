@@ -1,4 +1,6 @@
 import { z } from 'zod'
+import { requireAuth } from '@/lib/auth-helpers'
+import { rateLimitGenerate } from '@/lib/rate-limit'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300 // 5 minute timeout for transcription
@@ -9,6 +11,14 @@ const transcribeAudioSchema = z.object({
 
 export async function POST(request) {
   try {
+    const auth = await requireAuth(request)
+    if (auth.error) return auth.error
+
+    const rl = rateLimitGenerate(auth.user.userId)
+    if (!rl.allowed) {
+      return Response.json({ error: 'Rate limit exceeded. Please try again later.' }, { status: 429 })
+    }
+
     const body = await request.json()
     const { audioUrl } = transcribeAudioSchema.parse(body)
 
@@ -38,17 +48,32 @@ export async function POST(request) {
       )
     }
 
-    // Build Pollinations API URL for transcription
-    const apiUrl = `https://gen.pollinations.ai/audio/transcribe?model=whisper&url=${encodeURIComponent(audioUrlForApi)}`
+    console.log(`📡 Downloading source audio...`)
 
-    console.log(`📡 Calling Pollinations API...`)
+    const sourceAudioResponse = await fetch(audioUrlForApi)
+    if (!sourceAudioResponse.ok) {
+      return Response.json(
+        { error: 'Failed to fetch source audio from URL.' },
+        { status: 400 }
+      )
+    }
 
-    // Call Pollinations API
-    const response = await fetch(apiUrl, {
-      method: 'GET',
+    const sourceContentType = sourceAudioResponse.headers.get('content-type') || 'audio/mpeg'
+    const sourceBuffer = await sourceAudioResponse.arrayBuffer()
+
+    const blob = new Blob([sourceBuffer], { type: sourceContentType })
+    const formData = new FormData()
+    formData.append('file', blob, 'audio-input.mp3')
+    formData.append('model', 'whisper-1')
+
+    console.log(`📡 Calling Pollinations transcription API...`)
+
+    const response = await fetch('https://gen.pollinations.ai/v1/audio/transcriptions', {
+      method: 'POST',
       headers: {
         'Authorization': `Bearer ${pollinationsKey}`,
       },
+      body: formData,
     })
 
     if (!response.ok) {
@@ -71,8 +96,28 @@ export async function POST(request) {
       )
     }
 
-    // Get transcription result
-    const data = await response.json()
+    // Get transcription result (log raw response for debugging)
+    const contentType = response.headers.get('content-type') || 'unknown'
+    const rawBody = await response.text()
+
+    console.log('🧪 Transcribe provider response:', {
+      status: response.status,
+      contentType,
+      preview: rawBody.slice(0, 500),
+    })
+
+    let data = null
+    try {
+      data = JSON.parse(rawBody)
+    } catch {
+      return Response.json(
+        {
+          error: 'Unexpected transcription response format from provider.',
+          details: rawBody.slice(0, 200),
+        },
+        { status: 502 }
+      )
+    }
 
     console.log(`✅ Transcription completed successfully`)
 

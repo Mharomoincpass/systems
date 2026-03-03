@@ -53,7 +53,7 @@ export default function VideosDocPage() {
           <h2 className="text-2xl font-bold mb-6">Available Models</h2>
           <div className="space-y-4">
             {[
-              { name: 'Seedance Lite', speed: 'Fast', quality: 'Standard', desc: 'Fast and efficient video generation' },
+              { name: 'Grok Video (api.airforce)', speed: 'Fast', quality: 'Alpha', desc: 'Alpha model for fast text-to-video generation' },
             ].map((model, i) => (
               <div key={i} className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
                 <div className="flex justify-between items-start mb-2">
@@ -74,6 +74,7 @@ export default function VideosDocPage() {
           <h2 className="text-2xl font-bold mb-6">Features</h2>
           <ul className="space-y-3 text-gray-700">
             <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Text-to-Video:</strong> Generate videos from descriptions</span></li>
+            <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Image-to-Video:</strong> Animate a source image with motion prompts</span></li>
             <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Short Clips:</strong> Best for 2-10 second outputs</span></li>
             <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>MP4 Output:</strong> Ready to share or edit</span></li>
             <li className="flex gap-3"><span className="text-blue-600 font-bold">✓</span><span><strong>Instant Download:</strong> Save and edit immediately</span></li>

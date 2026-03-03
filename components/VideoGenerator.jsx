@@ -1,32 +1,85 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
 import { useNotification } from '@/components/Notifications'
 
 export default function VideoGenerator() {
   const router = useRouter()
+  const pathname = usePathname()
+  const isDashboard = pathname?.startsWith('/dashboard')
   const { addNotification, removeNotification } = useNotification()
   const [prompt, setPrompt] = useState('')
-  const [model, setModel] = useState('seedance')
+  const [imageUrl, setImageUrl] = useState('')
+  const [imageFile, setImageFile] = useState(null)
+  const [imagePreview, setImagePreview] = useState(null)
+  const [model, setModel] = useState('grok-video')
   const [duration, setDuration] = useState(5)
+  const [aspectRatio, setAspectRatio] = useState('16:9')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [generatedVideo, setGeneratedVideo] = useState(null)
   const [uploadProgress, setUploadProgress] = useState(0)
   const scrollRef = useRef(null)
+  const fileInputRef = useRef(null)
 
   const models = [
-    { id: 'seedance', name: 'Seedance Lite', description: 'Fast and efficient video generation' },
+    { id: 'grok-video', name: 'Grok Video (api.airforce)', description: 'Alpha model for fast text-to-video generation' },
   ]
+
+  const fileToDataUrl = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result)
+      reader.onerror = () => reject(new Error('Failed to read image file'))
+      reader.readAsDataURL(file)
+    })
+
+  const handleImageSelect = (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      addNotification('Please select a valid image file.', 'warning')
+      return
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      addNotification('Image must be 10MB or smaller.', 'warning')
+      return
+    }
+
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview)
+    }
+
+    setImageFile(file)
+    setImagePreview(URL.createObjectURL(file))
+    addNotification('Image selected for image-to-video generation.', 'success')
+  }
+
+  const clearSelectedImage = () => {
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview)
+    }
+    setImageFile(null)
+    setImagePreview(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
 
   const generateVideo = async (e) => {
     e.preventDefault()
 
-    if (!prompt.trim()) {
-      addNotification('Please enter a prompt to describe the video', 'warning')
+    const hasPrompt = Boolean(prompt.trim())
+    const hasImageUrl = Boolean(imageUrl.trim())
+    const hasImageFile = Boolean(imageFile)
+
+    if (!hasPrompt && !hasImageUrl && !hasImageFile) {
+      addNotification('Add a prompt, an image URL, or upload an image to generate video.', 'warning')
       return
     }
 
@@ -38,6 +91,29 @@ export default function VideoGenerator() {
     try {
       setUploadProgress(20)
 
+      let finalImageUrl = imageUrl.trim()
+
+      if (imageFile) {
+        setUploadProgress(30)
+        const imageData = await fileToDataUrl(imageFile)
+
+        const uploadResponse = await fetch('/api/upload/temp', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ imageData }),
+        })
+
+        if (!uploadResponse.ok) {
+          const uploadError = await uploadResponse.json().catch(() => ({}))
+          throw new Error(uploadError.error || 'Failed to upload image for video generation')
+        }
+
+        const uploadData = await uploadResponse.json()
+        finalImageUrl = uploadData.url
+      }
+
       const response = await fetch('/api/videos/generate', {
         method: 'POST',
         headers: {
@@ -45,8 +121,10 @@ export default function VideoGenerator() {
         },
         body: JSON.stringify({
           prompt: prompt.trim(),
+          imageUrl: finalImageUrl || undefined,
           model,
           duration,
+          aspectRatio,
         }),
       })
 
@@ -90,31 +168,34 @@ export default function VideoGenerator() {
   }
 
   return (
-    <div className="min-h-screen bg-black pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16">
-      {/* Noise texture overlay */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+    <div className={isDashboard ? 'bg-black' : 'min-h-screen bg-black pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16'}>
+      {!isDashboard && (
+        <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+      )}
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        {/* Back Button */}
-        <button
-          onClick={() => router.back()}
-          className="mb-6 sm:mb-8 flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 hover:gap-3"
-        >
-          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          <span className="text-sm sm:text-base">Back</span>
-        </button>
+        {!isDashboard && (
+          <>
+            <button
+              onClick={() => router.back()}
+              className="mb-6 sm:mb-8 flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 hover:gap-3"
+            >
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span className="text-sm sm:text-base">Back</span>
+            </button>
 
-        {/* Header */}
-        <div className="mb-8 sm:mb-12">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4 tracking-tight">
-            AI Video Generator
-          </h1>
-          <p className="text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl">
-            Turn text prompts into dynamic videos using advanced AI models.
-          </p>
-        </div>
+            <div className="mb-8 sm:mb-12">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4 tracking-tight">
+                AI Video Generator
+              </h1>
+              <p className="text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl">
+                Turn text prompts into dynamic videos using advanced AI models.
+              </p>
+            </div>
+          </>
+        )}
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Form Section */}
@@ -133,6 +214,57 @@ export default function VideoGenerator() {
                 />
                 <p className="text-xs text-gray-500 mt-1">Describe the motion/animation for your video</p>
               </div>
+
+              {/* Image Input (Optional) */}
+              <div>
+                <Input
+                  label="Image URL (Optional)"
+                  placeholder="https://example.com/image.jpg"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  className="!bg-white/10 !border-white/20 !text-white placeholder:text-gray-500 text-sm sm:text-base"
+                  disabled={isLoading}
+                />
+                <p className="text-xs text-gray-500 mt-1">Use this for image-to-video from a public image URL</p>
+              </div>
+
+              {/* Image Upload (Optional) */}
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
+                  Upload Image (Optional)
+                </label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageSelect}
+                  disabled={isLoading}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isLoading}
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border-2 border-dashed border-white/20 rounded-lg text-gray-300 hover:border-white/40 hover:bg-white/15 transition disabled:opacity-50 text-xs sm:text-sm"
+                >
+                  {imageFile ? '🖼️ ' + imageFile.name : '📤 Click to select an image'}
+                </button>
+                <p className="text-xs text-gray-500 mt-2">Max size: 10MB</p>
+              </div>
+
+              {imagePreview && (
+                <div className="relative overflow-hidden rounded-lg border border-white/20">
+                  <img src={imagePreview} alt="Selected image" className="w-full h-44 object-cover" />
+                  <button
+                    type="button"
+                    onClick={clearSelectedImage}
+                    disabled={isLoading}
+                    className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white rounded-full px-3 py-1 text-sm transition disabled:opacity-50"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
 
               {/* Model Selection */}
               <div>
@@ -175,6 +307,31 @@ export default function VideoGenerator() {
                 </div>
               </div>
 
+              {/* Aspect Ratio */}
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
+                  Aspect Ratio
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {['16:9', '9:16'].map((ratio) => (
+                    <button
+                      key={ratio}
+                      type="button"
+                      onClick={() => setAspectRatio(ratio)}
+                      disabled={isLoading}
+                      className={`px-3 py-2 rounded-lg text-xs sm:text-sm border transition ${
+                        aspectRatio === ratio
+                          ? 'bg-white text-black border-white'
+                          : 'bg-white/10 border-white/20 text-gray-300 hover:border-white/40'
+                      } disabled:opacity-50`}
+                    >
+                      {ratio}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Choose landscape or portrait output.</p>
+              </div>
+
               {/* Error Message */}
               {error && (
                 <div className="bg-red-900/20 border border-red-800 rounded-lg p-3">
@@ -204,7 +361,7 @@ export default function VideoGenerator() {
                 fullWidth
                 loading={isLoading}
                 className="!py-3"
-                disabled={!prompt.trim() || isLoading}
+                disabled={(!prompt.trim() && !imageUrl.trim() && !imageFile) || isLoading}
               >
                 {isLoading ? 'Generating Video...' : 'Generate Video'}
               </Button>
@@ -215,7 +372,10 @@ export default function VideoGenerator() {
           <div className="lg:col-span-2">
             {generatedVideo ? (
               <div ref={scrollRef} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl sm:rounded-2xl overflow-hidden hover:border-white/20 transition-all duration-300">
-                <div className="relative w-full bg-black flex items-center justify-center" style={{ aspectRatio: '16/9' }}>
+                <div
+                  className="relative w-full bg-black flex items-center justify-center"
+                  style={{ aspectRatio: (generatedVideo.aspectRatio || aspectRatio).replace(':', '/') }}
+                >
                   <video
                     src={generatedVideo.url}
                     controls
@@ -234,13 +394,17 @@ export default function VideoGenerator() {
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <p className="text-gray-400 text-xs">Model</p>
-                      <p className="text-white">{generatedVideo.model.split('/')[1]}</p>
+                      <p className="text-white">{generatedVideo.model?.split('/')?.[1] || generatedVideo.model}</p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-xs">Generated</p>
                       <p className="text-white">
                         {new Date(generatedVideo.generatedAt).toLocaleTimeString()}
                       </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400 text-xs">Aspect Ratio</p>
+                      <p className="text-white">{generatedVideo.aspectRatio || aspectRatio}</p>
                     </div>
                   </div>
                   <div className="mt-4 flex gap-2">
@@ -259,7 +423,10 @@ export default function VideoGenerator() {
                 </div>
               </div>
             ) : (
-              <div className="bg-gray-800 rounded-xl p-12 flex items-center justify-center min-h-96">
+              <div
+                className="bg-gray-800 rounded-xl p-12 flex items-center justify-center"
+                style={{ aspectRatio: aspectRatio.replace(':', '/'), minHeight: '380px' }}
+              >
                 <div className="text-center">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-700 flex items-center justify-center">
                     <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -271,7 +438,7 @@ export default function VideoGenerator() {
                     Generated videos will appear here
                   </h3>
                   <p className="text-gray-500 text-sm">
-                    Upload an image and click &quot;Generate Video&quot; to create a dynamic video from it.
+                    Add a motion prompt and optionally an image, then click &quot;Generate Video&quot;.
                   </p>
                 </div>
               </div>

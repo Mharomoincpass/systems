@@ -2,6 +2,7 @@ import connectDB from '@/lib/mongodb'
 import Conversation from '@/models/Conversation'
 import Message from '@/models/Message'
 import { z } from 'zod'
+import { requireAuth } from '@/lib/auth-helpers'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,6 +14,9 @@ const sendMessageSchema = z.object({
 
 export async function POST(request) {
   try {
+    const auth = await requireAuth(request)
+    if (auth.error) return auth.error
+
     await connectDB()
 
     const body = await request.json()

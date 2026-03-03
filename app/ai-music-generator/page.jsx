@@ -117,7 +117,7 @@ export default function AIMusicGeneratorPage() {
         </section>
 
         <section className="mt-10 flex flex-col sm:flex-row gap-3">
-          <Link href="/api/tools/launch?path=/music" className="px-5 py-2 rounded-lg bg-white text-black text-sm font-semibold hover:scale-105 hover:shadow-xl hover:shadow-white/20 transition-all duration-300 ease-out">
+          <Link href="/dashboard/music" className="px-5 py-2 rounded-lg bg-white text-black text-sm font-semibold hover:scale-105 hover:shadow-xl hover:shadow-white/20 transition-all duration-300 ease-out">
             Try the tool
           </Link>
           <Link href="/blogs" className="px-5 py-2 rounded-lg border border-white/20 text-sm font-semibold hover:bg-white hover:text-black hover:scale-105 transition-all duration-300 ease-out">

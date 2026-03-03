@@ -1,12 +1,14 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useRef, useEffect } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/Button'
 import { useNotification } from '@/components/Notifications'
 
 export default function TextToSpeech() {
   const router = useRouter()
+  const pathname = usePathname()
+  const isDashboard = pathname?.startsWith('/dashboard')
   const { addNotification, removeNotification } = useNotification()
   const [text, setText] = useState('')
   const [voice, setVoice] = useState('rachel')
@@ -14,8 +16,10 @@ export default function TextToSpeech() {
   const [error, setError] = useState(null)
   const [generatedAudio, setGeneratedAudio] = useState(null)
   const [progress, setProgress] = useState(0)
+  const [voiceOpen, setVoiceOpen] = useState(false)
   const audioRef = useRef(null)
   const scrollRef = useRef(null)
+  const voiceMenuRef = useRef(null)
 
   const voices = [
     { id: 'rachel', name: 'Rachel (Female, Calm)' },
@@ -118,32 +122,47 @@ export default function TextToSpeech() {
     setText(example)
   }
 
+  useEffect(() => {
+    const onClickOutside = (event) => {
+      if (!voiceMenuRef.current) return
+      if (!voiceMenuRef.current.contains(event.target)) {
+        setVoiceOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', onClickOutside)
+    return () => document.removeEventListener('mousedown', onClickOutside)
+  }, [])
+
   return (
-    <div className="min-h-screen bg-black pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16">
-      {/* Noise texture overlay */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+    <div className={isDashboard ? 'bg-black' : 'min-h-screen bg-black pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16'}>
+      {!isDashboard && (
+        <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+      )}
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        {/* Back Button */}
-        <button
-          onClick={() => router.back()}
-          className="mb-6 sm:mb-8 flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 hover:gap-3"
-        >
-          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          <span className="text-sm sm:text-base">Back</span>
-        </button>
+        {!isDashboard && (
+          <>
+            <button
+              onClick={() => router.back()}
+              className="mb-6 sm:mb-8 flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 hover:gap-3"
+            >
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span className="text-sm sm:text-base">Back</span>
+            </button>
 
-        {/* Header */}
-        <div className="mb-8 sm:mb-12">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4 tracking-tight">
-            Text-to-Speech
-          </h1>
-          <p className="text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl">
-            Convert text into natural-sounding speech using ElevenLabs AI voices.
-          </p>
-        </div>
+            <div className="mb-8 sm:mb-12">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4 tracking-tight">
+                Text-to-Speech
+              </h1>
+              <p className="text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl">
+                Convert text into natural-sounding speech using ElevenLabs AI voices.
+              </p>
+            </div>
+          </>
+        )}
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Form Section */}
@@ -193,18 +212,52 @@ export default function TextToSpeech() {
                 <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
                   Voice
                 </label>
-                <select
-                  value={voice}
-                  onChange={(e) => setVoice(e.target.value)}
-                  disabled={isLoading}
-                  className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-white/40 disabled:opacity-50 text-xs sm:text-sm backdrop-blur-xl"
-                >
-                  {voices.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {v.name}
-                    </option>
-                  ))}
-                </select>
+                <div ref={voiceMenuRef} className="relative">
+                  <button
+                    type="button"
+                    onClick={() => !isLoading && setVoiceOpen((prev) => !prev)}
+                    disabled={isLoading}
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-white/40 disabled:opacity-50 text-xs sm:text-sm backdrop-blur-xl flex items-center justify-between"
+                    aria-haspopup="listbox"
+                    aria-expanded={voiceOpen}
+                  >
+                    <span>{voices.find((v) => v.id === voice)?.name || 'Select voice'}</span>
+                    <svg
+                      className={`w-4 h-4 text-zinc-400 transition-transform ${voiceOpen ? 'rotate-180' : ''}`}
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 011.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+
+                  {voiceOpen && (
+                    <div
+                      role="listbox"
+                      className="absolute z-30 mt-1 w-full bg-zinc-950 border border-zinc-700 rounded-lg shadow-2xl overflow-hidden"
+                    >
+                      {voices.map((v) => (
+                        <button
+                          key={v.id}
+                          type="button"
+                          role="option"
+                          aria-selected={voice === v.id}
+                          onClick={() => {
+                            setVoice(v.id)
+                            setVoiceOpen(false)
+                          }}
+                          className={`w-full text-left px-3 sm:px-4 py-2.5 text-xs sm:text-sm transition ${
+                            voice === v.id
+                              ? 'bg-zinc-800 text-white'
+                              : 'text-zinc-300 hover:bg-zinc-900'
+                          }`}
+                        >
+                          {v.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Error Message */}
@@ -234,22 +287,23 @@ export default function TextToSpeech() {
               <button
                 type="submit"
                 disabled={isLoading || !text.trim()}
-                className="w-full text-sm sm:text-base py-3 sm:py-4 bg-white text-black hover:bg-gray-200 font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] rounded-xl sm:rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full text-sm sm:text-base py-3 sm:py-4 bg-white text-black hover:bg-gray-200 font-semibold transition rounded-xl sm:rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Generating Speech...' : '🔊 Generate Speech'}
               </button>
             </form>
 
-            {/* Info Box */}
-            <div className="mt-4 sm:mt-6 bg-white/5 border border-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 backdrop-blur-xl">
-              <h3 className="text-xs sm:text-sm font-semibold text-white mb-2">💡 Tips</h3>
-              <ul className="text-xs text-gray-400 space-y-1">
-                <li>• Use punctuation for natural pauses</li>
-                <li>• Different voices suit different content</li>
-                <li>• Cost: ~0.18 credits per 1K characters</li>
-                <li>• Powered by ElevenLabs v3 TTS</li>
-              </ul>
-            </div>
+            {!isDashboard && (
+              <div className="mt-4 sm:mt-6 bg-white/5 border border-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 backdrop-blur-xl">
+                <h3 className="text-xs sm:text-sm font-semibold text-white mb-2">💡 Tips</h3>
+                <ul className="text-xs text-gray-400 space-y-1">
+                  <li>• Use punctuation for natural pauses</li>
+                  <li>• Different voices suit different content</li>
+                  <li>• Cost: ~0.18 credits per 1K characters</li>
+                  <li>• Powered by ElevenLabs v3 TTS</li>
+                </ul>
+              </div>
+            )}
           </div>
 
           {/* Audio Player Section */}

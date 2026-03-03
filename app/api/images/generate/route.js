@@ -1,4 +1,10 @@
 import { z } from 'zod'
+import connectDB from '@/lib/mongodb'
+import Media from '@/models/Media'
+import User from '@/models/User'
+import { requireAuth } from '@/lib/auth-helpers'
+import { rateLimitGenerate } from '@/lib/rate-limit'
+import { uploadBlob, generateBlobPath, checkStorageQuota } from '@/lib/azure-storage'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,6 +17,14 @@ const generateImageSchema = z.object({
 
 export async function POST(request) {
   try {
+    const auth = await requireAuth(request)
+    if (auth.error) return auth.error
+
+    const rl = rateLimitGenerate(auth.user.userId)
+    if (!rl.allowed) {
+      return Response.json({ error: 'Rate limit exceeded. Please try again later.' }, { status: 429 })
+    }
+
     const body = await request.json()
     const { prompt, model, width, height } = generateImageSchema.parse(body)
 
@@ -66,6 +80,35 @@ export async function POST(request) {
     const buffer = await imageBlob.arrayBuffer()
     const base64Image = Buffer.from(buffer).toString('base64')
     const imageUrl = `data:image/png;base64,${base64Image}`
+
+    // Save to Azure Blob + Media record
+    let savedMedia = null
+    try {
+      await connectDB()
+      const user = await User.findById(auth.user.userId)
+      const bufferNode = Buffer.from(buffer)
+      const quotaCheck = user?.role === 'admin'
+        ? { allowed: true }
+        : checkStorageQuota(user.storageUsed, user.storageLimit, bufferNode.length)
+      if (quotaCheck.allowed) {
+        const blobPath = generateBlobPath(auth.user.userId, 'image', 'png')
+        const uploaded = await uploadBlob(bufferNode, 'image/png', blobPath)
+        savedMedia = await Media.create({
+          userId: auth.user.userId,
+          type: 'image',
+          prompt,
+          model,
+          blobUrl: uploaded.url,
+          blobPath: uploaded.blobPath,
+          fileSize: uploaded.fileSize,
+          mimeType: 'image/png',
+          metadata: { width, height },
+        })
+        await User.findByIdAndUpdate(auth.user.userId, { $inc: { storageUsed: uploaded.fileSize } })
+      }
+    } catch (saveErr) {
+      console.error('Media save error:', saveErr)
+    }
 
     console.log(`✅ Image generated successfully (${(buffer.byteLength / 1024).toFixed(2)}KB)`)
 

@@ -2,13 +2,15 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
 import { useNotification } from '@/components/Notifications'
 
 export default function ImageGenerator() {
   const router = useRouter()
+  const pathname = usePathname()
+  const isDashboard = pathname?.startsWith('/dashboard')
   const { addNotification, removeNotification } = useNotification()
   const [prompt, setPrompt] = useState('')
   const [model, setModel] = useState('flux')
@@ -106,31 +108,34 @@ export default function ImageGenerator() {
   }
 
   return (
-    <div className="min-h-screen bg-black pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16">
-      {/* Noise texture overlay */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+    <div className={isDashboard ? 'bg-black' : 'min-h-screen bg-black pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16'}>
+      {!isDashboard && (
+        <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+      )}
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        {/* Back Button */}
-        <button
-          onClick={() => router.back()}
-          className="mb-6 sm:mb-8 flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 hover:gap-3"
-        >
-          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          <span className="text-sm sm:text-base">Back</span>
-        </button>
+        {!isDashboard && (
+          <>
+            <button
+              onClick={() => router.back()}
+              className="mb-6 sm:mb-8 flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 hover:gap-3"
+            >
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span className="text-sm sm:text-base">Back</span>
+            </button>
 
-        {/* Header */}
-        <div className="mb-8 sm:mb-12">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4 tracking-tight">
-            AI Image Generator
-          </h1>
-          <p className="text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl">
-            Generate stunning images from text prompts using advanced AI models.
-          </p>
-        </div>
+            <div className="mb-8 sm:mb-12">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4 tracking-tight">
+                AI Image Generator
+              </h1>
+              <p className="text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl">
+                Generate stunning images from text prompts using advanced AI models.
+              </p>
+            </div>
+          </>
+        )}
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Form Section */}

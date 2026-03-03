@@ -31,14 +31,7 @@ export default function SystemsPage() {
   }, [])
 
   const pingSession = async () => {
-    try {
-      await fetch('/api/session/ping', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      })
-    } catch (error) {
-      console.error('Failed to ping session:', error)
-    }
+    // Session ping removed - using JWT auth now
   }
 
   const systems = [

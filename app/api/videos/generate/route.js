@@ -1,17 +1,55 @@
 import { z } from 'zod'
+import connectDB from '@/lib/mongodb'
+import Media from '@/models/Media'
+import User from '@/models/User'
+import { requireAuth } from '@/lib/auth-helpers'
+import { rateLimitGenerate } from '@/lib/rate-limit'
+import { uploadBlob, generateBlobPath, checkStorageQuota } from '@/lib/azure-storage'
+
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300 // 5 minute timeout for video generation
 
-const generateVideoSchema = z.object({
-  prompt: z.string().min(1, 'Prompt is required for video generation'),
-  model: z.string().optional().default('seedance'),
-  duration: z.number().min(2).max(10).optional().default(5),
-})
+const generateVideoSchema = z
+  .object({
+    prompt: z.string().trim().optional(),
+    imageUrl: z.string().url().optional(),
+    model: z.string().optional().default('grok-video'),
+    duration: z.number().min(2).max(10).optional().default(5),
+    aspectRatio: z.enum(['16:9', '9:16']).optional().default('16:9'),
+  })
+  .refine((data) => (data.prompt && data.prompt.length > 0) || Boolean(data.imageUrl), {
+    message: 'Provide a prompt or an image URL for video generation',
+    path: ['prompt'],
+  })
 
 export async function POST(request) {
   try {
+    const auth = await requireAuth(request)
+    if (auth.error) return auth.error
+
+    const rl = rateLimitGenerate(auth.user.userId)
+    if (!rl.allowed) {
+      return Response.json({ error: 'Rate limit exceeded. Please try again later.' }, { status: 429 })
+    }
+
     const body = await request.json()
-    const { prompt, model, duration } = generateVideoSchema.parse(body)
+    const { prompt, imageUrl, model, duration, aspectRatio } = generateVideoSchema.parse(body)
+
+    if (imageUrl) {
+      try {
+        const parsed = new URL(imageUrl)
+        const host = parsed.hostname.toLowerCase()
+        if (host === 'localhost' || host === '127.0.0.1' || host === '::1') {
+          return Response.json(
+            {
+              error: 'Image URL must be publicly accessible. Localhost URLs cannot be reached by video providers.',
+            },
+            { status: 400 }
+          )
+        }
+      } catch (_urlErr) {
+      }
+    }
 
     const pollinationsKey = process.env.POLLINATIONS_API_KEY
     if (!pollinationsKey) {
@@ -21,12 +59,30 @@ export async function POST(request) {
       )
     }
 
-    console.log(`🎬 Generating video from text with model: ${model}`)
-    console.log(`📝 Prompt: ${prompt.substring(0, 50)}...`)
+    const effectivePrompt = prompt?.trim() || 'Cinematic motion'
+
+    console.log(`🎬 Generating video with model: ${model}`)
+    if (prompt) {
+      console.log(`📝 Prompt: ${effectivePrompt.substring(0, 50)}...`)
+    }
+    if (imageUrl) {
+      console.log(`🖼️ Image input: ${imageUrl.substring(0, 80)}...`)
+    }
 
     // Build Pollinations API URL
-    const encodedPrompt = encodeURIComponent(prompt)
-    const apiUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?model=${model}&duration=${duration}&aspectRatio=16:9&seed=-1`
+    const encodedPrompt = encodeURIComponent(effectivePrompt)
+    const params = new URLSearchParams({
+      model,
+      duration: String(duration),
+      aspectRatio,
+      seed: '-1',
+    })
+
+    if (imageUrl) {
+      params.set('image', imageUrl)
+    }
+
+    const apiUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?${params.toString()}`
 
     console.log(`📡 Calling Pollinations API...`)
 
@@ -66,6 +122,34 @@ export async function POST(request) {
     const base64Video = Buffer.from(buffer).toString('base64')
     const videoDataUrl = `data:video/mp4;base64,${base64Video}`
 
+    // Save to Azure Blob + Media record
+    try {
+      await connectDB()
+      const user = await User.findById(auth.user.userId)
+      const bufferNode = Buffer.from(buffer)
+      const quotaCheck = user?.role === 'admin'
+        ? { allowed: true }
+        : checkStorageQuota(user.storageUsed, user.storageLimit, bufferNode.length)
+      if (quotaCheck.allowed) {
+        const blobPath = generateBlobPath(auth.user.userId, 'video', 'mp4')
+        const uploaded = await uploadBlob(bufferNode, 'video/mp4', blobPath)
+        await Media.create({
+          userId: auth.user.userId,
+          type: 'video',
+          prompt: effectivePrompt,
+          model,
+          blobUrl: uploaded.url,
+          blobPath: uploaded.blobPath,
+          fileSize: uploaded.fileSize,
+          mimeType: 'video/mp4',
+          metadata: { duration, aspectRatio, imageUrl: imageUrl || null },
+        })
+        await User.findByIdAndUpdate(auth.user.userId, { $inc: { storageUsed: uploaded.fileSize } })
+      }
+    } catch (saveErr) {
+      console.error('Media save error:', saveErr)
+    }
+
     console.log(`✅ Video generated successfully (${(buffer.byteLength / 1024 / 1024).toFixed(2)}MB)`)
 
     return Response.json(
@@ -73,9 +157,11 @@ export async function POST(request) {
         success: true,
         video: {
           url: videoDataUrl,
-          prompt,
+          prompt: effectivePrompt,
+          imageUrl: imageUrl || null,
           model,
           duration,
+          aspectRatio,
           generatedAt: new Date().toISOString(),
         },
       },

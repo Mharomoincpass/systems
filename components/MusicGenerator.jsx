@@ -1,13 +1,15 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
 import { useNotification } from '@/components/Notifications'
 
 export default function MusicGenerator() {
   const router = useRouter()
+  const pathname = usePathname()
+  const isDashboard = pathname?.startsWith('/dashboard')
   const { addNotification, removeNotification } = useNotification()
   const [prompt, setPrompt] = useState('')
   const [duration, setDuration] = useState(30)
@@ -109,31 +111,34 @@ export default function MusicGenerator() {
   }
 
   return (
-    <div className="min-h-screen bg-black pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16">
-      {/* Noise texture overlay */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+    <div className={isDashboard ? 'bg-black' : 'min-h-screen bg-black pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16'}>
+      {!isDashboard && (
+        <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+      )}
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        {/* Back Button */}
-        <button
-          onClick={() => router.back()}
-          className="mb-6 sm:mb-8 flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 hover:gap-3"
-        >
-          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          <span className="text-sm sm:text-base">Back</span>
-        </button>
+        {!isDashboard && (
+          <>
+            <button
+              onClick={() => router.back()}
+              className="mb-6 sm:mb-8 flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 hover:gap-3"
+            >
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span className="text-sm sm:text-base">Back</span>
+            </button>
 
-        {/* Header */}
-        <div className="mb-8 sm:mb-12">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4 tracking-tight">
-            AI Music Generator
-          </h1>
-          <p className="text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl">
-            Create custom music tracks using AI. Describe the style, mood, and instruments you want.
-          </p>
-        </div>
+            <div className="mb-8 sm:mb-12">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4 tracking-tight">
+                AI Music Generator
+              </h1>
+              <p className="text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl">
+                Create custom music tracks using AI. Describe the style, mood, and instruments you want.
+              </p>
+            </div>
+          </>
+        )}
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Form Section */}
@@ -221,22 +226,23 @@ export default function MusicGenerator() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full text-sm sm:text-base py-3 sm:py-4 bg-white text-black hover:bg-gray-200 font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] rounded-xl sm:rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full text-sm sm:text-base py-3 sm:py-4 bg-white text-black hover:bg-gray-200 font-semibold transition rounded-xl sm:rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Generating Music...' : '🎵 Generate Music'}
               </button>
             </form>
 
-            {/* Info Box */}
-            <div className="mt-4 sm:mt-6 bg-white/5 border border-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 backdrop-blur-xl">
-              <h3 className="text-xs sm:text-sm font-semibold text-white mb-2">💡 Tips</h3>
-              <ul className="text-xs text-gray-400 space-y-1">
-                <li>• Be specific about instruments and style</li>
-                <li>• Include mood and tempo descriptors</li>
-                <li>• Longer durations take more time to generate</li>
-                <li>• Cost: ~0.0050 credits per second</li>
-              </ul>
-            </div>
+            {!isDashboard && (
+              <div className="mt-4 sm:mt-6 bg-white/5 border border-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 backdrop-blur-xl">
+                <h3 className="text-xs sm:text-sm font-semibold text-white mb-2">💡 Tips</h3>
+                <ul className="text-xs text-gray-400 space-y-1">
+                  <li>• Be specific about instruments and style</li>
+                  <li>• Include mood and tempo descriptors</li>
+                  <li>• Longer durations take more time to generate</li>
+                  <li>• Cost: ~0.0050 credits per second</li>
+                </ul>
+              </div>
+            )}
           </div>
 
           {/* Audio Player Section */}

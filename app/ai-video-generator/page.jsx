@@ -3,7 +3,7 @@ import Script from 'next/script'
 
 export const metadata = {
   title: 'AI Video Generator',
-  description: 'Generate short videos from text prompts using Grok Video.',
+  description: 'Generate short videos from text prompts or source images using Grok Video.',
 }
 
 const siteUrl = 'https://mharomo.systems'
@@ -36,8 +36,8 @@ export default function AIVideoGeneratorPage() {
           </Link>
           <h1 className="text-3xl sm:text-4xl font-bold mt-3">What is an AI Video Generator?</h1>
           <p className="text-sm sm:text-base text-zinc-400 mt-3">
-            An AI video generator creates short video clips from text. Describe the scene, the motion, and the
-            camera behavior, and the model turns that description into a playable clip. This tool uses Advanced AI Models
+            An AI video generator creates short clips from text or a source image. Describe the scene, motion, and
+            camera behavior, and the model turns that into a playable clip. This tool uses Advanced AI Models
             for fast, creative iterations.
           </p>
         </div>
@@ -46,6 +46,7 @@ export default function AIVideoGeneratorPage() {
           <h2 className="text-xl sm:text-2xl font-semibold text-white">How it works</h2>
           <ul className="list-disc list-inside space-y-2">
             <li>Write a motion-focused prompt with action verbs.</li>
+            <li>Optionally provide an image URL or upload an image as a visual starting point.</li>
             <li>Set a target duration (2 to 10 seconds).</li>
             <li>Generate and refine with more specific details.</li>
           </ul>
@@ -117,7 +118,7 @@ export default function AIVideoGeneratorPage() {
         </section>
 
         <section className="mt-10 flex flex-col sm:flex-row gap-3">
-          <Link href="/api/tools/launch?path=/videos" className="px-5 py-2 rounded-lg bg-white text-black text-sm font-semibold hover:scale-105 hover:shadow-xl hover:shadow-white/20 transition-all duration-300 ease-out">
+          <Link href="/dashboard/videos" className="px-5 py-2 rounded-lg bg-white text-black text-sm font-semibold hover:scale-105 hover:shadow-xl hover:shadow-white/20 transition-all duration-300 ease-out">
             Try the tool
           </Link>
           <Link href="/blogs" className="px-5 py-2 rounded-lg border border-white/20 text-sm font-semibold hover:bg-white hover:text-black hover:scale-105 transition-all duration-300 ease-out">

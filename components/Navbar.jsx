@@ -18,21 +18,7 @@ export function Navbar() {
 
   const handleAction = async (e) => {
     e.preventDefault()
-    setLoading(true)
-    try {
-      const response = await fetch('/api/session/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
-      })
-      
-      if (!response.ok) throw new Error('Failed to start session')
-      
-      window.location.href = '/systems'
-    } catch (error) {
-      console.error('Failed to start session:', error)
-      setLoading(false)
-    }
+    router.push('/dashboard')
   }
 
   return (
@@ -97,7 +83,7 @@ export function Navbar() {
             className="group relative flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/5 border border-white/10 hover:bg-white transition-all duration-500 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span className="text-white group-hover:text-black text-sm font-medium transition-colors duration-500 whitespace-nowrap">
-              {loading ? 'Starting...' : 'Try Tools'}
+              Dashboard
             </span>
             {!loading && (
               <svg 
@@ -120,7 +106,7 @@ export function Navbar() {
             className="group relative flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white transition-all duration-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span className="text-white group-hover:text-black text-xs font-medium transition-colors duration-500 whitespace-nowrap">
-              {loading ? 'Starting...' : 'Tools'}
+              Dashboard
             </span>
             {!loading && (
               <svg 

@@ -2,8 +2,11 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 export default function ChatInterface({ conversationId }) {
+  const pathname = usePathname()
+  const isDashboard = pathname?.startsWith('/dashboard')
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
@@ -112,7 +115,10 @@ export default function ChatInterface({ conversationId }) {
 
   // Load messages
   useEffect(() => {
-    if (!conversationId) return
+    if (!conversationId) {
+      setIsLoading(false)
+      return
+    }
     let cancelled = false
     setIsLoading(true)
 
@@ -240,8 +246,7 @@ export default function ChatInterface({ conversationId }) {
   if (isLoading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-black text-white z-50">
-        {/* Noise texture overlay */}
-        <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+        {!isDashboard && <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>}
         
         <div className="relative z-10 flex flex-col items-center gap-3">
           <svg className="animate-spin h-5 w-5 sm:h-6 sm:w-6 text-white" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
@@ -257,20 +262,19 @@ export default function ChatInterface({ conversationId }) {
       className="fixed inset-x-0 top-0 flex flex-col bg-black text-white font-sans overflow-hidden"
       style={{ height: '100dvh' }}
     >
-      {/* Noise texture overlay */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[100] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
+      {!isDashboard && <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[100] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>}
       
       {/* Header */}
       <div className="shrink-0 bg-black/50 backdrop-blur-xl border-b border-white/10 z-10">
         <div className="max-w-4xl mx-auto w-full flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center gap-2 sm:gap-3">
-            <Link href="/systems" className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg sm:rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/30 active:scale-95 transition-all duration-300">
+            <Link href={isDashboard ? '/dashboard' : '/systems'} className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg sm:rounded-xl bg-white/10 border border-white/20 hover:border-white/30 transition">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-gray-400 hover:text-white">
                 <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
               </svg>
             </Link>
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-green-400" />
               <span className="font-bold text-base sm:text-lg">Multi Chat Models</span>
             </div>
           </div>
@@ -323,8 +327,8 @@ export default function ChatInterface({ conversationId }) {
                   onClick={() => copy(msg.content)}
                   className={`max-w-[88%] px-4 py-3 rounded-2xl text-[15px] leading-relaxed break-words whitespace-pre-wrap transition-all duration-300 ${
                     msg.role === 'user'
-                      ? 'bg-gradient-to-br from-indigo-600 to-indigo-700 text-white rounded-tr-sm shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/30 hover:scale-[1.02]'
-                      : 'bg-white/5 text-gray-200 border border-white/10 backdrop-blur-sm rounded-tl-sm hover:bg-white/[0.07] hover:border-white/20 hover:scale-[1.02]'
+                      ? 'bg-zinc-800 text-white rounded-tr-sm'
+                      : 'bg-zinc-900 text-gray-200 border border-zinc-800 rounded-tl-sm'
                   }`}
                 >
                   {msg.content || (

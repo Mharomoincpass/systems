@@ -1,6 +1,7 @@
 import connectDB from '@/lib/mongodb'
 import Message from '@/models/Message'
 import { z } from 'zod'
+import { requireAuth } from '@/lib/auth-helpers'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,6 +11,9 @@ const getMessagesSchema = z.object({
 
 export async function GET(request) {
   try {
+    const auth = await requireAuth(request)
+    if (auth.error) return auth.error
+
     await connectDB()
 
     const { searchParams } = new URL(request.url)

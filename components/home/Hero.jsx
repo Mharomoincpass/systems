@@ -15,23 +15,7 @@ export default function Hero() {
   const bgRef = useRef(null)
 
   const handleStartSession = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch('/api/session/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
-      })
-      
-      if (!response.ok) {
-        throw new Error('Failed to start session')
-      }
-      
-      window.location.href = '/systems'
-    } catch (error) {
-      console.error('Failed to start session:', error)
-      setLoading(false)
-    }
+    window.location.href = '/dashboard'
   }
 
   useGSAP(() => {
