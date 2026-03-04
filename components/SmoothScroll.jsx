@@ -12,17 +12,17 @@ export default function SmoothScroll({ children }) {
 
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const isMobile = window.matchMedia('(max-width: 767px)').matches
-    if (reduceMotion || isMobile) return
+    const isSmallScreen = window.matchMedia('(max-width: 1023px)').matches
+    if (reduceMotion || isSmallScreen) return
 
     const lenis = new Lenis({
-      duration: 1.2,
+      duration: 0.9,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 1,
-      touchMultiplier: 2,
+      touchMultiplier: 1,
       infinite: false,
     })
     lenisRef.current = lenis
@@ -34,8 +34,6 @@ export default function SmoothScroll({ children }) {
     }
 
     gsap.ticker.add(raf)
-
-    gsap.ticker.lagSmoothing(0)
 
     return () => {
       gsap.ticker.remove(raf)

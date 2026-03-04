@@ -23,6 +23,9 @@ export default function Hero() {
     if (reduceMotion) return
 
     const isMobile = window.matchMedia('(max-width: 767px)').matches
+    const isLowPower =
+      (typeof navigator !== 'undefined' && navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+      (typeof navigator !== 'undefined' && navigator.deviceMemory && navigator.deviceMemory <= 4)
     const tl = gsap.timeline()
 
     // Background reveal - adjusted for mobile
@@ -45,48 +48,45 @@ export default function Hero() {
       "-=0.8"
     )
 
-    // Parallax effect on scroll - reduced intensity on mobile
-    ScrollTrigger.create({
-      trigger: container.current,
-      start: "top top",
-      end: "bottom top",
-      scrub: 1,
-      onUpdate: (self) => {
-        const parallaxIntensity = isMobile ? 0.5 : 1
-        gsap.to(textRef.current, {
-          y: self.progress * 200 * parallaxIntensity,
-          opacity: 1 - self.progress,
-          overwrite: true
-        })
-        gsap.to(bgRef.current, {
-          y: self.progress * 100 * parallaxIntensity,
-          scale: 1 + self.progress * 0.1 * parallaxIntensity,
-          overwrite: true
-        })
-      }
-    })
+    if (!isMobile && !isLowPower) {
+      const setTextY = gsap.quickSetter(textRef.current, 'y', 'px')
+      const setBgY = gsap.quickSetter(bgRef.current, 'y', 'px')
+
+      ScrollTrigger.create({
+        trigger: container.current,
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 0.6,
+        onUpdate: (self) => {
+          const progress = self.progress
+          setTextY(progress * 60)
+          setBgY(progress * 30)
+        },
+      })
+    }
+
   }, { scope: container })
 
   return (
-    <section ref={container} className="relative h-screen flex items-center justify-center overflow-hidden z-0 bg-black">
+    <section ref={container} className="relative min-h-screen flex items-center justify-center overflow-x-hidden z-0 bg-black pt-20 sm:pt-24 pb-6 sm:pb-8">
       {/* Dynamic Background */}
       <div ref={bgRef} className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-900/20 to-black z-10" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(255,255,255,0.03),transparent_50%)]" />
         
         {/* Animated grid/mesh illusion */}
-        <div className="absolute inset-0 opacity-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay"></div>
+        <div className="absolute inset-0 opacity-10 bg-noise"></div>
       </div>
 
-      <div ref={textRef} className="relative z-20 text-center px-4 sm:px-6 max-w-7xl mx-auto mix-blend-difference">
-        <div className="overflow-hidden mb-6 sm:mb-8">
-          <h1 className="hero-text-line text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter text-white">
-            Free AI Tools <span className="block text-zinc-500 mt-2 sm:mt-4">for Chat, Images, Video, Music & Voice</span>
+      <div ref={textRef} className="relative z-20 text-center px-4 sm:px-6 max-w-6xl mx-auto">
+        <div className="overflow-hidden mb-4 sm:mb-6">
+          <h1 className="hero-text-line text-5xl sm:text-6xl lg:text-7xl 2xl:text-8xl font-black tracking-tighter text-white leading-[0.95]">
+            Free AI Tools <span className="block text-zinc-500 mt-2 sm:mt-3 text-[0.88em]">for Chat, Images, Video, Music & Voice</span>
           </h1>
         </div>
 
-        <div className="hero-subtitle max-w-4xl mx-auto mt-6 sm:mt-8 backdrop-blur-sm bg-white/5 p-6 sm:p-8 rounded-xl border border-white/10">
-          <p className="text-lg sm:text-xl md:text-2xl text-zinc-400 font-light tracking-wide mb-6">
+        <div className="hero-subtitle max-w-4xl mx-auto mt-4 sm:mt-6 backdrop-blur-sm bg-white/5 p-5 sm:p-6 rounded-xl border border-white/10">
+          <p className="text-base sm:text-lg lg:text-xl text-zinc-400 font-light tracking-wide mb-5 sm:mb-6">
             Mharomo Systems provides a complete suite of free AI tools. Generate high-quality images, create videos from text, compose original music, convert text to speech, and transcribe audio. Chat with advanced AI models like OpenAI and Claude without any sign-up required.
           </p>
           <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-center gap-4">

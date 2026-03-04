@@ -259,7 +259,7 @@ export default function ChatInterface({ conversationId }) {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-x-0 top-0 flex flex-col bg-black text-white font-sans overflow-hidden"
+      className={`fixed top-0 right-0 left-0 ${isDashboard ? 'lg:left-60' : ''} flex flex-col bg-black text-white font-sans overflow-hidden`}
       style={{ height: '100dvh' }}
     >
       {!isDashboard && <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[100] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>}
@@ -306,9 +306,9 @@ export default function ChatInterface({ conversationId }) {
         className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 overscroll-contain space-y-3 sm:space-y-4"
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
-        <div className="max-w-3xl mx-auto w-full space-y-4">
+        <div className={`max-w-3xl mx-auto w-full ${messages.length === 0 ? 'min-h-full flex items-center justify-center' : 'space-y-4'}`}>
           {messages.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center p-8">
+            <div className="flex flex-col items-center justify-center text-center px-8 py-10">
               <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 mb-4 text-3xl backdrop-blur-sm">
                 🤖
               </div>

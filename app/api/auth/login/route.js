@@ -82,6 +82,21 @@ export async function POST(request) {
     if (error instanceof z.ZodError) {
       return Response.json({ error: error.errors[0]?.message || 'Validation error' }, { status: 400 })
     }
+
+    const isDbUnavailable =
+      error?.name === 'MongooseServerSelectionError' ||
+      (error?.code === 'ECONNREFUSED' && error?.syscall === 'querySrv')
+
+    if (isDbUnavailable) {
+      console.error('Login DB connectivity error:', error)
+      return Response.json(
+        {
+          error: 'Database is temporarily unreachable. Check MONGODB_URI/network and try again.',
+        },
+        { status: 503 }
+      )
+    }
+
     console.error('Login error:', error)
     return Response.json({ error: 'Login failed.' }, { status: 500 })
   }

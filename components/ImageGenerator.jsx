@@ -13,22 +13,29 @@ export default function ImageGenerator() {
   const isDashboard = pathname?.startsWith('/dashboard')
   const { addNotification, removeNotification } = useNotification()
   const [prompt, setPrompt] = useState('')
+  const [generationMode, setGenerationMode] = useState('text-to-image')
   const [model, setModel] = useState('flux')
   const [width, setWidth] = useState(512)
   const [height, setHeight] = useState(512)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const [generatedImage, setGeneratedImage] = useState(null)
+  const [referenceImageFile, setReferenceImageFile] = useState(null)
+  const [referenceImagePreview, setReferenceImagePreview] = useState('')
   const scrollRef = useRef(null)
 
   const models = [
-    { id: 'flux', name: 'Flux Schnell', description: 'Fast & affordable' },
-    { id: 'zimage', name: 'Z-Image Turbo', description: 'Ultra fast' },
-    { id: 'imagen-4', name: 'Imagen 4', description: 'High quality (alpha)' },
-    { id: 'klein', name: 'FLUX.2 Klein 4B', description: 'Balanced quality' },
-    { id: 'klein-large', name: 'FLUX.2 Klein 9B', description: 'Higher quality' },
-    { id: 'gptimage', name: 'GPT Image 1 Mini', description: 'Prompt-following' },
+    { id: 'flux', name: 'Flux Schnell', description: 'Fast & affordable', supportsImageInput: false },
+    { id: 'zimage', name: 'Z-Image Turbo', description: 'Ultra fast', supportsImageInput: false },
+    { id: 'imagen-4', name: 'Imagen 4', description: 'High quality (alpha)', supportsImageInput: false },
+    { id: 'grok-imagine', name: 'Grok Imagine', description: 'Creative (alpha)', supportsImageInput: false },
+    { id: 'klein', name: 'FLUX.2 Klein 4B', description: 'Balanced quality · image input', supportsImageInput: true },
+    { id: 'klein-large', name: 'FLUX.2 Klein 9B', description: 'Higher quality · image input', supportsImageInput: true },
+    { id: 'gptimage', name: 'GPT Image 1 Mini', description: 'Prompt-following · image input', supportsImageInput: true },
+    { id: 'flux-2-dev', name: 'FLUX.2 Dev', description: 'Experimental (alpha)', supportsImageInput: false },
   ]
+
+  const imageToImageModels = models.filter((m) => m.supportsImageInput).map((m) => m.id)
 
   const dimensions = [
     { label: '512x512', width: 512, height: 512 },
@@ -43,6 +50,14 @@ export default function ImageGenerator() {
     // No longer fetching history - images are temporary
   }, [])
 
+  useEffect(() => {
+    return () => {
+      if (referenceImagePreview) {
+        URL.revokeObjectURL(referenceImagePreview)
+      }
+    }
+  }, [referenceImagePreview])
+
   const fetchImageHistory = async () => {
     // History not available - images are temporary
   }
@@ -54,23 +69,35 @@ export default function ImageGenerator() {
       return
     }
 
+    if (generationMode === 'image-to-image' && !referenceImageFile) {
+      addNotification('Please upload a reference image', 'warning')
+      return
+    }
+
+    if (generationMode === 'image-to-image' && !imageToImageModels.includes(model)) {
+      addNotification('Selected model does not support image-to-image. Use Klein or GPT Image 1 Mini.', 'warning')
+      return
+    }
+
     setIsLoading(true)
     setError(null)
     setGeneratedImage(null)
     const loadingId = addNotification('Generating image...', 'info', 0)
 
     try {
+      const formData = new FormData()
+      formData.append('prompt', prompt)
+      formData.append('model', model)
+      formData.append('width', String(width))
+      formData.append('height', String(height))
+      formData.append('mode', generationMode)
+      if (generationMode === 'image-to-image' && referenceImageFile) {
+        formData.append('referenceImage', referenceImageFile)
+      }
+
       const response = await fetch('/api/images/generate', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt,
-          model,
-          width,
-          height,
-        }),
+        body: formData,
       })
 
       if (!response.ok) {
@@ -90,6 +117,10 @@ export default function ImageGenerator() {
       const data = await response.json()
       setGeneratedImage(data.image)
       setPrompt('')
+      if (generationMode === 'image-to-image') {
+        setReferenceImageFile(null)
+        setReferenceImagePreview('')
+      }
       addNotification('✨ Image generated successfully!', 'success')
 
       // Scroll to image
@@ -152,6 +183,79 @@ export default function ImageGenerator() {
                   disabled={isLoading}
                 />
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Mode</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setGenerationMode('text-to-image')}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                      generationMode === 'text-to-image'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-800 text-gray-300 border border-gray-700 hover:border-gray-600'
+                    }`}
+                    disabled={isLoading}
+                  >
+                    Text to Image
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setGenerationMode('image-to-image')
+                      if (!imageToImageModels.includes(model)) setModel('klein')
+                    }}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                      generationMode === 'image-to-image'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-800 text-gray-300 border border-gray-700 hover:border-gray-600'
+                    }`}
+                    disabled={isLoading}
+                  >
+                    Image to Image
+                  </button>
+                </div>
+                {generationMode === 'image-to-image' && (
+                  <p className="text-xs text-gray-500 mt-2">Image-to-image supported on: klein, klein-large, gptimage.</p>
+                )}
+              </div>
+
+              {generationMode === 'image-to-image' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Reference Image</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    disabled={isLoading}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] || null
+                      if (referenceImagePreview) {
+                        URL.revokeObjectURL(referenceImagePreview)
+                      }
+                      setReferenceImageFile(file)
+                      if (file) {
+                        const previewUrl = URL.createObjectURL(file)
+                        setReferenceImagePreview(previewUrl)
+                      } else {
+                        setReferenceImagePreview('')
+                      }
+                    }}
+                    className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-gray-700 file:text-gray-100 hover:file:bg-gray-600"
+                  />
+                  {referenceImagePreview && (
+                    <div className="mt-3 rounded-lg overflow-hidden border border-gray-700 bg-gray-900">
+                      <Image
+                        src={referenceImagePreview}
+                        alt="Reference preview"
+                        width={512}
+                        height={320}
+                        className="w-full h-40 object-cover"
+                        unoptimized
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Model Selection */}
               <div>
@@ -271,7 +375,7 @@ export default function ImageGenerator() {
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <p className="text-gray-400 text-xs">Model</p>
-                      <p className="text-white">{generatedImage.model.split('/')[1]}</p>
+                          <p className="text-white">{generatedImage.model}</p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-xs">Dimensions</p>

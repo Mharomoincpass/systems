@@ -9,100 +9,49 @@ gsap.registerPlugin(ScrollTrigger)
 
 export default function ScrollStory() {
   const container = useRef(null)
-  const storyRef = useRef(null)
 
   useGSAP(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduceMotion) return
 
-    const isMobile = window.matchMedia('(max-width: 767px)').matches
-    const sections = gsap.utils.toArray('.story-section')
-    
-    // Adjust scroll distance and animation based on device
-    const scrollDistance = isMobile ? "+=200%" : "+=300%"
-    const snapValue = isMobile ? false : 1 / (sections.length - 1)
-    
-    const tl = gsap.timeline({
+    gsap.from('.story-card', {
       scrollTrigger: {
         trigger: container.current,
-        start: "top top",
-        end: scrollDistance,
-        scrub: 1,
-        pin: true,
-        snap: snapValue
-      }
+        start: 'top 80%',
+        once: true,
+      },
+      y: 32,
+      opacity: 0,
+      stagger: 0.12,
+      duration: 0.7,
+      ease: 'power2.out',
     })
-
-    sections.forEach((section, i) => {
-        if (i === 0) return // Skip first section
-        
-        // Simplified animation for mobile
-        const scaleStart = isMobile ? 0.9 : 0.8
-        const zStart = isMobile ? -50 : -100
-        
-        tl.fromTo(section, 
-            { opacity: 0, scale: scaleStart, z: zStart },
-            { opacity: 1, scale: 1, z: 0, duration: 1, ease: "power2.inOut" }
-        )
-        // Fade out previous
-        .to(sections[i-1], 
-            { 
-              opacity: 0, 
-              scale: isMobile ? 1.1 : 1.2, 
-              filter: isMobile ? "blur(5px)" : "blur(10px)", 
-              duration: 0.5 
-            }, 
-            "<"
-        )
-    })
-
   }, { scope: container })
 
   return (
-    <section ref={container} className="relative h-screen bg-black overflow-hidden text-white perspective-1000">
-      <div ref={storyRef} className="relative w-full h-full flex items-center justify-center">
-        
-        {/* Section 1 */}
-        <div className="story-section absolute inset-0 flex flex-col items-center justify-center p-4 sm:p-8 text-center opacity-100">
-            <h2 className="text-4xl sm:text-6xl md:text-8xl font-bold text-white mb-4 sm:mb-6">
-                Backend
-            </h2>
-            <p className="text-lg sm:text-2xl md:text-3xl text-zinc-500 max-w-3xl px-4">
-                Scaling systems with <span className="text-white">Node.js</span>, <span className="text-white">Python</span>, & <span className="text-white">Cloud</span>.
-            </p>
+    <section ref={container} className="relative bg-black overflow-hidden text-white py-20 sm:py-24 border-t border-white/10 border-b border-white/10">
+      <div className="max-w-7xl mx-auto px-6 grid gap-8 md:grid-cols-3">
+        <div className="story-card rounded-xl border border-white/10 bg-white/5 p-6 sm:p-8 text-center transition-transform duration-300 hover:-translate-y-1">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Backend</h2>
+          <p className="text-base sm:text-lg text-zinc-400">
+            Scaling systems with <span className="text-white">Node.js</span>, <span className="text-white">Python</span>, and <span className="text-white">Cloud</span>.
+          </p>
         </div>
 
-        {/* Section 2 */}
-        <div className="story-section absolute inset-0 flex flex-col items-center justify-center p-4 sm:p-8 text-center opacity-0 translate-z-[-100px]">
-            <h2 className="text-4xl sm:text-6xl md:text-8xl font-bold text-white mb-4 sm:mb-6">
-                Frontend
-            </h2>
-            <p className="text-lg sm:text-2xl md:text-3xl text-zinc-500 max-w-3xl px-4">
-                Building stunning UIs with <span className="text-white">React</span>, <span className="text-white">Next.js</span>, & <span className="text-white">Tailwind</span>.
-            </p>
-            <div className="mt-8 grid grid-cols-2 gap-4 opacity-50 hidden sm:grid">
-                <div className="border border-white/10 p-4 rounded bg-white/5 text-zinc-400">React.js</div>
-                <div className="border border-white/10 p-4 rounded bg-white/5 text-zinc-400">Next.js</div>
-            </div>
+        <div className="story-card rounded-xl border border-white/10 bg-white/5 p-6 sm:p-8 text-center transition-transform duration-300 hover:-translate-y-1">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Frontend</h2>
+          <p className="text-base sm:text-lg text-zinc-400">
+            Building stunning UIs with <span className="text-white">React</span>, <span className="text-white">Next.js</span>, and <span className="text-white">Tailwind</span>.
+          </p>
         </div>
 
-        {/* Section 3 */}
-        <div className="story-section absolute inset-0 flex flex-col items-center justify-center p-4 sm:p-8 text-center opacity-0 translate-z-[-100px]">
-             <h2 className="text-4xl sm:text-6xl md:text-8xl font-bold text-white mb-4 sm:mb-6">
-                AI/ML
-            </h2>
-             <p className="text-lg sm:text-2xl md:text-3xl text-zinc-500 max-w-3xl px-4">
-                Integrating <span className="text-white">Vertex AI</span>, <span className="text-white">Embeddings</span>, & <span className="text-white">NLP</span>.
-            </p>
-             <div className="mt-8 text-base sm:text-xl font-mono text-zinc-500">
-                &lt;Intelligent Systems /&gt;
-            </div>
+        <div className="story-card rounded-xl border border-white/10 bg-white/5 p-6 sm:p-8 text-center transition-transform duration-300 hover:-translate-y-1">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">AI/ML</h2>
+          <p className="text-base sm:text-lg text-zinc-400">
+            Integrating <span className="text-white">Vertex AI</span>, <span className="text-white">Embeddings</span>, and <span className="text-white">NLP</span>.
+          </p>
         </div>
-
       </div>
-      
-      {/* Background Decor */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/5 rounded-full blur-[120px] pointer-events-none" />
     </section>
   )
 }

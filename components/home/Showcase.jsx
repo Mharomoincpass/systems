@@ -12,27 +12,24 @@ const products = [
   {
     name: 'Grocliq GEO',
     category: 'SEO & Automation',
-    images: ['/images/grocliq.png', '/images/grocliqq.png', '/images/grocliqqq.png', '/images/grocliqqqq.png'],
+    image: '/images/grocliq.png',
     desc: 'GEO monitoring platform with AI agents that automate the SEO process and track brand presence across search engines.',
     url: 'https://grocliq.ai/',
-    color: 'from-zinc-800 to-black'
   },
   {
     name: 'OpenSignals.ai',
     category: 'Ad Intelligence',
-    images: ['/images/opensignals.png', '/images/opensignalss.png'],
+    image: '/images/opensignals.png',
     desc: 'Competitor ad analysis platform with AI-powered video, image, and paid ads generation for market research.',
     url: 'https://opensignals.ai/',
-    color: 'from-zinc-800 to-black'
   },
   {
     name: 'Incpass',
     category: 'Process Automation',
-    images: ['/images/incpass.png', '/images/incpasss.png'],
+    image: '/images/incpass.png',
     desc: 'Business process automation platform streamlining workflows, compliance, and operational efficiency.',
     url: 'https://incpass.co/',
-    color: 'from-zinc-800 to-black'
-  }
+  },
 ]
 
 export default function Showcase() {
@@ -42,103 +39,56 @@ export default function Showcase() {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduceMotion) return
 
-    const isMobile = window.matchMedia('(max-width: 767px)').matches
-    const panels = gsap.utils.toArray('.project-panel')
-    
-    panels.forEach((panel, i) => {
-      const images = gsap.utils.toArray('.project-img-card', panel)
-      
-      // Set initial states for all images
-      gsap.set(images, { opacity: 0, scale: 0.9 })
-      gsap.set(images[0], { opacity: 1, scale: 1 }) // First image visible
-      
-      // Full animation for all devices - adjusted parameters for mobile
-      const scrollDistance = isMobile ? images.length * 40 : images.length * 60
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: panel,
-          start: isMobile ? "top 15%" : "top top", // Pin a bit lower on mobile
-          end: `+=${scrollDistance}%`,
-          scrub: 1,
-          pin: true, 
-          pinSpacing: true,
-          anticipatePin: 1
-        }
-      })
-
-      // Animate images one by one
-      images.forEach((img, idx) => {
-        if (idx === 0) return // Skip first (already visible)
-        
-        tl.to(images[idx - 1], 
-          { opacity: 0, scale: 1.1, duration: 0.5 },
-          "+=0.5"
-        )
-        .fromTo(img, 
-          { opacity: 0, scale: 0.9 },
-          { opacity: 1, scale: 1, duration: 1 },
-          "<"
-        )
-      })
+    gsap.from('.project-card', {
+      scrollTrigger: {
+        trigger: container.current,
+        start: 'top 80%',
+        once: true,
+      },
+      y: 36,
+      opacity: 0,
+      stagger: 0.14,
+      duration: 0.75,
+      ease: 'power2.out',
     })
   }, { scope: container })
 
   return (
-    <section id="projects" ref={container} className="relative bg-black z-10 overflow-hidden">
-      <div className="container mx-auto px-6 py-32">
+    <section id="projects" ref={container} className="relative bg-black z-10 overflow-hidden py-20 sm:py-28 border-t border-white/10">
+      <div className="container mx-auto px-6">
         <h2 className="text-4xl md:text-6xl font-bold text-white mb-4">
           Top <span className="text-zinc-500">Projects by yours truly</span>
         </h2>
-        <div className="w-full h-px bg-white/10 mt-8"></div>
-      </div>
+        <div className="w-full h-px bg-white/10 mt-8 mb-12"></div>
 
-      <div className="w-full">
-        {products.map((product, i) => (
-          <div key={i} className="project-panel relative w-full min-h-[80vh] md:h-screen flex items-center justify-center bg-black overflow-hidden">
-            
-            <div className={`grid lg:grid-cols-[1.5fr_1fr] gap-8 md:gap-12 items-center w-full px-4 sm:px-6 lg:px-12 max-w-[90vw] ${i % 2 === 1 ? 'lg:grid-cols-[1fr_1.5fr]' : ''}`}>
-                
-                {/* Image Container - Absolutely positioned images stack */}
-              <div className={`relative w-full aspect-video max-w-full bg-zinc-900 rounded-lg overflow-hidden ${i % 2 === 1 ? 'lg:order-2' : ''}`}>
-                {product.images.map((img, idx) => (
-                  <div 
-                    key={idx} 
-                    className="project-img-card absolute inset-0 rounded-lg overflow-hidden border border-white/10"
-                  >
-                    <Image
-                      src={img}
-                      alt={`${product.name} - ${idx}`}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover"
-                    />
-                  </div>
-                ))}
+        <div className="grid gap-8 lg:grid-cols-3">
+          {products.map((product) => (
+            <article key={product.name} className="project-card rounded-xl border border-white/10 bg-white/5 overflow-hidden transition-transform duration-300 hover:-translate-y-1">
+              <div className="relative w-full aspect-video overflow-hidden">
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 33vw"
+                  className="object-cover transition-transform duration-500 hover:scale-[1.03]"
+                />
               </div>
-
-              {/* Text Content */}
-              <div className={`${i % 2 === 1 ? 'lg:order-1' : ''}`}>
-                <h3 className="text-5xl md:text-6xl font-bold text-white mb-4">
-                  {product.name}
-                </h3>
-                <p className="text-sm uppercase tracking-widest text-zinc-500 mb-6">
-                  {product.category}
-                </p>
-                <p className="text-lg text-zinc-400 leading-relaxed mb-8">
-                  {product.desc}
-                </p>
+              <div className="p-6">
+                <h3 className="text-3xl font-bold text-white mb-2">{product.name}</h3>
+                <p className="text-xs uppercase tracking-widest text-zinc-500 mb-4">{product.category}</p>
+                <p className="text-zinc-400 leading-relaxed mb-6">{product.desc}</p>
                 <a
                   href={product.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block px-8 py-3 border border-white/20 text-white hover:bg-white hover:text-black transition-all duration-300"
+                  className="inline-block px-6 py-2.5 border border-white/20 text-white hover:bg-white hover:text-black transition-all duration-300"
                 >
                   View Project →
                 </a>
               </div>
-            </div>
-          </div>
-        ))}
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   )

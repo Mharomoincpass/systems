@@ -13,7 +13,10 @@ const generateImageSchema = z.object({
   model: z.string().optional().default('flux'),
   width: z.number().optional().default(512),
   height: z.number().optional().default(512),
+  mode: z.enum(['text-to-image', 'image-to-image']).optional().default('text-to-image'),
 })
+
+const IMG2IMG_SUPPORTED_MODELS = new Set(['klein', 'klein-large', 'gptimage'])
 
 export async function POST(request) {
   try {
@@ -25,8 +28,25 @@ export async function POST(request) {
       return Response.json({ error: 'Rate limit exceeded. Please try again later.' }, { status: 429 })
     }
 
-    const body = await request.json()
-    const { prompt, model, width, height } = generateImageSchema.parse(body)
+    const contentType = request.headers.get('content-type') || ''
+    let parsedBody
+    let referenceImageFile = null
+
+    if (contentType.includes('multipart/form-data')) {
+      const formData = await request.formData()
+      referenceImageFile = formData.get('referenceImage') || null
+      parsedBody = {
+        prompt: formData.get('prompt'),
+        model: formData.get('model') || 'flux',
+        width: Number(formData.get('width') || 512),
+        height: Number(formData.get('height') || 512),
+        mode: formData.get('mode') || 'text-to-image',
+      }
+    } else {
+      parsedBody = await request.json()
+    }
+
+    const { prompt, model, width, height, mode } = generateImageSchema.parse(parsedBody)
 
     const pollinationsKey = process.env.POLLINATIONS_API_KEY
     if (!pollinationsKey) {
@@ -39,9 +59,76 @@ export async function POST(request) {
     console.log(`📸 Generating image with model: ${model}`)
     console.log(`📝 Prompt: ${prompt.substring(0, 50)}...`)
 
+    let referenceImageUrl = ''
+    if (mode === 'image-to-image') {
+      if (!IMG2IMG_SUPPORTED_MODELS.has(model)) {
+        return Response.json(
+          { error: `Model '${model}' does not support image-to-image. Use klein, klein-large, or gptimage.` },
+          { status: 400 }
+        )
+      }
+
+      if (!referenceImageFile || typeof referenceImageFile === 'string') {
+        return Response.json(
+          { error: 'Reference image is required for image-to-image mode.' },
+          { status: 400 }
+        )
+      }
+
+      const maxBytes = 10 * 1024 * 1024
+      if (referenceImageFile.size > maxBytes) {
+        return Response.json(
+          { error: 'Reference image must be 10MB or smaller.' },
+          { status: 400 }
+        )
+      }
+
+      const uploadFormData = new FormData()
+      uploadFormData.append('file', referenceImageFile)
+
+      const uploadResponse = await fetch('https://media.pollinations.ai/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${pollinationsKey}`,
+        },
+        body: uploadFormData,
+      })
+
+      if (!uploadResponse.ok) {
+        const uploadError = await uploadResponse.text()
+        console.error(`❌ Pollinations media upload error: ${uploadResponse.status} ${uploadError}`)
+        return Response.json(
+          { error: 'Failed to upload reference image for image-to-image generation.' },
+          { status: uploadResponse.status || 500 }
+        )
+      }
+
+      const uploadResult = await uploadResponse.json()
+      referenceImageUrl = uploadResult?.url || ''
+
+      if (!referenceImageUrl) {
+        return Response.json(
+          { error: 'Reference image upload did not return a usable URL.' },
+          { status: 500 }
+        )
+      }
+    }
+
     // Build Pollinations API URL
     const encodedPrompt = encodeURIComponent(prompt)
-    const apiUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?model=${model}&width=${width}&height=${height}&nologo=true&seed=-1`
+    const params = new URLSearchParams({
+      model,
+      width: String(width),
+      height: String(height),
+      nologo: 'true',
+      seed: '-1',
+    })
+
+    if (referenceImageUrl) {
+      params.set('image', referenceImageUrl)
+    }
+
+    const apiUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?${params.toString()}`
 
     console.log(`📡 Calling Pollinations API...`)
 
@@ -56,6 +143,27 @@ export async function POST(request) {
     if (!response.ok) {
       const errorText = await response.text()
       console.error(`❌ Pollinations API error: ${response.status} ${errorText}`)
+
+      let parsedError = null
+      try {
+        parsedError = JSON.parse(errorText)
+      } catch (_) {
+        parsedError = null
+      }
+
+      const nestedMessage =
+        parsedError?.error?.message ||
+        parsedError?.message ||
+        errorText ||
+        response.statusText
+
+      const isContentPolicyBlock =
+        response.status === 403 &&
+        (
+          String(nestedMessage).toLowerCase().includes('content policy') ||
+          String(nestedMessage).toLowerCase().includes('temporarily blocked') ||
+          String(nestedMessage).toLowerCase().includes('forbidden')
+        )
       
       if (response.status === 402) {
         return Response.json(
@@ -64,10 +172,24 @@ export async function POST(request) {
         )
       }
 
+      if (isContentPolicyBlock) {
+        const modelAdvice = mode === 'image-to-image'
+          ? 'Try model `klein` or `klein-large`, and use a more specific edit prompt.'
+          : 'Try rephrasing the prompt to be more specific and policy-safe.'
+
+        return Response.json(
+          {
+            error: 'Request blocked by provider content policy for this prompt/model.',
+            details: modelAdvice,
+          },
+          { status: 403 }
+        )
+      }
+
       return Response.json(
         {
-          error: `Image generation failed: ${response.statusText}`,
-          details: errorText,
+          error: `Image generation failed: ${response.statusText || 'Provider error'}`,
+          details: typeof nestedMessage === 'string' ? nestedMessage.slice(0, 300) : 'Upstream error',
         },
         { status: response.status }
       )
@@ -119,6 +241,7 @@ export async function POST(request) {
           url: imageUrl,
           prompt,
           model,
+          mode,
           width,
           height,
           generatedAt: new Date().toISOString(),
