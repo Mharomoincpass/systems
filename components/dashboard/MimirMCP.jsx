@@ -1,744 +1,396 @@
-'use client'
+﻿'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 
-const STEPS = [
-  { id: 'concept', label: 'Concept & Script', icon: '📝', description: 'Generate your reel concept, script, and narration text' },
-  { id: 'image', label: 'Image Generation', icon: '🖼️', description: 'Create influencer visuals and scene images' },
-  { id: 'video', label: 'Video Generation', icon: '🎬', description: 'Generate video from your images' },
-  { id: 'music', label: 'Background Music', icon: '🎵', description: 'Create background music for your reel' },
-  { id: 'voiceover', label: 'Voiceover', icon: '🎙️', description: 'Generate narration voiceover from your script' },
-  { id: 'preview', label: 'Final Preview', icon: '✅', description: 'Review and download your completed reel' },
-]
+const STEP_META = {
+  plan:      { icon: '\uD83E\uDDE0', label: 'Planning' },
+  image:     { icon: '\uD83D\uDDBC\uFE0F', label: 'Image Generation' },
+  video:     { icon: '\uD83C\uDFAC', label: 'Video Generation' },
+  music:     { icon: '\uD83C\uDFB5', label: 'Background Music' },
+  voiceover: { icon: '\uD83C\uDF99\uFE0F', label: 'Voiceover' },
+}
 
-const VOICE_OPTIONS = [
-  { value: 'rachel', label: 'Rachel (Female)' },
-  { value: 'drew', label: 'Drew (Male)' },
-  { value: 'clyde', label: 'Clyde (Male)' },
-  { value: 'paul', label: 'Paul (Male)' },
-  { value: 'domi', label: 'Domi (Female)' },
-  { value: 'dave', label: 'Dave (Male)' },
-  { value: 'fin', label: 'Fin (Male)' },
-  { value: 'sarah', label: 'Sarah (Female)' },
-  { value: 'antoni', label: 'Antoni (Male)' },
-  { value: 'elli', label: 'Elli (Female)' },
-]
+const STATUS_COLORS = {
+  running: 'text-yellow-400 border-yellow-500/30 bg-yellow-950/20',
+  done:    'text-green-400  border-green-500/30  bg-green-950/20',
+  error:   'text-red-400    border-red-500/30    bg-red-950/20',
+}
 
 export default function MimirMCP() {
-  const [currentStep, setCurrentStep] = useState(0)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-
-  // Step 1: Concept
   const [topic, setTopic] = useState('')
-  const [generatedScript, setGeneratedScript] = useState('')
-  const [narrationText, setNarrationText] = useState('')
+  const [running, setRunning] = useState(false)
+  const [log, setLog] = useState([])
+  const [result, setResult] = useState(null)
+  const [error, setError] = useState('')
+  const logEndRef = useRef(null)
 
-  // Step 2: Image
-  const [imagePrompt, setImagePrompt] = useState('')
-  const [generatedImage, setGeneratedImage] = useState(null)
+  useEffect(() => {
+    logEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [log])
 
-  // Step 3: Video
-  const [videoPrompt, setVideoPrompt] = useState('')
-  const [generatedVideo, setGeneratedVideo] = useState(null)
-
-  // Step 4: Music
-  const [musicPrompt, setMusicPrompt] = useState('')
-  const [musicDuration, setMusicDuration] = useState(15)
-  const [generatedMusic, setGeneratedMusic] = useState(null)
-
-  // Step 5: Voiceover
-  const [voiceoverVoice, setVoiceoverVoice] = useState('rachel')
-  const [generatedVoiceover, setGeneratedVoiceover] = useState(null)
-
-  const goToStep = useCallback((step) => {
-    setError('')
-    setCurrentStep(step)
-  }, [])
-
-  // Step 1: Generate concept/script via chat API
-  const generateConcept = async () => {
-    if (!topic.trim()) {
-      setError('Please enter a topic or idea for your reel')
-      return
-    }
-    setLoading(true)
+  const startGeneration = useCallback(async () => {
+    if (!topic.trim() || running) return
+    setRunning(true)
+    setLog([])
+    setResult(null)
     setError('')
 
     try {
-      const res = await fetch('/api/chat/conversations', {
+      const res = await fetch('/api/mimir/orchestrate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: `Mimir MCP: ${topic}` }),
+        body: JSON.stringify({ topic: topic.trim() }),
       })
 
-      if (!res.ok) throw new Error('Failed to create conversation')
-      const { conversation } = await res.json()
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || `Request failed (${res.status})`)
+      }
 
-      const prompt = `You are a UGC Instagram Reels content strategist. Create a complete reel concept for the following topic: "${topic}"
-
-Provide the response in this exact format:
-
-**HOOK:** (attention-grabbing first 3 seconds)
-**SCRIPT:** (the full spoken script for the reel, keep it under 150 words for a 30-60 second reel)
-**VISUAL DESCRIPTION:** (describe the ideal influencer look and scene for image generation - be specific about appearance, setting, lighting, and style)
-**VIDEO DIRECTION:** (describe camera movement and visual transitions)
-**MUSIC MOOD:** (describe the ideal background music mood and genre)
-**NARRATION TEXT:** (the exact text to be converted to speech - clean, no stage directions)`
-
-      const streamRes = await fetch('/api/chat/stream', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          conversationId: conversation._id,
-          content: prompt,
-          model: 'openai',
-        }),
-      })
-
-      if (!streamRes.ok) throw new Error('Failed to generate concept')
-
-      const reader = streamRes.body.getReader()
+      const reader = res.body.getReader()
       const decoder = new TextDecoder()
-      let fullText = ''
+      let buf = ''
 
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
-        const chunk = decoder.decode(value, { stream: true })
-        const lines = chunk.split('\n')
+
+        buf += decoder.decode(value, { stream: true })
+        const lines = buf.split('\n')
+        buf = lines.pop() || ''
+
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            try {
-              const data = JSON.parse(line.slice(6))
-              if (data.content) {
-                fullText += data.content
-                setGeneratedScript(fullText)
-              }
-            } catch {
-              // Ignore incomplete JSON chunks during streaming
+          if (!line.startsWith('data: ')) continue
+          try {
+            const data = JSON.parse(line.slice(6))
+
+            if (data.type === 'step') {
+              setLog((prev) => {
+                const idx = prev.findIndex(
+                  (e) => e.step === data.step && e.status === 'running'
+                )
+                if (idx !== -1 && data.status !== 'running') {
+                  const updated = [...prev]
+                  updated[idx] = data
+                  return updated
+                }
+                return [...prev, data]
+              })
             }
+
+            if (data.type === 'done') {
+              setResult(data)
+            }
+          } catch {
+            // partial JSON
           }
         }
       }
-
-      // Extract sections for auto-fill
-      const narrationMatch = fullText.match(/\*\*NARRATION TEXT:\*\*\s*([\s\S]*?)(?=\*\*|$)/i)
-      const visualMatch = fullText.match(/\*\*VISUAL DESCRIPTION:\*\*\s*([\s\S]*?)(?=\*\*|$)/i)
-      const musicMatch = fullText.match(/\*\*MUSIC MOOD:\*\*\s*([\s\S]*?)(?=\*\*|$)/i)
-      const videoMatch = fullText.match(/\*\*VIDEO DIRECTION:\*\*\s*([\s\S]*?)(?=\*\*|$)/i)
-
-      if (narrationMatch) setNarrationText(narrationMatch[1].trim())
-      if (visualMatch) setImagePrompt(`UGC Instagram reel influencer photo, ${visualMatch[1].trim()}, professional quality, 9:16 vertical format`)
-      if (musicMatch) setMusicPrompt(musicMatch[1].trim())
-      if (videoMatch) setVideoPrompt(videoMatch[1].trim())
     } catch (err) {
-      setError(err.message || 'Failed to generate concept')
+      setError(err.message || 'Something went wrong')
     } finally {
-      setLoading(false)
+      setRunning(false)
+    }
+  }, [topic, running])
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      startGeneration()
     }
   }
 
-  // Step 2: Generate image
-  const generateImage = async () => {
-    if (!imagePrompt.trim()) {
-      setError('Please enter an image prompt')
-      return
-    }
-    setLoading(true)
-    setError('')
+  const assets = result?.assets
 
-    try {
-      const res = await fetch('/api/images/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: imagePrompt,
-          model: 'flux',
-          width: 576,
-          height: 1024,
-        }),
-      })
+  return (
+    <div className="max-w-4xl space-y-6">
+      {/* Description */}
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
+        <p className="text-sm text-zinc-400">
+          Enter a topic and the MCP agent will autonomously plan, generate images, create video,
+          compose music, and produce voiceover &mdash; all in one run. You&apos;ll see the agent&apos;s live
+          decision log below.
+        </p>
+      </div>
 
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Image generation failed')
-      setGeneratedImage(data.image)
-    } catch (err) {
-      setError(err.message || 'Failed to generate image')
-    } finally {
-      setLoading(false)
-    }
-  }
+      {/* Single input */}
+      <div className="bg-zinc-900/30 border border-zinc-800 rounded-xl p-6">
+        <label className="block text-sm text-zinc-400 mb-2">What should the reel be about?</label>
+        <div className="flex gap-3">
+          <input
+            type="text"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={running}
+            placeholder="e.g. Morning skincare routine, Gym motivation, AI productivity tips..."
+            className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 disabled:opacity-50"
+          />
+          <button
+            onClick={startGeneration}
+            disabled={running || !topic.trim()}
+            className="px-5 py-2.5 bg-violet-600 hover:bg-violet-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap"
+          >
+            {running ? (
+              <span className="flex items-center gap-2">
+                <Spinner /> Running...
+              </span>
+            ) : (
+              'Create Reel'
+            )}
+          </button>
+        </div>
+      </div>
 
-  // Step 3: Generate video
-  const generateVideoFromImage = async () => {
-    setLoading(true)
-    setError('')
+      {/* Error */}
+      {error && (
+        <div className="bg-red-950/30 border border-red-900/50 rounded-xl px-4 py-3 text-sm text-red-400">
+          {error}
+        </div>
+      )}
 
-    try {
-      const body = {
-        model: 'grok-video',
-        duration: 5,
-        aspectRatio: '9:16',
-      }
-
-      if (generatedImage?.url && !generatedImage.url.startsWith('data:')) {
-        body.imageUrl = generatedImage.url
-        body.prompt = videoPrompt || 'Cinematic motion, smooth camera movement'
-      } else {
-        body.prompt = videoPrompt || imagePrompt || 'UGC influencer Instagram reel, cinematic motion, smooth camera movement, 9:16 vertical'
-      }
-
-      const res = await fetch('/api/videos/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Video generation failed')
-      setGeneratedVideo(data.video)
-    } catch (err) {
-      setError(err.message || 'Failed to generate video')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Step 4: Generate music
-  const generateMusic = async () => {
-    if (!musicPrompt.trim()) {
-      setError('Please enter a music prompt')
-      return
-    }
-    setLoading(true)
-    setError('')
-
-    try {
-      const res = await fetch('/api/music/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: musicPrompt,
-          duration: musicDuration,
-        }),
-      })
-
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Music generation failed')
-      setGeneratedMusic(data.audio)
-    } catch (err) {
-      setError(err.message || 'Failed to generate music')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Step 5: Generate voiceover
-  const generateVoiceover = async () => {
-    if (!narrationText.trim()) {
-      setError('Please enter narration text')
-      return
-    }
-    setLoading(true)
-    setError('')
-
-    try {
-      const res = await fetch('/api/tts/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: narrationText,
-          voice: voiceoverVoice,
-        }),
-      })
-
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Voiceover generation failed')
-      setGeneratedVoiceover(data.audio)
-    } catch (err) {
-      setError(err.message || 'Failed to generate voiceover')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const renderStepContent = () => {
-    switch (STEPS[currentStep].id) {
-      case 'concept':
-        return (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm text-zinc-400 mb-1.5">What is your reel about?</label>
-              <input
-                type="text"
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                placeholder="e.g. Morning skincare routine, Gym motivation, Travel vlog in Bali..."
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600"
-              />
-            </div>
-            <button
-              onClick={generateConcept}
-              disabled={loading || !topic.trim()}
-              className="px-4 py-2 bg-violet-600 hover:bg-violet-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white text-sm rounded-lg transition-colors"
-            >
-              {loading ? 'Generating concept...' : 'Generate Concept & Script'}
-            </button>
-            {generatedScript && (
-              <div className="mt-4">
-                <label className="block text-sm text-zinc-400 mb-1.5">Generated Script</label>
-                <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 text-sm text-zinc-300 whitespace-pre-wrap max-h-96 overflow-y-auto">
-                  {generatedScript}
+      {/* Live agent log */}
+      {log.length > 0 && (
+        <div className="bg-zinc-900/30 border border-zinc-800 rounded-xl p-5">
+          <h2 className="text-sm font-medium text-zinc-300 mb-3 flex items-center gap-2">
+            <span className="text-base">{'\uD83D\uDCCB'}</span> Agent Activity Log
+            {running && <Spinner />}
+          </h2>
+          <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+            {log.map((entry, i) => {
+              const meta = STEP_META[entry.step] || { icon: '\u2699\uFE0F', label: entry.step }
+              const colors = STATUS_COLORS[entry.status] || 'text-zinc-400 border-zinc-800 bg-zinc-900'
+              return (
+                <div
+                  key={`${entry.step}-${entry.status}-${i}`}
+                  className={`flex items-start gap-3 px-3 py-2 rounded-lg border text-xs ${colors}`}
+                >
+                  <span className="text-sm flex-shrink-0 mt-0.5">{meta.icon}</span>
+                  <div className="min-w-0">
+                    <span className="font-medium">{meta.label}</span>
+                    <span className="mx-1.5 text-zinc-600">{'\u2022'}</span>
+                    <span className={entry.status === 'running' ? 'text-yellow-300' : ''}>{entry.message}</span>
+                  </div>
+                  <span className="ml-auto flex-shrink-0">
+                    {entry.status === 'running' && <Spinner small />}
+                    {entry.status === 'done' && <CheckIcon />}
+                    {entry.status === 'error' && <XIcon />}
+                  </span>
                 </div>
-                <p className="text-xs text-zinc-600 mt-2">
-                  The image prompt, music mood, video direction, and narration have been auto-filled from this script. You can edit them in the next steps.
-                </p>
-              </div>
-            )}
+              )
+            })}
+            <div ref={logEndRef} />
           </div>
-        )
+        </div>
+      )}
 
-      case 'image':
-        return (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm text-zinc-400 mb-1.5">Image Prompt</label>
-              <textarea
-                value={imagePrompt}
-                onChange={(e) => setImagePrompt(e.target.value)}
-                placeholder="Describe the influencer look and scene for your reel thumbnail/visual..."
-                rows={3}
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 resize-none"
-              />
-            </div>
-            <button
-              onClick={generateImage}
-              disabled={loading || !imagePrompt.trim()}
-              className="px-4 py-2 bg-violet-600 hover:bg-violet-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white text-sm rounded-lg transition-colors"
-            >
-              {loading ? 'Generating image...' : 'Generate Image (9:16)'}
-            </button>
-            {generatedImage && (
-              <div className="mt-4">
-                <p className="text-sm text-zinc-400 mb-2">Generated Image</p>
-                <div className="max-w-xs mx-auto">
-                  <img
-                    src={generatedImage.url}
-                    alt="Generated influencer"
-                    className="w-full rounded-lg border border-zinc-800"
-                  />
-                </div>
-                <p className="text-xs text-zinc-600 mt-2 text-center">
-                  {generatedImage.width}×{generatedImage.height} • Model: {generatedImage.model}
-                </p>
-              </div>
-            )}
+      {/* Plan preview */}
+      {log.find((e) => e.step === 'plan' && e.status === 'done')?.plan && (
+        <PlanPreview plan={log.find((e) => e.step === 'plan' && e.status === 'done').plan} />
+      )}
+
+      {/* Final result */}
+      {result && (
+        <div className="space-y-6">
+          <div
+            className={`rounded-xl border p-4 ${
+              result.success
+                ? 'bg-green-950/20 border-green-900/30'
+                : 'bg-red-950/20 border-red-900/30'
+            }`}
+          >
+            <p className={`text-sm font-medium ${result.success ? 'text-green-400' : 'text-red-400'}`}>
+              {result.success ? '\u2705' : '\u26A0\uFE0F'} {result.message || (result.success ? 'Reel created!' : 'Some steps failed')}
+            </p>
           </div>
-        )
 
-      case 'video':
-        return (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm text-zinc-400 mb-1.5">Video Prompt</label>
-              <textarea
-                value={videoPrompt}
-                onChange={(e) => setVideoPrompt(e.target.value)}
-                placeholder="Describe camera movement and visual style..."
-                rows={2}
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 resize-none"
-              />
-            </div>
-            {generatedImage && (
-              <p className="text-xs text-zinc-500">
-                ℹ️ Your generated image will be used as the base for the video (if supported by the model).
-              </p>
-            )}
-            <button
-              onClick={generateVideoFromImage}
-              disabled={loading}
-              className="px-4 py-2 bg-violet-600 hover:bg-violet-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white text-sm rounded-lg transition-colors"
-            >
-              {loading ? 'Generating video (this may take a few minutes)...' : 'Generate Video (9:16)'}
-            </button>
-            {generatedVideo && (
-              <div className="mt-4">
-                <p className="text-sm text-zinc-400 mb-2">Generated Video</p>
-                <div className="max-w-xs mx-auto">
-                  <video
-                    src={generatedVideo.url}
-                    controls
-                    className="w-full rounded-lg border border-zinc-800"
-                  />
-                </div>
-                <p className="text-xs text-zinc-600 mt-2 text-center">
-                  {generatedVideo.duration}s • {generatedVideo.aspectRatio} • Model: {generatedVideo.model}
-                </p>
-              </div>
-            )}
-          </div>
-        )
+          {assets && (
+            <div className="bg-zinc-900/30 border border-zinc-800 rounded-xl p-6 space-y-6">
+              <h3 className="text-sm font-medium text-white">Generated Assets</h3>
 
-      case 'music':
-        return (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm text-zinc-400 mb-1.5">Music Mood / Style</label>
-              <textarea
-                value={musicPrompt}
-                onChange={(e) => setMusicPrompt(e.target.value)}
-                placeholder="e.g. Upbeat lo-fi hip hop, chill vibes, Instagram reel background music..."
-                rows={2}
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 resize-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-zinc-400 mb-1.5">Duration: {musicDuration}s</label>
-              <input
-                type="range"
-                min={5}
-                max={60}
-                value={musicDuration}
-                onChange={(e) => setMusicDuration(Number(e.target.value))}
-                className="w-full accent-violet-600"
-              />
-              <div className="flex justify-between text-xs text-zinc-600">
-                <span>5s</span>
-                <span>60s</span>
-              </div>
-            </div>
-            <button
-              onClick={generateMusic}
-              disabled={loading || !musicPrompt.trim()}
-              className="px-4 py-2 bg-violet-600 hover:bg-violet-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white text-sm rounded-lg transition-colors"
-            >
-              {loading ? 'Generating music...' : 'Generate Background Music'}
-            </button>
-            {generatedMusic && (
-              <div className="mt-4">
-                <p className="text-sm text-zinc-400 mb-2">Generated Music</p>
-                <audio src={generatedMusic.url} controls className="w-full" />
-                <p className="text-xs text-zinc-600 mt-2">
-                  Duration: {generatedMusic.duration}s
-                </p>
-              </div>
-            )}
-          </div>
-        )
-
-      case 'voiceover':
-        return (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm text-zinc-400 mb-1.5">Narration Text</label>
-              <textarea
-                value={narrationText}
-                onChange={(e) => setNarrationText(e.target.value)}
-                placeholder="Enter the text to be spoken as voiceover..."
-                rows={4}
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 resize-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-zinc-400 mb-1.5">Voice</label>
-              <select
-                value={voiceoverVoice}
-                onChange={(e) => setVoiceoverVoice(e.target.value)}
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-zinc-600"
-              >
-                {VOICE_OPTIONS.map((v) => (
-                  <option key={v.value} value={v.value}>{v.label}</option>
-                ))}
-              </select>
-            </div>
-            <button
-              onClick={generateVoiceover}
-              disabled={loading || !narrationText.trim()}
-              className="px-4 py-2 bg-violet-600 hover:bg-violet-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white text-sm rounded-lg transition-colors"
-            >
-              {loading ? 'Generating voiceover...' : 'Generate Voiceover'}
-            </button>
-            {generatedVoiceover && (
-              <div className="mt-4">
-                <p className="text-sm text-zinc-400 mb-2">Generated Voiceover</p>
-                <audio src={generatedVoiceover.url} controls className="w-full" />
-                <p className="text-xs text-zinc-600 mt-2">
-                  Voice: {voiceoverVoice} • {generatedVoiceover.characterCount} characters
-                </p>
-              </div>
-            )}
-          </div>
-        )
-
-      case 'preview':
-        return (
-          <div className="space-y-6">
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-              <h3 className="text-sm font-medium text-white mb-4">Reel Assets Summary</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <AssetCard
-                  title="Script"
-                  ready={!!generatedScript}
-                  onRetry={() => goToStep(0)}
-                />
-                <AssetCard
-                  title="Influencer Image"
-                  ready={!!generatedImage}
-                  onRetry={() => goToStep(1)}
-                />
-                <AssetCard
-                  title="Video Clip"
-                  ready={!!generatedVideo}
-                  onRetry={() => goToStep(2)}
-                />
-                <AssetCard
-                  title="Background Music"
-                  ready={!!generatedMusic}
-                  onRetry={() => goToStep(3)}
-                />
-                <AssetCard
-                  title="Voiceover"
-                  ready={!!generatedVoiceover}
-                  onRetry={() => goToStep(4)}
-                />
-              </div>
-            </div>
-
-            {/* Preview section */}
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-              <h3 className="text-sm font-medium text-white mb-4">Preview Your Reel</h3>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Video preview */}
-                <div>
-                  {generatedVideo ? (
+                <div className="space-y-4">
+                  {assets.video ? (
                     <div>
-                      <p className="text-xs text-zinc-500 mb-2">Video</p>
+                      <p className="text-xs text-zinc-500 mb-2">Video ({assets.video.duration}s, {assets.video.aspectRatio})</p>
                       <video
-                        src={generatedVideo.url}
+                        src={assets.video.url}
                         controls
                         className="w-full max-w-xs mx-auto rounded-lg border border-zinc-800"
                       />
                     </div>
-                  ) : generatedImage ? (
+                  ) : assets.image ? (
                     <div>
-                      <p className="text-xs text-zinc-500 mb-2">Image (no video generated)</p>
+                      <p className="text-xs text-zinc-500 mb-2">Image ({assets.image.width}{'\u00D7'}{assets.image.height})</p>
                       <img
-                        src={generatedImage.url}
-                        alt="Reel visual"
+                        src={assets.image.url}
+                        alt="Generated visual"
                         className="w-full max-w-xs mx-auto rounded-lg border border-zinc-800"
                       />
                     </div>
                   ) : (
-                    <div className="flex items-center justify-center h-48 bg-zinc-900 rounded-lg border border-zinc-800">
-                      <p className="text-sm text-zinc-600">No visual assets generated</p>
-                    </div>
+                    <EmptyCard text="No visual generated" />
                   )}
                 </div>
 
-                {/* Audio previews */}
                 <div className="space-y-4">
-                  {generatedMusic && (
+                  {assets.music ? (
                     <div>
-                      <p className="text-xs text-zinc-500 mb-2">Background Music</p>
-                      <audio src={generatedMusic.url} controls className="w-full" />
+                      <p className="text-xs text-zinc-500 mb-2">Background Music ({assets.music.duration}s)</p>
+                      <audio src={assets.music.url} controls className="w-full" />
                     </div>
+                  ) : (
+                    <EmptyCard text="No music generated" />
                   )}
-                  {generatedVoiceover && (
+                  {assets.voiceover ? (
                     <div>
-                      <p className="text-xs text-zinc-500 mb-2">Voiceover</p>
-                      <audio src={generatedVoiceover.url} controls className="w-full" />
+                      <p className="text-xs text-zinc-500 mb-2">
+                        Voiceover ({assets.voiceover.characterCount} chars, {assets.voiceover.voice})
+                      </p>
+                      <audio src={assets.voiceover.url} controls className="w-full" />
                     </div>
+                  ) : (
+                    <EmptyCard text="No voiceover generated" />
                   )}
-                  {!generatedMusic && !generatedVoiceover && (
-                    <div className="flex items-center justify-center h-24 bg-zinc-900 rounded-lg border border-zinc-800">
-                      <p className="text-sm text-zinc-600">No audio assets generated</p>
-                    </div>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-zinc-800">
+                <p className="text-xs text-zinc-500 mb-3">
+                  Download assets individually and combine in your editor (CapCut, Premiere, etc.)
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {assets.image && (
+                    <DownloadBtn label="Image" url={assets.image.url} filename="mimir-image.png" />
+                  )}
+                  {assets.video && (
+                    <DownloadBtn label="Video" url={assets.video.url} filename="mimir-video.mp4" />
+                  )}
+                  {assets.music && (
+                    <DownloadBtn label="Music" url={assets.music.url} filename="mimir-music.mp3" />
+                  )}
+                  {assets.voiceover && (
+                    <DownloadBtn label="Voiceover" url={assets.voiceover.url} filename="mimir-voiceover.mp3" />
+                  )}
+                  {assets.plan && (
+                    <button
+                      onClick={() => {
+                        const blob = new Blob(
+                          [JSON.stringify(assets.plan, null, 2)],
+                          { type: 'application/json' }
+                        )
+                        const url = URL.createObjectURL(blob)
+                        const a = document.createElement('a')
+                        a.href = url
+                        a.download = 'mimir-plan.json'
+                        a.click()
+                        URL.revokeObjectURL(url)
+                      }}
+                      className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs rounded-lg transition-colors"
+                    >
+                      {'\uD83D\uDCC4'} Plan JSON
+                    </button>
                   )}
                 </div>
               </div>
             </div>
-
-            {/* Download individual assets */}
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6">
-              <h3 className="text-sm font-medium text-white mb-4">Download Assets</h3>
-              <p className="text-xs text-zinc-500 mb-4">
-                Download each asset individually. Combine them in your preferred video editor (CapCut, Premiere, etc.) for the final reel.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {generatedVideo && (
-                  <DownloadButton label="Video" url={generatedVideo.url} filename="mimir-reel-video.mp4" />
-                )}
-                {generatedImage && (
-                  <DownloadButton label="Image" url={generatedImage.url} filename="mimir-reel-image.png" />
-                )}
-                {generatedMusic && (
-                  <DownloadButton label="Music" url={generatedMusic.url} filename="mimir-reel-music.mp3" />
-                )}
-                {generatedVoiceover && (
-                  <DownloadButton label="Voiceover" url={generatedVoiceover.url} filename="mimir-reel-voiceover.mp3" />
-                )}
-                {generatedScript && (
-                  <button
-                    onClick={() => {
-                      const blob = new Blob([generatedScript], { type: 'text/plain' })
-                      const url = URL.createObjectURL(blob)
-                      const a = document.createElement('a')
-                      a.href = url
-                      a.download = 'mimir-reel-script.txt'
-                      a.click()
-                      URL.revokeObjectURL(url)
-                    }}
-                    className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs rounded-lg transition-colors"
-                  >
-                    📄 Script
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        )
-
-      default:
-        return null
-    }
-  }
-
-  return (
-    <div className="max-w-4xl">
-      {/* Pipeline description */}
-      <div className="mb-6 bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
-        <p className="text-sm text-zinc-400">
-          Agentic workflow builder for UGC Instagram Reels. Generate a complete reel step by step — from concept to final video with music and voiceover.
-          Each step uses the system&#39;s AI APIs to create your assets.
-        </p>
-      </div>
-
-      {/* Step indicator */}
-      <div className="flex items-center gap-1 mb-6 overflow-x-auto pb-2">
-        {STEPS.map((step, i) => (
-          <button
-            key={step.id}
-            onClick={() => goToStep(i)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs whitespace-nowrap transition-colors ${
-              i === currentStep
-                ? 'bg-violet-600/20 text-violet-400 border border-violet-500/30'
-                : i < currentStep
-                  ? 'bg-zinc-800 text-zinc-300'
-                  : 'bg-zinc-900 text-zinc-600 border border-zinc-800'
-            }`}
-          >
-            <span>{step.icon}</span>
-            <span>{step.label}</span>
-            {getStepStatus(i, {
-              generatedScript,
-              generatedImage,
-              generatedVideo,
-              generatedMusic,
-              generatedVoiceover,
-            }) && (
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-green-500">
-                <path d="M3 6l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* Current step */}
-      <div className="bg-zinc-900/30 border border-zinc-800 rounded-xl p-6">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-lg">{STEPS[currentStep].icon}</span>
-          <h2 className="text-sm font-medium text-white">
-            Step {currentStep + 1}: {STEPS[currentStep].label}
-          </h2>
+          )}
         </div>
-        <p className="text-xs text-zinc-500 mb-4">{STEPS[currentStep].description}</p>
-
-        {error && (
-          <div className="mb-4 bg-red-950/30 border border-red-900/50 rounded-lg px-3 py-2 text-sm text-red-400">
-            {error}
-          </div>
-        )}
-
-        {renderStepContent()}
-
-        {/* Navigation */}
-        <div className="flex justify-between mt-6 pt-4 border-t border-zinc-800">
-          <button
-            onClick={() => goToStep(Math.max(0, currentStep - 1))}
-            disabled={currentStep === 0}
-            className="px-4 py-2 text-sm text-zinc-400 hover:text-white disabled:text-zinc-700 transition-colors"
-          >
-            ← Previous
-          </button>
-          <button
-            onClick={() => goToStep(Math.min(STEPS.length - 1, currentStep + 1))}
-            disabled={currentStep === STEPS.length - 1}
-            className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 disabled:bg-zinc-900 disabled:text-zinc-700 text-white text-sm rounded-lg transition-colors"
-          >
-            Next →
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function getStepStatus(index, assets) {
-  switch (index) {
-    case 0: return !!assets.generatedScript
-    case 1: return !!assets.generatedImage
-    case 2: return !!assets.generatedVideo
-    case 3: return !!assets.generatedMusic
-    case 4: return !!assets.generatedVoiceover
-    case 5: return !!(assets.generatedVideo && assets.generatedMusic && assets.generatedVoiceover)
-    default: return false
-  }
-}
-
-function AssetCard({ title, ready, onRetry }) {
-  return (
-    <div className={`flex items-center justify-between px-3 py-2 rounded-lg border ${
-      ready ? 'bg-green-950/20 border-green-900/30' : 'bg-zinc-900 border-zinc-800'
-    }`}>
-      <div className="flex items-center gap-2">
-        {ready ? (
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-green-500">
-            <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.3" />
-            <path d="M4 7l2 2 4-4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        ) : (
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-zinc-600">
-            <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.3" />
-          </svg>
-        )}
-        <span className={`text-xs ${ready ? 'text-green-400' : 'text-zinc-500'}`}>{title}</span>
-      </div>
-      {!ready && (
-        <button onClick={onRetry} className="text-xs text-violet-400 hover:text-violet-300">
-          Generate
-        </button>
       )}
     </div>
   )
 }
 
-function DownloadButton({ label, url, filename }) {
-  const handleDownload = () => {
-    const a = document.createElement('a')
-    a.href = url
-    a.download = filename
-    a.click()
-    a.remove()
-  }
+function PlanPreview({ plan }) {
+  const [collapsed, setCollapsed] = useState(true)
+  return (
+    <div className="bg-zinc-900/30 border border-zinc-800 rounded-xl p-4">
+      <button
+        onClick={() => setCollapsed(!collapsed)}
+        className="flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-200 transition-colors w-full"
+      >
+        <span>{'\uD83E\uDDE0'}</span>
+        <span className="font-medium">Agent Plan</span>
+        <span className="ml-auto text-xs">{collapsed ? 'Show \u25BC' : 'Hide \u25B2'}</span>
+      </button>
+      {!collapsed && (
+        <div className="mt-3 space-y-2 text-xs text-zinc-400">
+          <PlanField label="Hook" value={plan.hook} />
+          <PlanField label="Script" value={plan.script} />
+          <PlanField label="Image Prompt" value={plan.imagePrompt} />
+          <PlanField label="Video Prompt" value={plan.videoPrompt} />
+          <PlanField label="Music Prompt" value={plan.musicPrompt} />
+          <PlanField label="Narration" value={plan.narrationText} />
+        </div>
+      )}
+    </div>
+  )
+}
 
+function PlanField({ label, value }) {
+  return (
+    <div>
+      <span className="text-zinc-500">{label}:</span>{' '}
+      <span className="text-zinc-300">{value}</span>
+    </div>
+  )
+}
+
+function EmptyCard({ text }) {
+  return (
+    <div className="flex items-center justify-center h-20 bg-zinc-900 rounded-lg border border-zinc-800">
+      <p className="text-xs text-zinc-600">{text}</p>
+    </div>
+  )
+}
+
+function DownloadBtn({ label, url, filename }) {
   return (
     <button
-      onClick={handleDownload}
+      onClick={() => {
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename
+        a.click()
+        a.remove()
+      }}
       className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs rounded-lg transition-colors"
     >
-      ⬇️ {label}
+      {'\u2B07\uFE0F'} {label}
     </button>
+  )
+}
+
+function Spinner({ small } = {}) {
+  return (
+    <svg
+      className={`animate-spin ${small ? 'w-3 h-3' : 'w-4 h-4'} text-current`}
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" className="opacity-20" />
+      <path
+        d="M12 2a10 10 0 0 1 10 10"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
+function CheckIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-green-500">
+      <path d="M3 7l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function XIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-red-500">
+      <path d="M4 4l6 6M10 4l-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
   )
 }

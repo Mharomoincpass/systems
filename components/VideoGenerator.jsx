@@ -132,14 +132,21 @@ export default function VideoGenerator() {
 
       if (!response.ok) {
         const data = await response.json()
-        const errorMsg = data.error || 'Failed to generate video'
+        const baseError = data.error || 'Failed to generate video'
+        const detailText = Array.isArray(data.details)
+          ? data.details
+              .map((entry) => `${entry.model} (${entry.mode}) -> ${entry.status}: ${String(entry.details || '').slice(0, 180)}`)
+              .join(' | ')
+          : (typeof data.details === 'string' ? data.details : '')
+        const hintText = typeof data.hint === 'string' ? data.hint : ''
+        const errorMsg = [baseError, detailText, hintText].filter(Boolean).join(' — ')
         
-        if (response.status === 402 || errorMsg.includes('credit') || errorMsg.includes('limit')) {
+        if (response.status === 402 || baseError.includes('credit') || baseError.includes('limit')) {
           addNotification('❌ Insufficient credits for video generation.', 'error')
         } else if (response.status === 429) {
           addNotification('⏳ Rate limited. Please try again later.', 'warning')
         } else {
-          addNotification(`❌ ${errorMsg}`, 'error')
+          addNotification(`❌ ${baseError}`, 'error')
         }
         throw new Error(errorMsg)
       }
