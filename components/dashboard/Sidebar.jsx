@@ -6,6 +6,7 @@ import StorageIndicator from './StorageIndicator'
 
 const navItems = [
   { label: 'Overview', href: '/dashboard', icon: 'grid' },
+  { label: 'Mimir MCP(beta)', href: '/dashboard/mimir-mcp', icon: 'mimir' },
   { label: 'Chat', href: '/dashboard/chat', icon: 'chat' },
   { label: 'Images', href: '/dashboard/images', icon: 'image' },
   { label: 'Videos', href: '/dashboard/videos', icon: 'video' },
@@ -23,6 +24,13 @@ const icons = {
       <rect x="9" y="2" width="5" height="5" rx="1" />
       <rect x="2" y="9" width="5" height="5" rx="1" />
       <rect x="9" y="9" width="5" height="5" rx="1" />
+    </svg>
+  ),
+  mimir: (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
+      <path d="M8 2L3 5v3c0 3.5 2.2 5.5 5 6.5 2.8-1 5-3 5-6.5V5L8 2z" />
+      <circle cx="8" cy="7" r="1.5" fill="currentColor" />
+      <path d="M5.5 10.5c0-1.4 1.1-2 2.5-2s2.5.6 2.5 2" />
     </svg>
   ),
   chat: (
