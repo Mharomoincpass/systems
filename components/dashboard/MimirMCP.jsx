@@ -116,7 +116,7 @@ Provide the response in this exact format:
                 setGeneratedScript(fullText)
               }
             } catch {
-              // partial JSON
+              // Ignore incomplete JSON chunks during streaming
             }
           }
         }
@@ -610,7 +610,7 @@ Provide the response in this exact format:
       <div className="mb-6 bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
         <p className="text-sm text-zinc-400">
           Agentic workflow builder for UGC Instagram Reels. Generate a complete reel step by step — from concept to final video with music and voiceover.
-          Each step uses the system&apos;s AI APIs to create your assets.
+          Each step uses the system&#39;s AI APIs to create your assets.
         </p>
       </div>
 
@@ -730,6 +730,7 @@ function DownloadButton({ label, url, filename }) {
     a.href = url
     a.download = filename
     a.click()
+    a.remove()
   }
 
   return (
