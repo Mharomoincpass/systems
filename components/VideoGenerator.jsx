@@ -197,9 +197,9 @@ export default function VideoGenerator() {
           </>
         )}
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Form Section */}
-          <div className="lg:col-span-1">
+          <div className="md:col-span-1 order-2 md:order-1">
             <form onSubmit={generateVideo} className="space-y-6">
               {/* Prompt */}
               <div>
@@ -245,7 +245,7 @@ export default function VideoGenerator() {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isLoading}
-                  className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border-2 border-dashed border-white/20 rounded-lg text-gray-300 hover:border-white/40 hover:bg-white/15 transition disabled:opacity-50 text-xs sm:text-sm"
+                  className="w-full min-h-[44px] px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border-2 border-dashed border-white/20 rounded-lg text-gray-300 hover:border-white/40 hover:bg-white/15 transition disabled:opacity-50 text-xs sm:text-sm"
                 >
                   {imageFile ? '🖼️ ' + imageFile.name : '📤 Click to select an image'}
                 </button>
@@ -299,7 +299,7 @@ export default function VideoGenerator() {
                   value={duration}
                   onChange={(e) => setDuration(parseInt(e.target.value))}
                   disabled={isLoading}
-                  className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                  className="w-full h-3 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500 touch-manipulation"
                 />
                 <div className="flex justify-between text-xs text-gray-500 mt-1">
                   <span>2s</span>
@@ -360,7 +360,7 @@ export default function VideoGenerator() {
                 type="submit"
                 fullWidth
                 loading={isLoading}
-                className="!py-3"
+                className="!py-3.5"
                 disabled={(!prompt.trim() && !imageUrl.trim() && !imageFile) || isLoading}
               >
                 {isLoading ? 'Generating Video...' : 'Generate Video'}
@@ -369,7 +369,7 @@ export default function VideoGenerator() {
           </div>
 
           {/* Video Display Section */}
-          <div className="lg:col-span-2">
+          <div className="md:col-span-2 order-1 md:order-2">
             {generatedVideo ? (
               <div ref={scrollRef} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl sm:rounded-2xl overflow-hidden hover:border-white/20 transition-all duration-300">
                 <div
@@ -394,7 +394,7 @@ export default function VideoGenerator() {
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <p className="text-gray-400 text-xs">Model</p>
-                      <p className="text-white">{generatedVideo.model?.split('/')?.[1] || generatedVideo.model}</p>
+                      <p className="text-white truncate">{generatedVideo.model?.split('/')?.[1] || generatedVideo.model}</p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-xs">Generated</p>
@@ -407,7 +407,7 @@ export default function VideoGenerator() {
                       <p className="text-white">{generatedVideo.aspectRatio || aspectRatio}</p>
                     </div>
                   </div>
-                  <div className="mt-4 flex gap-2">
+                  <div className="mt-4 flex flex-col sm:flex-row gap-2">
                     <button
                       onClick={() => {
                         const link = document.createElement('a')
@@ -415,7 +415,7 @@ export default function VideoGenerator() {
                         link.download = `video-${Date.now()}.mp4`
                         link.click()
                       }}
-                      className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition"
+                      className="w-full sm:flex-1 px-4 py-3 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition text-sm sm:text-base"
                     >
                       Download Video
                     </button>
@@ -424,8 +424,8 @@ export default function VideoGenerator() {
               </div>
             ) : (
               <div
-                className="bg-gray-800 rounded-xl p-12 flex items-center justify-center"
-                style={{ aspectRatio: aspectRatio.replace(':', '/'), minHeight: '380px' }}
+                className="bg-gray-800 rounded-xl p-6 sm:p-8 md:p-12 flex items-center justify-center min-h-[200px] sm:min-h-[280px] md:min-h-[380px]"
+                style={{ aspectRatio: aspectRatio.replace(':', '/') }}
               >
                 <div className="text-center">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-700 flex items-center justify-center">

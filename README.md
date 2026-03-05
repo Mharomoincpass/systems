@@ -7,7 +7,7 @@ It combines chat, image, video, music, text-to-speech, and transcription tools i
 
 - Multi Chat Models (MCM)
 - AI Image Generation
-- AI Video Generation
+- AI Video Generation (mobile-responsive)
 - AI Music Generation
 - Text-to-Speech (TTS)
 - Audio Transcription
@@ -108,6 +108,18 @@ npm run dev
 ```
 
 Open http://localhost:3000
+
+## 📱 Mobile Support
+
+The AI Video Generator interface is fully responsive and optimized for mobile devices:
+
+- Stacked single-column layout on small screens with the video result displayed above the form
+- Touch-friendly controls: larger range slider, minimum 44 px tap targets on buttons
+- Responsive grid breakpoints starting at `md` (768 px) for tablet and desktop side-by-side view
+- Full-width download button on mobile for easy access
+- Reduced spacing and padding scaled for small viewports
+
+To test on mobile, use Chrome DevTools → Device Toolbar, or open the app on a real device.
 
 ## 🔐 Access Model
 
