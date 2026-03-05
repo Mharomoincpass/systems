@@ -1,11 +1,10 @@
 'use client'
 
 import { Suspense, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 function LoginForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const redirect = searchParams.get('redirect') || '/dashboard'
 
@@ -32,7 +31,10 @@ function LoginForm() {
         return
       }
 
-      router.push(redirect)
+      // Use full page navigation to ensure the session cookie is picked up
+      // by all browsers (including mobile Safari on iPhone) before loading
+      // the destination page.
+      window.location.href = redirect
     } catch {
       setError('Something went wrong. Please try again.')
     } finally {

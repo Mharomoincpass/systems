@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import CreditsDisplay from '@/components/CreditsDisplay'
 
 export default function TopBar({ user, onToggleSidebar }) {
   const router = useRouter()
@@ -25,6 +26,7 @@ export default function TopBar({ user, onToggleSidebar }) {
       <div className="flex-1" />
 
       <div className="flex items-center gap-3">
+        <CreditsDisplay />
         <span className="text-xs text-zinc-400 hidden sm:block">{user?.email}</span>
         <div className="w-7 h-7 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center">
           <span className="text-xs text-white font-medium">
