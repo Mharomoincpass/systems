@@ -67,6 +67,7 @@ Copy `.env.example` to `.env` and set values:
 
 ```bash
 MONGODB_URI="mongodb://localhost:27017/myapp"
+MONGODB_DIRECT_URI=""
 JWT_SECRET="your-strong-jwt-secret"
 ADMIN_PASSWORD="your-strong-admin-password"
 POLLINATIONS_API_KEY="your-pollinations-secret-key"
