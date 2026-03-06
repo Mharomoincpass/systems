@@ -199,7 +199,7 @@ export async function POST(request) {
         )
       }
 
-      const shouldRetryPromptOnly = Boolean(imageUrl) && (primaryStatus === 400 || primaryStatus === 500 || !primaryStatus)
+      const shouldRetryPromptOnly = Boolean(imageUrl) && (!primaryStatus || primaryStatus >= 400)
       if (shouldRetryPromptOnly) {
         const fallbackPrompt = `${effectivePrompt} vertical cinematic social video`
         console.log(`↩️ Retrying ${candidateModel} without image conditioning...`)
