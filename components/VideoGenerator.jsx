@@ -133,11 +133,20 @@ export default function VideoGenerator() {
       if (!response.ok) {
         const data = await response.json()
         const baseError = data.error || 'Failed to generate video'
-        const detailText = Array.isArray(data.details)
-          ? data.details
+        let detailText = ''
+        if (Array.isArray(data.details)) {
+          if (data.details.length > 0 && data.details[0].code) {
+            // Zod validation errors have a 'code' field
+            detailText = data.details.map((e) => e.message || String(e)).join(', ')
+          } else {
+            // Video attempt errors have model/mode/status/details fields
+            detailText = data.details
               .map((entry) => `${entry.model} (${entry.mode}) -> ${entry.status}: ${String(entry.details || '').slice(0, 180)}`)
               .join(' | ')
-          : (typeof data.details === 'string' ? data.details : '')
+          }
+        } else if (typeof data.details === 'string') {
+          detailText = data.details
+        }
         const hintText = typeof data.hint === 'string' ? data.hint : ''
         const errorMsg = [baseError, detailText, hintText].filter(Boolean).join(' — ')
         
@@ -156,7 +165,11 @@ export default function VideoGenerator() {
       const data = await response.json()
       setGeneratedVideo(data.video)
       setUploadProgress(100)
-      addNotification('🎉 Video generated successfully!', 'success')
+      if (data.video?.retryMode === 'prompt-only' && (imageUrl.trim() || imageFile)) {
+        addNotification('⚠️ Image could not be used for generation — video was created from your prompt only.', 'warning')
+      } else {
+        addNotification('🎉 Video generated successfully!', 'success')
+      }
 
       // Scroll to video
       setTimeout(() => {
@@ -211,15 +224,14 @@ export default function VideoGenerator() {
               {/* Prompt */}
               <div>
                 <Input
-                  label="Prompt (Required)"
+                  label="Prompt"
                   placeholder="e.g., person walking, waves crashing, clouds moving..."
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   className="!bg-white/10 !border-white/20 !text-white placeholder:text-gray-500 text-sm sm:text-base"
                   disabled={isLoading}
-                  required
                 />
-                <p className="text-xs text-gray-500 mt-1">Describe the motion/animation for your video</p>
+                <p className="text-xs text-gray-500 mt-1">Describe the motion/animation for your video. Optional if you provide an image.</p>
               </div>
 
               {/* Image Input (Optional) */}
