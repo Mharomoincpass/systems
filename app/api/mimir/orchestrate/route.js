@@ -444,6 +444,7 @@ export async function POST(request) {
               userId, 'video', 'mp4', 'video/mp4', video.buffer,
               plan.videoPrompt, 'grok-video', { duration: 5, aspectRatio: '9:16' }
             )
+            video.savedUrl = savedUrl || null
             emit('step', {
               step: 'video',
               status: 'done',
@@ -467,6 +468,7 @@ export async function POST(request) {
                 userId, 'video', 'mp4', 'video/mp4', video.buffer,
                 fallbackPrompt, 'grok-video', { duration: 5, aspectRatio: '9:16', retryMode: 'prompt-only' }
               )
+              video.savedUrl = savedUrl || null
 
               emit('step', {
                 step: 'video',
@@ -500,6 +502,7 @@ export async function POST(request) {
               userId, 'audio', 'mp3', 'audio/mpeg', music.buffer,
               plan.musicPrompt, 'elevenmusic', { duration: 15, generationType: 'music' }
             )
+            music.savedUrl = savedUrl || null
             emit('step', {
               step: 'music',
               status: 'done',
@@ -518,6 +521,7 @@ export async function POST(request) {
               plan.narrationText.substring(0, 200), 'elevenlabs',
               { voice: voiceover.voice, characterCount: voiceover.characterCount, generationType: 'tts' }
             )
+            voiceover.savedUrl = savedUrl || null
             emit('step', {
               step: 'voiceover',
               status: 'done',
@@ -531,10 +535,10 @@ export async function POST(request) {
           // ── Final result ─────────────────────────────────
           const assets = {
             plan,
-            image: image ? { url: image.url, width: image.width, height: image.height } : null,
-            video: video ? { url: video.url, duration: video.duration, aspectRatio: video.aspectRatio } : null,
-            music: music ? { url: music.url, duration: music.duration } : null,
-            voiceover: voiceover ? { url: voiceover.url, voice: voiceover.voice, characterCount: voiceover.characterCount } : null,
+            image: image ? { url: image.savedUrl || image.url, width: image.width, height: image.height } : null,
+            video: video ? { url: video.savedUrl || video.url, duration: video.duration, aspectRatio: video.aspectRatio } : null,
+            music: music ? { url: music.savedUrl || music.url, duration: music.duration } : null,
+            voiceover: voiceover ? { url: voiceover.savedUrl || voiceover.url, voice: voiceover.voice, characterCount: voiceover.characterCount } : null,
           }
 
           const completedSteps = [assets.image, assets.video, assets.music, assets.voiceover].filter(Boolean).length

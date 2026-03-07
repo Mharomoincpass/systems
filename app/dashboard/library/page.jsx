@@ -147,13 +147,25 @@ export default function LibraryPage() {
 
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] text-zinc-600">{formatDate(item.createdAt)}</span>
-                  <button
-                    onClick={() => handleDelete(item._id)}
-                    disabled={deleting === item._id}
-                    className="text-xs px-2 py-1 rounded border border-zinc-700 text-zinc-400 hover:text-red-300 hover:border-red-400/50 disabled:opacity-50"
-                  >
-                    {deleting === item._id ? 'Deleting...' : 'Delete'}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {item.blobUrl && (
+                      <a
+                        href={item.blobUrl}
+                        download
+                        rel="noopener noreferrer"
+                        className="text-xs px-2 py-1 rounded border border-zinc-700 text-zinc-400 hover:text-blue-300 hover:border-blue-400/50"
+                      >
+                        Download
+                      </a>
+                    )}
+                    <button
+                      onClick={() => handleDelete(item._id)}
+                      disabled={deleting === item._id}
+                      className="text-xs px-2 py-1 rounded border border-zinc-700 text-zinc-400 hover:text-red-300 hover:border-red-400/50 disabled:opacity-50"
+                    >
+                      {deleting === item._id ? 'Deleting...' : 'Delete'}
+                    </button>
+                  </div>
                 </div>
               </div>
             </article>
