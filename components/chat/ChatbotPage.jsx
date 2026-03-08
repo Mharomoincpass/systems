@@ -48,8 +48,8 @@ export default function ChatbotPage() {
   // Check auth status
   useEffect(() => {
     fetch('/api/user')
-      .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data?.user) setUser(data.user) })
+      .then(response => response.ok ? response.json() : null)
+      .then(userData => { if (userData?.user) setUser(userData.user) })
       .catch(() => {})
   }, [])
 
@@ -203,7 +203,7 @@ export default function ChatbotPage() {
     streamTextRef.current = ''
 
     // Build context
-    const contextMessages = messages.slice(-10).map(m => ({ role: m.role, content: m.content }))
+    const contextMessages = messages.slice(-10).map(msg => ({ role: msg.role, content: msg.content }))
 
     try {
       const res = await fetch('/api/chat/public', {

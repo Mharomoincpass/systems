@@ -41,8 +41,8 @@ export async function POST(request) {
 
     const contextMessages = (clientMessages || [])
       .slice(-10)
-      .filter(m => m.role === 'user' || m.role === 'assistant')
-      .map(m => ({ role: m.role, content: typeof m.content === 'string' ? m.content.slice(0, 2000) : '' }))
+      .filter(msg => msg.role === 'user' || msg.role === 'assistant')
+      .map(msg => ({ role: msg.role, content: typeof msg.content === 'string' ? msg.content.slice(0, 2000) : '' }))
 
     contextMessages.push({ role: 'user', content: content.trim() })
 
