@@ -1,10 +1,7 @@
-import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import { NotificationProvider } from '@/components/Notifications'
 import AnalyticsTracker from '@/components/AnalyticsTracker'
-
-const inter = Inter({ subsets: ['latin'] })
 
 const siteName = 'AI Tools and Systems'
 const siteDescription = 'AI tools and systems for chat, images, video, music, transcription, and speech.'
@@ -102,7 +99,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body className={inter.className}>
+      <body className="font-sans">
         <AnalyticsTracker />
         <script
           type="application/ld+json"
