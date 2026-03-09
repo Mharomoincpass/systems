@@ -3,18 +3,6 @@ import { jwtVerify } from 'jose'
 
 const authPages = ['/login', '/signup', '/forgot-password', '/verify']
 
-const publicPages = ['/chat']
-
-const toolRedirects = {
-  '/images': '/dashboard/images',
-  '/videos': '/dashboard/videos',
-  '/music': '/dashboard/music',
-  '/tts': '/dashboard/tts',
-  '/transcribe': '/dashboard/transcribe',
-  '/MCM': '/chat',
-  '/systems': '/dashboard',
-}
-
 async function verifyJWT(token) {
   if (!token) return null
   try {
@@ -46,31 +34,25 @@ export async function middleware(request) {
 
   // Redirect authenticated users away from auth pages
   if (isAuthenticated && authPages.some((p) => pathname === p)) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    return NextResponse.redirect(new URL('/chat', request.url))
   }
 
-  // Redirect old tool routes
-  for (const [oldPath, newPath] of Object.entries(toolRedirects)) {
-    if (pathname === oldPath || pathname.startsWith(oldPath + '/')) {
-      if (isAuthenticated) {
-        return NextResponse.redirect(new URL(newPath, request.url))
-      } else {
-        return NextResponse.redirect(new URL('/login', request.url))
-      }
-    }
-  }
-
-  // Protect dashboard routes
-  if (pathname.startsWith('/dashboard')) {
+  // Protect dashboard/admin routes - admin only
+  if (pathname.startsWith('/dashboard/admin')) {
     if (!isAuthenticated) {
       const loginUrl = new URL('/login', request.url)
       loginUrl.searchParams.set('redirect', pathname)
       return NextResponse.redirect(loginUrl)
     }
-    if (pathname.startsWith('/dashboard/admin') && user?.role !== 'admin') {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
+    if (user?.role !== 'admin') {
+      return NextResponse.redirect(new URL('/chat', request.url))
     }
     return NextResponse.next()
+  }
+
+  // Redirect all other /dashboard routes to /chat
+  if (pathname.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/chat', request.url))
   }
 
   return NextResponse.next()

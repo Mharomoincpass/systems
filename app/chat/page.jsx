@@ -1,11 +1,11 @@
 import ChatbotPage from '@/components/chat/ChatbotPage'
 
 export const metadata = {
-  title: 'AI Chat - Free Multi-Model Chatbot | Mharomo',
-  description: 'Chat with multiple AI models for free. No sign-up required. Switch between OpenAI, Gemini, Mistral, and more.',
+  title: 'Mharomo AI - Chat, Images, Video & Music',
+  description: 'Chat with multiple AI models. Generate images, videos, and music. All from one place. No sign-up required for chat.',
   openGraph: {
-    title: 'AI Chat - Free Multi-Model Chatbot | Mharomo',
-    description: 'Chat with multiple AI models for free. No sign-up required.',
+    title: 'Mharomo AI - Chat, Images, Video & Music',
+    description: 'Chat with multiple AI models. Generate images, videos, and music. All in one place.',
     url: 'https://mharomo.systems/chat',
     type: 'website',
   },

@@ -1,16 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import Sidebar from '@/components/dashboard/Sidebar'
-import TopBar from '@/components/dashboard/TopBar'
-import { DashboardNotificationProvider } from '@/components/dashboard/GlobalNotifications'
+import { useRouter, usePathname } from 'next/navigation'
+import Link from 'next/link'
 
-export default function DashboardLayout({ children }) {
+export default function AdminLayout({ children }) {
   const router = useRouter()
+  const pathname = usePathname()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -21,6 +19,10 @@ export default function DashboardLayout({ children }) {
           return
         }
         const data = await res.json()
+        if (data.user?.role !== 'admin') {
+          router.push('/chat')
+          return
+        }
         setUser(data.user)
       } catch {
         router.push('/login')
@@ -41,25 +43,55 @@ export default function DashboardLayout({ children }) {
 
   if (!user) return null
 
-  return (
-    <DashboardNotificationProvider>
-      <div className="min-h-screen bg-black text-white">
-        <Sidebar
-          user={user}
-          collapsed={sidebarCollapsed}
-          onClose={() => setSidebarCollapsed(true)}
-        />
+  const adminNav = [
+    { label: 'Overview', href: '/dashboard/admin' },
+    { label: 'Users', href: '/dashboard/admin/users' },
+    { label: 'Media', href: '/dashboard/admin/media' },
+    { label: 'Audit Logs', href: '/dashboard/admin/audit' },
+  ]
 
-        <div className="lg:ml-60 flex flex-col min-h-screen">
-          <TopBar
-            user={user}
-            onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
-          />
-          <main className="flex-1 p-4 sm:p-6">
-            {children}
-          </main>
+  return (
+    <div className="min-h-screen bg-black text-white flex">
+      {/* Admin sidebar */}
+      <aside className="w-52 shrink-0 border-r border-zinc-800 flex flex-col">
+        <div className="h-14 flex items-center px-4 border-b border-zinc-800">
+          <Link href="/chat" className="flex items-center gap-2">
+            <div className="w-7 h-7 border border-zinc-700 flex items-center justify-center">
+              <span className="text-white text-xs font-bold">M</span>
+            </div>
+            <span className="text-white font-semibold text-sm tracking-tight">
+              Admin
+            </span>
+          </Link>
         </div>
-      </div>
-    </DashboardNotificationProvider>
+        <nav className="flex-1 py-2 px-2">
+          {adminNav.map((item) => {
+            const isActive = pathname === item.href || (item.href !== '/dashboard/admin' && pathname.startsWith(item.href))
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center px-3 py-2 rounded-lg text-sm mb-0.5 ${
+                  isActive
+                    ? 'bg-zinc-800 text-white'
+                    : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+                }`}
+              >
+                {item.label}
+              </Link>
+            )
+          })}
+        </nav>
+        <div className="border-t border-zinc-800 p-3">
+          <Link href="/chat" className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg">
+            ← Back to Chat
+          </Link>
+        </div>
+      </aside>
+
+      <main className="flex-1 p-6 overflow-auto">
+        {children}
+      </main>
+    </div>
   )
 }

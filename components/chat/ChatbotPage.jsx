@@ -2,6 +2,11 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
+
+const ImageGenerator = dynamic(() => import('@/components/ImageGenerator'), { ssr: false })
+const VideoGenerator = dynamic(() => import('@/components/VideoGenerator'), { ssr: false })
+const MusicGenerator = dynamic(() => import('@/components/MusicGenerator'), { ssr: false })
 
 const MODELS = [
   { id: 'openai-fast', name: 'GPT Fast', desc: 'Quick responses' },
@@ -24,6 +29,185 @@ function generateId() {
   return `${Date.now()}_${Math.random().toString(36).slice(2, 9)}`
 }
 
+function LibraryPanel() {
+  const [media, setMedia] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [type, setType] = useState('all')
+  const [deleting, setDeleting] = useState(null)
+
+  const fetchMedia = async () => {
+    setLoading(true)
+    try {
+      const params = type !== 'all' ? `?type=${type}` : ''
+      const res = await fetch(`/api/media${params}`)
+      const data = await res.json()
+      setMedia((data.media || []).filter((item) => item.type !== 'transcription'))
+    } catch {
+      setMedia([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { fetchMedia() }, [type])
+
+  const handleDelete = async (id) => {
+    if (!confirm('Delete this item? This cannot be undone.')) return
+    setDeleting(id)
+    try {
+      const res = await fetch(`/api/media?id=${id}`, { method: 'DELETE' })
+      if (res.ok) setMedia((prev) => prev.filter((m) => m._id !== id))
+    } catch {} finally {
+      setDeleting(null)
+    }
+  }
+
+  const formatDate = (d) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  const formatSize = (bytes) => {
+    if (!bytes) return '—'
+    if (bytes < 1024) return `${bytes} B`
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  }
+
+  return (
+    <div>
+      <div className="flex gap-2 mb-6 flex-wrap">
+        {['all', 'image', 'video', 'audio'].map((f) => (
+          <button key={f} onClick={() => setType(f)}
+            className={`px-3 py-1.5 text-xs rounded-lg border ${type === f ? 'bg-white text-black border-white' : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-zinc-600'}`}
+          >
+            {f.charAt(0).toUpperCase() + f.slice(1)}
+          </button>
+        ))}
+      </div>
+      {loading ? (
+        <div className="flex justify-center py-12"><div className="w-5 h-5 border-2 border-zinc-700 border-t-white rounded-full animate-spin" /></div>
+      ) : media.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-zinc-500 text-sm">No media found</p>
+          <p className="text-zinc-600 text-xs mt-1">Generated content will appear here</p>
+        </div>
+      ) : (
+        <div className="columns-1 md:columns-2 xl:columns-3 [column-gap:1rem]">
+          {media.map((item) => (
+            <article key={item._id} className="mb-4 break-inside-avoid bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
+              {item.type === 'image' && item.blobUrl && (
+                <div className="bg-zinc-950"><img src={item.blobUrl} alt={item.prompt || 'Generated image'} className="w-full h-auto block" loading="lazy" /></div>
+              )}
+              {item.type === 'video' && item.blobUrl && (
+                <div className="bg-zinc-950"><video src={item.blobUrl} controls preload="metadata" className="w-full h-auto block" /></div>
+              )}
+              {item.type === 'audio' && item.blobUrl && (
+                <div className="p-4 bg-zinc-950"><audio src={item.blobUrl} controls className="w-full" /></div>
+              )}
+              <div className="p-3">
+                <p className="text-xs text-white line-clamp-2 mb-2">{item.prompt || item.type}</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-zinc-600">{formatDate(item.createdAt)} · {formatSize(item.fileSize)}</span>
+                  <div className="flex items-center gap-2">
+                    {item.blobUrl && (
+                      <a href={item.blobUrl} download rel="noopener noreferrer" className="text-xs px-2 py-1 rounded border border-zinc-700 text-zinc-400 hover:text-blue-300 hover:border-blue-400/50">Download</a>
+                    )}
+                    <button onClick={() => handleDelete(item._id)} disabled={deleting === item._id}
+                      className="text-xs px-2 py-1 rounded border border-zinc-700 text-zinc-400 hover:text-red-300 hover:border-red-400/50 disabled:opacity-50">
+                      {deleting === item._id ? 'Deleting...' : 'Delete'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function SettingsPanel({ user, onUserUpdate }) {
+  const [name, setName] = useState(user?.name || '')
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [msg, setMsg] = useState(null)
+
+  const showMsg = (text, ok = true) => { setMsg({ text, ok }); setTimeout(() => setMsg(null), 3000) }
+
+  const updateProfile = async (e) => {
+    e.preventDefault()
+    setSaving(true)
+    try {
+      const res = await fetch('/api/user', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }) })
+      const data = await res.json()
+      if (res.ok) { showMsg('Profile updated'); onUserUpdate?.(data.user) } else showMsg(data.error || 'Update failed', false)
+    } catch { showMsg('Something went wrong', false) } finally { setSaving(false) }
+  }
+
+  const changePassword = async (e) => {
+    e.preventDefault()
+    if (newPassword.length < 6) { showMsg('Password must be at least 6 characters', false); return }
+    setSaving(true)
+    try {
+      const res = await fetch('/api/user', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ currentPassword, newPassword }) })
+      const data = await res.json()
+      if (res.ok) { showMsg('Password changed'); setCurrentPassword(''); setNewPassword('') } else showMsg(data.error || 'Password change failed', false)
+    } catch { showMsg('Something went wrong', false) } finally { setSaving(false) }
+  }
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' })
+    window.location.href = '/chat'
+  }
+
+  return (
+    <div className="max-w-lg">
+      {msg && (
+        <div className={`mb-4 px-4 py-2.5 rounded-xl text-sm ${msg.ok ? 'bg-green-500/10 border border-green-500/20 text-green-300' : 'bg-red-500/10 border border-red-500/20 text-red-300'}`}>
+          {msg.text}
+        </div>
+      )}
+      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 mb-4">
+        <h2 className="text-sm font-medium mb-4">Profile</h2>
+        <form onSubmit={updateProfile} className="space-y-3">
+          <div>
+            <label className="block text-xs text-zinc-400 mb-1">Email</label>
+            <input type="email" value={user?.email || ''} disabled className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-500 text-sm" />
+          </div>
+          <div>
+            <label className="block text-xs text-zinc-400 mb-1">Name</label>
+            <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-zinc-600" />
+          </div>
+          <button type="submit" disabled={saving} className="px-4 py-2 bg-white text-black text-sm rounded-lg hover:bg-zinc-200 disabled:opacity-50">{saving ? 'Saving...' : 'Save'}</button>
+        </form>
+      </div>
+      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 mb-4">
+        <h2 className="text-sm font-medium mb-4">Change Password</h2>
+        <form onSubmit={changePassword} className="space-y-3">
+          <div>
+            <label className="block text-xs text-zinc-400 mb-1">Current password</label>
+            <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-zinc-600" />
+          </div>
+          <div>
+            <label className="block text-xs text-zinc-400 mb-1">New password</label>
+            <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required minLength={6} className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-zinc-600" />
+          </div>
+          <button type="submit" disabled={saving} className="px-4 py-2 bg-white text-black text-sm rounded-lg hover:bg-zinc-200 disabled:opacity-50">{saving ? 'Changing...' : 'Change Password'}</button>
+        </form>
+      </div>
+      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 mb-4">
+        <h2 className="text-sm font-medium mb-3">Account</h2>
+        <div className="space-y-2 text-xs text-zinc-400">
+          <div className="flex justify-between"><span>Role</span><span className="text-white capitalize">{user?.role}</span></div>
+          <div className="flex justify-between"><span>Joined</span><span className="text-white">{user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</span></div>
+        </div>
+      </div>
+      <button onClick={handleLogout} className="w-full max-w-lg px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-red-400 hover:border-red-400/30 text-sm rounded-lg transition-all">
+        Log out
+      </button>
+    </div>
+  )
+}
+
 export default function ChatbotPage() {
   const [conversations, setConversations] = useState([])
   const [activeConversationId, setActiveConversationId] = useState(null)
@@ -37,6 +221,7 @@ export default function ChatbotPage() {
   const [showModelPicker, setShowModelPicker] = useState(false)
   const [showSignupPrompt, setShowSignupPrompt] = useState(false)
   const [signupFeature, setSignupFeature] = useState('')
+  const [activePanel, setActivePanel] = useState(null) // null | 'image' | 'video' | 'music' | 'library' | 'settings'
 
   const scrollRef = useRef(null)
   const inputRef = useRef(null)
@@ -454,23 +639,24 @@ export default function ChatbotPage() {
 
         {/* Sidebar footer - tools & user */}
         <div className="border-t border-zinc-800/50 p-3 space-y-1">
-          {/* Premium features (gated) */}
+          {/* Tools */}
           {[
-            { icon: '🖼️', label: 'Image Generation', feature: 'image-gen' },
-            { icon: '🎬', label: 'Video Generation', feature: 'video-gen' },
-            { icon: '🎵', label: 'Audio Generation', feature: 'audio-gen' },
+            { icon: '🖼️', label: 'Image Generation', panel: 'image', feature: 'image-gen' },
+            { icon: '🎬', label: 'Video Generation', panel: 'video', feature: 'video-gen' },
+            { icon: '🎵', label: 'Music Generation', panel: 'music', feature: 'audio-gen' },
           ].map(item => (
             <button
-              key={item.feature}
+              key={item.panel}
               onClick={() => {
                 if (user) {
-                  window.location.href = `/dashboard/${item.feature === 'image-gen' ? 'images' : item.feature === 'video-gen' ? 'videos' : 'music'}`
+                  setActivePanel(item.panel)
+                  setSidebarOpen(false)
                 } else {
                   setSignupFeature(item.feature)
                   setShowSignupPrompt(true)
                 }
               }}
-              className="w-full flex items-center gap-3 px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-all"
+              className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-all ${activePanel === item.panel ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'}`}
             >
               <span className="text-base">{item.icon}</span>
               <span>{item.label}</span>
@@ -478,20 +664,45 @@ export default function ChatbotPage() {
             </button>
           ))}
 
+          {user && (
+            <button
+              onClick={() => { setActivePanel('library'); setSidebarOpen(false) }}
+              className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-all ${activePanel === 'library' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'}`}
+            >
+              <span className="text-base">📁</span>
+              <span>Library</span>
+            </button>
+          )}
+
           <div className="h-px bg-zinc-800/50 my-2" />
 
           {user ? (
-            <div className="flex items-center gap-3 px-3 py-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-xs font-bold">
-                {user.name?.[0]?.toUpperCase() || 'U'}
+            <div className="space-y-1">
+              <button
+                onClick={() => { setActivePanel('settings'); setSidebarOpen(false) }}
+                className={`w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg transition-all ${activePanel === 'settings' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'}`}
+              >
+                <span className="text-base">⚙️</span>
+                <span>Settings</span>
+              </button>
+              {user.role === 'admin' && (
+                <Link
+                  href="/dashboard/admin"
+                  className="w-full flex items-center gap-3 px-3 py-2 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800/50 rounded-lg transition-all"
+                >
+                  <span className="text-base">🛡️</span>
+                  <span>Admin</span>
+                </Link>
+              )}
+              <div className="flex items-center gap-3 px-3 py-2">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-xs font-bold">
+                  {user.name?.[0]?.toUpperCase() || 'U'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{user.name || 'User'}</p>
+                  <p className="text-xs text-zinc-500 truncate">{user.email}</p>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{user.name || 'User'}</p>
-                <p className="text-xs text-zinc-500 truncate">{user.email}</p>
-              </div>
-              <Link href="/dashboard" className="p-1.5 rounded text-zinc-500 hover:text-white transition-colors" title="Dashboard">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-              </Link>
             </div>
           ) : (
             <div className="flex gap-2 px-1">
@@ -506,8 +717,48 @@ export default function ChatbotPage() {
         </div>
       </aside>
 
-      {/* Main chat area */}
+      {/* Main area: panel or chat */}
       <div className="flex-1 flex flex-col min-w-0">
+        {activePanel ? (
+          /* Panel view */
+          <div className="flex-1 flex flex-col min-h-0">
+            {/* Panel top bar */}
+            <div className="shrink-0 h-12 flex items-center justify-between px-3 border-b border-zinc-800/50 bg-[#0a0a0a]">
+              <div className="flex items-center gap-2">
+                <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all md:hidden">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M3 12h18M3 6h18M3 18h18" />
+                  </svg>
+                </button>
+                <span className="text-sm font-medium text-zinc-200">
+                  {activePanel === 'image' && '🖼️ Image Generation'}
+                  {activePanel === 'video' && '🎬 Video Generation'}
+                  {activePanel === 'music' && '🎵 Music Generation'}
+                  {activePanel === 'library' && '📁 Library'}
+                  {activePanel === 'settings' && '⚙️ Settings'}
+                </span>
+              </div>
+              <button
+                onClick={() => setActivePanel(null)}
+                className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all"
+                title="Back to chat"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+            </div>
+            {/* Panel content */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+              {activePanel === 'image' && <ImageGenerator />}
+              {activePanel === 'video' && <VideoGenerator />}
+              {activePanel === 'music' && <MusicGenerator />}
+              {activePanel === 'library' && <LibraryPanel />}
+              {activePanel === 'settings' && <SettingsPanel user={user} onUserUpdate={setUser} />}
+            </div>
+          </div>
+        ) : (
+        <>
         {/* Top bar */}
         <div className="shrink-0 h-12 flex items-center justify-between px-3 border-b border-zinc-800/50 bg-[#0a0a0a]">
           <div className="flex items-center gap-2">
@@ -726,6 +977,8 @@ export default function ChatbotPage() {
             </p>
           </form>
         </div>
+        </>
+        )}
       </div>
     </div>
   )
