@@ -35,7 +35,7 @@ function LibraryPanel() {
   const [type, setType] = useState('all')
   const [deleting, setDeleting] = useState(null)
 
-  const fetchMedia = async () => {
+  const fetchMedia = useCallback(async () => {
     setLoading(true)
     try {
       const params = type !== 'all' ? `?type=${type}` : ''
@@ -47,9 +47,9 @@ function LibraryPanel() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [type])
 
-  useEffect(() => { fetchMedia() }, [type])
+  useEffect(() => { fetchMedia() }, [fetchMedia])
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this item? This cannot be undone.')) return
