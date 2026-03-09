@@ -18,7 +18,7 @@ export function Navbar() {
 
   const handleAction = async (e) => {
     e.preventDefault()
-    router.push('/dashboard')
+    router.push('/chat')
   }
 
   return (
@@ -42,6 +42,12 @@ export function Navbar() {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-4 lg:gap-6">
           <Link
+            href="/chat"
+            className="text-sm text-zinc-300 hover:text-white transition-colors"
+          >
+            Chat
+          </Link>
+          <Link
             href="/services"
             className="text-sm text-zinc-300 hover:text-white transition-colors"
           >
@@ -54,22 +60,10 @@ export function Navbar() {
             AI Tools
           </Link>
           <Link
-            href="#projects"
-            className="text-sm text-zinc-300 hover:text-white transition-colors"
-          >
-            Projects
-          </Link>
-          <Link
             href="/author"
             className="text-sm text-zinc-300 hover:text-white transition-colors"
           >
             About
-          </Link>
-          <Link
-            href="#contact"
-            className="text-sm text-zinc-300 hover:text-white transition-colors"
-          >
-            Contact
           </Link>
           <Link
             href="/blogs"
@@ -83,7 +77,7 @@ export function Navbar() {
             className="group relative flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/5 border border-white/10 hover:bg-white transition-all duration-500 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span className="text-white group-hover:text-black text-sm font-medium transition-colors duration-500 whitespace-nowrap">
-              Dashboard
+              Start Chatting
             </span>
             {!loading && (
               <svg 
@@ -106,7 +100,7 @@ export function Navbar() {
             className="group relative flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white transition-all duration-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span className="text-white group-hover:text-black text-xs font-medium transition-colors duration-500 whitespace-nowrap">
-              Dashboard
+              Start Chatting
             </span>
             {!loading && (
               <svg 
@@ -142,6 +136,13 @@ export function Navbar() {
         <div className="md:hidden border-t border-white/10 bg-black/95 backdrop-blur-xl">
           <div className="px-4 py-4 space-y-3">
             <Link
+              href="/chat"
+              className="block py-2 text-sm text-zinc-300 hover:text-white transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Chat
+            </Link>
+            <Link
               href="/services"
               className="block py-2 text-sm text-zinc-300 hover:text-white transition-colors"
               onClick={() => setMobileMenuOpen(false)}
@@ -156,25 +157,11 @@ export function Navbar() {
               AI Tools
             </Link>
             <Link
-              href="#projects"
-              className="block py-2 text-sm text-zinc-300 hover:text-white transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Projects
-            </Link>
-            <Link
               href="/author"
               className="block py-2 text-sm text-zinc-300 hover:text-white transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               About
-            </Link>
-            <Link
-              href="#contact"
-              className="block py-2 text-sm text-zinc-300 hover:text-white transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Contact
             </Link>
             <Link
               href="/blogs"

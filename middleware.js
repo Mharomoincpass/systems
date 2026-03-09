@@ -3,13 +3,15 @@ import { jwtVerify } from 'jose'
 
 const authPages = ['/login', '/signup', '/forgot-password', '/verify']
 
+const publicPages = ['/chat']
+
 const toolRedirects = {
   '/images': '/dashboard/images',
   '/videos': '/dashboard/videos',
   '/music': '/dashboard/music',
   '/tts': '/dashboard/tts',
   '/transcribe': '/dashboard/transcribe',
-  '/MCM': '/dashboard/chat',
+  '/MCM': '/chat',
   '/systems': '/dashboard',
 }
 
