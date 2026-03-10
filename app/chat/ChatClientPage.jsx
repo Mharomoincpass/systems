@@ -1,35 +1,26 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Sidebar from '@/components/dashboard/Sidebar'
+import ChatInterface from '@/components/chat/ChatInterface'
 import { DashboardNotificationProvider } from '@/components/dashboard/GlobalNotifications'
 
-export default function DashboardLayout({ children }) {
-  const router = useRouter()
-  const pathname = usePathname()
+export default function PublicChatPage() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
+  
+  const searchParams = useSearchParams()
+  const conversationId = searchParams?.get('id') || null
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await fetch('/api/user', { cache: 'no-store' })
-        if (!res.ok) {
-          router.push('/login')
-          return
-        }
-        const data = await res.json()
-        setUser(data.user)
-      } catch {
-        router.push('/login')
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchUser()
-  }, [router])
+    fetch('/api/user', { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => setUser(data?.user || null))
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false))
+  }, [])
 
   if (loading) {
     return (
@@ -38,10 +29,6 @@ export default function DashboardLayout({ children }) {
       </div>
     )
   }
-
-  if (!user) return null
-
-  const isChatPage = pathname === '/dashboard/chat'
 
   return (
     <DashboardNotificationProvider>
@@ -60,14 +47,8 @@ export default function DashboardLayout({ children }) {
           <span className="font-semibold text-sm ml-2">Mharomo</span>
         </div>
 
-        <main className="w-full pt-14 lg:pt-0 relative h-full overflow-y-auto">
-          {isChatPage ? (
-            children
-          ) : (
-            <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-              {children}
-            </div>
-          )}
+        <main className="w-full pt-14 lg:pt-0 relative h-full">
+          <ChatInterface conversationId={conversationId} allowMediaGeneration={!!user} />
         </main>
       </div>
     </DashboardNotificationProvider>

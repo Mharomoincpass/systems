@@ -39,3 +39,8 @@ Thumbs.db
 
 # Temporary uploads
 public/temp/
+
+# Local scratch UI snapshots
+temp_chat_*.jsx
+current_ui.jsx
+*_backup.jsx

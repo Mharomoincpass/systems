@@ -14,14 +14,27 @@ const FREE_MODELS = [
 
 const PREMIUM_FEATURES = ['image-gen', 'video-gen', 'audio-gen', 'image-to-video']
 
+function isMediaGenerationRequest(text = '') {
+  const q = text.toLowerCase()
+  const patterns = [
+    /\b(generate|create|make|produce|render)\b.*\b(image|photo|picture|art|illustration)\b/,
+    /\b(generate|create|make|produce|render)\b.*\b(video|clip|animation|movie|reel)\b/,
+    /\b(generate|create|make|compose|produce)\b.*\b(audio|music|song|beat|voiceover|voice over|speech)\b/,
+    /\btext\s*to\s*speech\b|\btts\b/,
+    /\btranscribe\b.*\b(audio|voice|speech)\b/,
+    /\bimage\s*to\s*video\b|\banimate\b.*\bimage\b/,
+  ]
+  return patterns.some((re) => re.test(q))
+}
+
 export async function POST(request) {
   try {
     const body = await request.json()
-    const { content, model = 'openai-fast', messages: clientMessages = [], feature } = body
+    const { content, model = 'openai-fast', messages: clientMessages = [], feature, attachments = [], audioAttachments = [] } = body
+    const authUser = await getAuthUser(request)
 
     if (feature && PREMIUM_FEATURES.includes(feature)) {
-      const user = await getAuthUser(request)
-      if (!user) {
+      if (!authUser) {
         return Response.json(
           { error: 'signup_required', message: 'Sign up to use this feature' },
           { status: 401 }
@@ -31,6 +44,17 @@ export async function POST(request) {
 
     if (!content || typeof content !== 'string' || content.trim().length === 0) {
       return Response.json({ error: 'Message cannot be empty' }, { status: 400 })
+    }
+
+    // Public chat supports text chat only. Media generation requires login.
+    if (!authUser && (isMediaGenerationRequest(content) || (Array.isArray(attachments) && attachments.length > 0) || (Array.isArray(audioAttachments) && audioAttachments.length > 0))) {
+      return Response.json(
+        {
+          error: 'signup_required',
+          message: 'Image, video, and audio generation are available only for logged-in users.',
+        },
+        { status: 401 }
+      )
     }
 
     if (content.length > 4000) {

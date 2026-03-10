@@ -36,6 +36,7 @@ export async function GET(request) {
         content: msg.content,
         role: msg.role,
         createdAt: msg.createdAt,
+        ...(msg.media?.length > 0 ? { media: msg.media } : {}),
       })),
     })
   } catch (error) {

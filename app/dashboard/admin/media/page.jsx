@@ -30,10 +30,13 @@ export default function AdminMediaPage() {
   }, [page, type])
 
   return (
-    <div>
-      <h1 className="text-lg font-semibold mb-6">Media Browser</h1>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Media Browser</h1>
+        <p className="text-sm text-zinc-400 mt-1">Inspect generated media across all users.</p>
+      </div>
 
-      <div className="flex gap-2 mb-6 flex-wrap">
+      <div className="flex gap-2 flex-wrap">
         {['', 'image', 'video', 'audio', 'transcription'].map((f) => (
           <button
             key={f}
@@ -54,10 +57,10 @@ export default function AdminMediaPage() {
           <div className="w-5 h-5 border-2 border-zinc-700 border-t-white rounded-full animate-spin" />
         </div>
       ) : media.length === 0 ? (
-        <p className="text-zinc-500 text-sm text-center py-12">No media found</p>
+        <div className="text-zinc-500 text-sm text-center py-14 bg-zinc-900/40 border border-zinc-800 rounded-xl">No media found</div>
       ) : (
         <>
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-x-auto">
+          <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl overflow-x-auto">
             <table className="w-full text-sm min-w-[700px]">
               <thead>
                 <tr className="border-b border-zinc-800 text-xs text-zinc-500">
@@ -71,7 +74,7 @@ export default function AdminMediaPage() {
               </thead>
               <tbody>
                 {media.map((m) => (
-                  <tr key={m._id} className="border-b border-zinc-800/50">
+                  <tr key={m._id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
                     <td className="p-3">
                       <span className="text-xs uppercase text-zinc-400">{m.type}</span>
                     </td>
@@ -110,7 +113,7 @@ export default function AdminMediaPage() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1.5 text-xs bg-zinc-900 border border-zinc-800 rounded-lg disabled:opacity-50"
+                className="px-3 py-1.5 text-xs bg-zinc-900 border border-zinc-800 rounded-lg disabled:opacity-50 hover:border-zinc-600 transition-colors"
               >
                 Prev
               </button>
@@ -118,7 +121,7 @@ export default function AdminMediaPage() {
               <button
                 onClick={() => setPage((p) => Math.min(pages, p + 1))}
                 disabled={page === pages}
-                className="px-3 py-1.5 text-xs bg-zinc-900 border border-zinc-800 rounded-lg disabled:opacity-50"
+                className="px-3 py-1.5 text-xs bg-zinc-900 border border-zinc-800 rounded-lg disabled:opacity-50 hover:border-zinc-600 transition-colors"
               >
                 Next
               </button>

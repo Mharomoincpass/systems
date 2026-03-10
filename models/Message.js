@@ -16,6 +16,15 @@ const MessageSchema = new Schema(
       enum: ['user', 'assistant'],
       required: true,
     },
+    media: [
+      {
+        type: { type: String, enum: ['image', 'video', 'audio'] },
+        url: String,
+        prompt: String,
+        model: String,
+        metadata: Schema.Types.Mixed,
+      },
+    ],
   },
   {
     timestamps: true,

@@ -39,20 +39,27 @@ export async function POST(request) {
 
 export async function GET(request) {
   try {
-    const auth = await requireAdmin(request)
+    const auth = await requireAuth(request)
     if (auth.error) return auth.error
 
     await connectDB()
 
     const { searchParams } = new URL(request.url)
-    const limit = parseInt(searchParams.get('limit') || '10')
+    const limit = parseInt(searchParams.get('limit') || '50')
     const skip = parseInt(searchParams.get('skip') || '0')
+    const isAll = searchParams.get('all') === 'true'
 
-    const conversations = await Conversation.find({})
-      .sort({ createdAt: -1 })
+    if (isAll && auth.user.role !== 'admin') {
+      return Response.json({ error: 'Unauthorized' }, { status: 403 })
+    }
+
+    const query = isAll ? {} : { userId: auth.user.userId }
+
+    const conversations = await Conversation.find(query)
+      .sort({ updatedAt: -1, createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .select('_id title createdAt')
+      .select('_id title createdAt updatedAt')
       .exec()
 
     return Response.json({
@@ -65,5 +72,31 @@ export async function GET(request) {
       { error: error.message || 'Failed to fetch conversations' },
       { status: 500 }
     )
+  }
+}
+
+export async function DELETE(request) {
+  try {
+    const auth = await requireAuth(request)
+    if (auth.error) return auth.error
+
+    await connectDB()
+
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    if (!id) return Response.json({ error: 'ID required' }, { status: 400 })
+
+    const conversation = await Conversation.findOne({ _id: id, userId: auth.user.userId })
+    if (!conversation) return Response.json({ error: 'Not found' }, { status: 404 })
+
+    await Conversation.deleteOne({ _id: id })
+    // Also delete associated messages (if necessary, or keep them orphaned, but ideally delete)
+    const Message = (await import('@/models/Message')).default
+    await Message.deleteMany({ conversationId: id })
+
+    return Response.json({ success: true })
+  } catch (error) {
+    console.error('Delete conversation error:', error)
+    return Response.json({ error: error.message }, { status: 500 })
   }
 }

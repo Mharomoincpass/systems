@@ -26,18 +26,21 @@ export default function AdminAuditPage() {
   }, [page])
 
   return (
-    <div>
-      <h1 className="text-lg font-semibold mb-6">Audit Logs</h1>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Audit Logs</h1>
+        <p className="text-sm text-zinc-400 mt-1">Review system actions and trace important events.</p>
+      </div>
 
       {loading ? (
         <div className="flex justify-center py-12">
           <div className="w-5 h-5 border-2 border-zinc-700 border-t-white rounded-full animate-spin" />
         </div>
       ) : logs.length === 0 ? (
-        <p className="text-zinc-500 text-sm text-center py-12">No audit logs found</p>
+        <div className="text-zinc-500 text-sm text-center py-14 bg-zinc-900/40 border border-zinc-800 rounded-xl">No audit logs found</div>
       ) : (
         <>
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-x-auto">
+          <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl overflow-x-auto">
             <table className="w-full text-sm min-w-[600px]">
               <thead>
                 <tr className="border-b border-zinc-800 text-xs text-zinc-500">
@@ -50,7 +53,7 @@ export default function AdminAuditPage() {
               </thead>
               <tbody>
                 {logs.map((log) => (
-                  <tr key={log._id} className="border-b border-zinc-800/50">
+                  <tr key={log._id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
                     <td className="p-3">
                       <span className="text-xs font-mono text-zinc-300">{log.action}</span>
                     </td>
@@ -77,7 +80,7 @@ export default function AdminAuditPage() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1.5 text-xs bg-zinc-900 border border-zinc-800 rounded-lg disabled:opacity-50"
+                className="px-3 py-1.5 text-xs bg-zinc-900 border border-zinc-800 rounded-lg disabled:opacity-50 hover:border-zinc-600 transition-colors"
               >
                 Prev
               </button>
@@ -85,7 +88,7 @@ export default function AdminAuditPage() {
               <button
                 onClick={() => setPage((p) => Math.min(pages, p + 1))}
                 disabled={page === pages}
-                className="px-3 py-1.5 text-xs bg-zinc-900 border border-zinc-800 rounded-lg disabled:opacity-50"
+                className="px-3 py-1.5 text-xs bg-zinc-900 border border-zinc-800 rounded-lg disabled:opacity-50 hover:border-zinc-600 transition-colors"
               >
                 Next
               </button>

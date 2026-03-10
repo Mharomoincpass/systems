@@ -7,26 +7,56 @@ const typeFilters = ['all', 'image', 'video', 'audio']
 export default function LibraryPage() {
   const [media, setMedia] = useState([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [type, setType] = useState('all')
   const [deleting, setDeleting] = useState(null)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(false)
+  const [activeVideos, setActiveVideos] = useState({})
 
-  const fetchMedia = async () => {
-    setLoading(true)
+  const handlePlayVideo = (id) => {
+    setActiveVideos((prev) => ({ ...prev, [id]: true }))
+  }
+
+  const fetchMedia = async (pageNum = 1, currentMedia = []) => {
+    if (pageNum === 1) setLoading(true)
+    else setLoadingMore(true)
+    
     try {
-      const params = type !== 'all' ? `?type=${type}` : ''
-      const res = await fetch(`/api/media${params}`)
+      const params = new URLSearchParams()
+      if (type !== 'all') params.set('type', type)
+      params.set('page', pageNum)
+      params.set('limit', 50)
+      
+      const res = await fetch(`/api/media?${params.toString()}`, {
+        cache: 'no-store'
+      })
       const data = await res.json()
-      setMedia((data.media || []).filter((item) => item.type !== 'transcription'))
+
+      if (pageNum === 1) {
+        setMedia(data.media || [])
+      } else {
+        setMedia([...currentMedia, ...(data.media || [])])
+      }
+      setHasMore(data.page < data.pages)
     } catch {
-      setMedia([])
+      if (pageNum === 1) setMedia([])
     } finally {
       setLoading(false)
+      setLoadingMore(false)
     }
   }
 
   useEffect(() => {
-    fetchMedia()
+    setPage(1)
+    fetchMedia(1, [])
   }, [type])
+
+  const handleLoadMore = () => {
+    const nextPage = page + 1
+    setPage(nextPage)
+    fetchMedia(nextPage, media)
+  }
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this item? This cannot be undone.')) return
@@ -66,16 +96,19 @@ export default function LibraryPage() {
   }
 
   return (
-    <div>
-      <h1 className="text-lg font-semibold mb-6">Library</h1>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Library</h1>
+        <p className="text-sm text-zinc-400 mt-1">Browse, filter, and manage your generated media.</p>
+      </div>
 
       {/* Filters */}
-      <div className="flex gap-2 mb-6 flex-wrap">
+      <div className="flex gap-2 flex-wrap">
         {typeFilters.map((f) => (
           <button
             key={f}
             onClick={() => setType(f)}
-            className={`px-3 py-1.5 text-xs rounded-lg border ${
+            className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
               type === f
                 ? 'bg-white text-black border-white'
                 : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-zinc-600'
@@ -91,16 +124,16 @@ export default function LibraryPage() {
           <div className="w-5 h-5 border-2 border-zinc-700 border-t-white rounded-full animate-spin" />
         </div>
       ) : media.length === 0 ? (
-        <div className="text-center py-12">
+        <div className="text-center py-16 bg-zinc-900/40 border border-zinc-800 rounded-xl">
           <p className="text-zinc-500 text-sm">No media found</p>
           <p className="text-zinc-600 text-xs mt-1">Generated content will appear here</p>
         </div>
       ) : (
-        <div className="columns-1 md:columns-2 xl:columns-3 [column-gap:1rem]">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {media.map((item) => (
             <article
               key={item._id}
-              className="mb-4 break-inside-avoid bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden"
+              className="bg-zinc-900/70 border border-zinc-800 rounded-xl overflow-hidden"
             >
               {item.type === 'image' && item.blobUrl && (
                 <div className="bg-zinc-950">
@@ -114,29 +147,49 @@ export default function LibraryPage() {
               )}
 
               {item.type === 'video' && item.blobUrl && (
-                <div className="bg-zinc-950">
-                  <video
-                    src={item.blobUrl}
-                    controls
-                    preload="metadata"
-                    className="w-full h-auto block"
-                  />
+                <div className="bg-zinc-950 relative">
+                  {activeVideos[item._id] ? (
+                    <video
+                      src={item.blobUrl}
+                      controls
+                      autoPlay
+                      preload="metadata"
+                      className="w-full h-auto block"
+                    />
+                  ) : (
+                    <div
+                      onClick={() => handlePlayVideo(item._id)}
+                      className="w-full aspect-video bg-zinc-900 flex items-center justify-center cursor-pointer group hover:bg-zinc-800 transition-colors"
+                      title="Play video"
+                    >
+                      <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors shadow-sm">
+                        <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
               {item.type === 'audio' && item.blobUrl && (
                 <div className="p-4 bg-zinc-950">
-                  <audio src={item.blobUrl} controls className="w-full" />
+                  <audio src={item.blobUrl} controls preload="none" className="w-full" />
                 </div>
               )}
 
-              <div className="p-3">
-                <p className="text-xs text-white line-clamp-2 mb-2">{item.prompt || item.type}</p>
+              <div className="p-4">
+                <p className="text-sm text-white line-clamp-2 mb-3">{item.prompt || item.type}</p>
 
-                <div className="flex items-center gap-2 flex-wrap mb-2">
+                <div className="flex items-center gap-2 flex-wrap mb-3">
                   <span className="text-[10px] px-2 py-0.5 rounded border border-zinc-700 text-zinc-400 uppercase">
                     {item.type}
                   </span>
+                  {item.userId?.email && (
+                    <span className="text-[10px] px-2 py-0.5 rounded border border-zinc-700 text-zinc-500">
+                      {item.userId.email}
+                    </span>
+                  )}
                   {getRatioLabel(item) && (
                     <span className="text-[10px] px-2 py-0.5 rounded border border-zinc-700 text-zinc-500">
                       {getRatioLabel(item)}
@@ -145,7 +198,7 @@ export default function LibraryPage() {
                   <span className="text-[10px] text-zinc-600">{formatSize(item.fileSize)}</span>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <span className="text-[10px] text-zinc-600">{formatDate(item.createdAt)}</span>
                   <div className="flex items-center gap-2">
                     {item.blobUrl && (
@@ -153,7 +206,7 @@ export default function LibraryPage() {
                         href={item.blobUrl}
                         download
                         rel="noopener noreferrer"
-                        className="text-xs px-2 py-1 rounded border border-zinc-700 text-zinc-400 hover:text-blue-300 hover:border-blue-400/50"
+                        className="text-xs px-2.5 py-1 rounded border border-zinc-700 text-zinc-400 hover:text-blue-300 hover:border-blue-400/50"
                       >
                         Download
                       </a>
@@ -161,7 +214,7 @@ export default function LibraryPage() {
                     <button
                       onClick={() => handleDelete(item._id)}
                       disabled={deleting === item._id}
-                      className="text-xs px-2 py-1 rounded border border-zinc-700 text-zinc-400 hover:text-red-300 hover:border-red-400/50 disabled:opacity-50"
+                      className="text-xs px-2.5 py-1 rounded border border-zinc-700 text-zinc-400 hover:text-red-300 hover:border-red-400/50 disabled:opacity-50"
                     >
                       {deleting === item._id ? 'Deleting...' : 'Delete'}
                     </button>
@@ -170,6 +223,18 @@ export default function LibraryPage() {
               </div>
             </article>
           ))}
+        </div>
+      )}
+
+      {hasMore && (
+        <div className="flex justify-center mt-8">
+          <button
+            onClick={handleLoadMore}
+            disabled={loadingMore}
+            className="px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-sm rounded-lg transition-colors disabled:opacity-50"
+          >
+            {loadingMore ? 'Loading...' : 'Load More'}
+          </button>
         </div>
       )}
     </div>

@@ -66,10 +66,13 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div>
-      <h1 className="text-lg font-semibold mb-6">User Management</h1>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">User Management</h1>
+        <p className="text-sm text-zinc-400 mt-1">Search users and manage account status safely.</p>
+      </div>
 
-      <form onSubmit={handleSearch} className="flex gap-2 mb-6">
+      <form onSubmit={handleSearch} className="flex gap-2">
         <input
           type="text"
           value={search}
@@ -88,7 +91,7 @@ export default function AdminUsersPage() {
         </div>
       ) : (
         <>
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-x-auto">
+          <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl overflow-x-auto">
             <table className="w-full text-sm min-w-[600px]">
               <thead>
                 <tr className="border-b border-zinc-800 text-xs text-zinc-500">
@@ -102,7 +105,7 @@ export default function AdminUsersPage() {
               </thead>
               <tbody>
                 {users.map((u) => (
-                  <tr key={u._id} className="border-b border-zinc-800/50">
+                  <tr key={u._id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
                     <td className="p-3 text-white">{u.email}</td>
                     <td className="p-3 text-zinc-400">{u.name || '—'}</td>
                     <td className="p-3 text-zinc-400 text-xs">
@@ -158,7 +161,7 @@ export default function AdminUsersPage() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1.5 text-xs bg-zinc-900 border border-zinc-800 rounded-lg disabled:opacity-50 hover:border-zinc-600"
+                className="px-3 py-1.5 text-xs bg-zinc-900 border border-zinc-800 rounded-lg disabled:opacity-50 hover:border-zinc-600 transition-colors"
               >
                 Prev
               </button>
@@ -168,7 +171,7 @@ export default function AdminUsersPage() {
               <button
                 onClick={() => setPage((p) => Math.min(pages, p + 1))}
                 disabled={page === pages}
-                className="px-3 py-1.5 text-xs bg-zinc-900 border border-zinc-800 rounded-lg disabled:opacity-50 hover:border-zinc-600"
+                className="px-3 py-1.5 text-xs bg-zinc-900 border border-zinc-800 rounded-lg disabled:opacity-50 hover:border-zinc-600 transition-colors"
               >
                 Next
               </button>

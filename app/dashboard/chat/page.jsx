@@ -1,54 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import ChatInterface from '@/components/chat/ChatInterface'
 
 export default function DashboardChatPage() {
-  const [conversationId, setConversationId] = useState(null)
-  const [isInitializing, setIsInitializing] = useState(true)
-
-  useEffect(() => {
-    const initializeChat = async () => {
-      try {
-        const response = await fetch('/api/chat/conversations', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({}),
-        })
-
-        const data = await response.json()
-        if (data.success) {
-          setConversationId(data.conversationId)
-        }
-      } catch (error) {
-        console.error('Failed to initialize chat:', error)
-      } finally {
-        setIsInitializing(false)
-      }
-    }
-
-    initializeChat()
-  }, [])
-
-  if (isInitializing) {
-    return (
-      <div className="h-[calc(100vh-8rem)] flex items-center justify-center text-zinc-400 text-sm">
-        Initializing chat...
-      </div>
-    )
-  }
-
-  if (!conversationId) {
-    return (
-      <div className="h-[calc(100vh-8rem)] flex items-center justify-center text-red-400 text-sm">
-        Failed to initialize chat. Please refresh.
-      </div>
-    )
-  }
+  const searchParams = useSearchParams()
+  const conversationId = searchParams.get('id') || null
 
   return (
-    <div className="h-[calc(100vh-8rem)]">
-      <ChatInterface conversationId={conversationId} />
+    <div className="h-full w-full">
+      <ChatInterface conversationId={conversationId} allowMediaGeneration />
     </div>
   )
 }

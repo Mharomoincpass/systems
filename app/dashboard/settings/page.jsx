@@ -81,12 +81,15 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-lg">
-      <h1 className="text-lg font-semibold mb-6">Settings</h1>
+    <div className="max-w-4xl space-y-8">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
+        <p className="text-sm text-zinc-400 mt-1">Manage your account details and security preferences.</p>
+      </div>
 
       {/* Profile */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 mb-4">
-        <h2 className="text-sm font-medium mb-4">Profile</h2>
+      <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-5 sm:p-6">
+        <h2 className="text-sm font-medium text-zinc-200 mb-4">Profile</h2>
         <form onSubmit={updateProfile} className="space-y-3">
           <div>
             <label className="block text-xs text-zinc-400 mb-1">Email</label>
@@ -117,8 +120,8 @@ export default function SettingsPage() {
       </div>
 
       {/* Change Password */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 mb-4">
-        <h2 className="text-sm font-medium mb-4">Change Password</h2>
+      <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-5 sm:p-6">
+        <h2 className="text-sm font-medium text-zinc-200 mb-4">Change Password</h2>
         <form onSubmit={changePassword} className="space-y-3">
           <div>
             <label className="block text-xs text-zinc-400 mb-1">Current password</label>
@@ -152,20 +155,20 @@ export default function SettingsPage() {
       </div>
 
       {/* Account Info */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-        <h2 className="text-sm font-medium mb-3">Account</h2>
+      <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-5 sm:p-6">
+        <h2 className="text-sm font-medium text-zinc-200 mb-4">Account</h2>
         <div className="space-y-2 text-xs text-zinc-400">
-          <div className="flex justify-between">
+          <div className="flex items-center justify-between py-1 border-b border-zinc-800/70">
             <span>Role</span>
             <span className="text-white capitalize">{user.role}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex items-center justify-between py-1 border-b border-zinc-800/70">
             <span>Storage used</span>
             <span className="text-white">
               {(user.storageUsed / (1024 * 1024)).toFixed(1)} / {(user.storageLimit / (1024 * 1024)).toFixed(0)} MB
             </span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex items-center justify-between py-1">
             <span>Joined</span>
             <span className="text-white">
               {new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}

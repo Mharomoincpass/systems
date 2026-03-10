@@ -1,4 +1,5 @@
-import ChatbotPage from '@/components/chat/ChatbotPage'
+import { Suspense } from 'react'
+import PublicChatPage from './ChatClientPage'
 
 export const metadata = {
   title: 'AI Chat - Free Multi-Model Chatbot | Mharomo',
@@ -12,5 +13,9 @@ export const metadata = {
 }
 
 export default function ChatPage() {
-  return <ChatbotPage />
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><div className="w-5 h-5 border-2 border-zinc-700 border-t-white rounded-full animate-spin" /></div>}>
+      <PublicChatPage />
+    </Suspense>
+  )
 }

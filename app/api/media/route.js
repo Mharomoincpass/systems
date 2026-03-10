@@ -19,13 +19,20 @@ export async function GET(request) {
     const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10), 100)
     const skip = (page - 1) * limit
 
-    const filter = { userId: auth.user.userId }
+    const filter = auth.user.role === 'admin' ? {} : { userId: auth.user.userId }
     if (type && ['image', 'video', 'audio', 'transcription'].includes(type)) {
       filter.type = type
+    } else {
+      filter.type = { $ne: 'transcription' }
     }
 
     const [media, total] = await Promise.all([
-      Media.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      Media.find(filter)
+        .populate('userId', 'email name')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
       Media.countDocuments(filter),
     ])
 
@@ -53,7 +60,8 @@ export async function DELETE(request) {
       return Response.json({ error: 'Missing media ID' }, { status: 400 })
     }
 
-    const media = await Media.findOne({ _id: id, userId: auth.user.userId })
+    const mediaQuery = auth.user.role === 'admin' ? { _id: id } : { _id: id, userId: auth.user.userId }
+    const media = await Media.findOne(mediaQuery)
     if (!media) {
       return Response.json({ error: 'Not found' }, { status: 404 })
     }
@@ -69,7 +77,7 @@ export async function DELETE(request) {
 
     // Update user storage
     if (media.fileSize) {
-      await User.findByIdAndUpdate(auth.user.userId, {
+      await User.findByIdAndUpdate(media.userId, {
         $inc: { storageUsed: -media.fileSize },
       })
     }
