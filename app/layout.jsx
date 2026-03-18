@@ -2,6 +2,10 @@ import Script from 'next/script'
 import './globals.css'
 import { NotificationProvider } from '@/components/Notifications'
 import AnalyticsTracker from '@/components/AnalyticsTracker'
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const siteName = 'AI Tools and Systems'
 const siteDescription = 'AI tools and systems for chat, images, video, music, transcription, and speech.'
@@ -71,8 +75,8 @@ export default function RootLayout({
   }
   
   return (
-    <html lang="en">
-      <head>
+    <html lang="en" className={cn("font-sans", geist.variable)}>
+      <body className="font-sans">
         {/* Google Analytics */}
         <Script
           async
@@ -91,15 +95,13 @@ export default function RootLayout({
             `,
           }}
         />
-        
-        {/* Google AdSense - Must be in head for verification */}
-        <script
+        {/* Google AdSense */}
+        <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7139373644000528"
           crossOrigin="anonymous"
+          strategy="afterInteractive"
         />
-      </head>
-      <body className="font-sans">
         <AnalyticsTracker />
         <script
           type="application/ld+json"
