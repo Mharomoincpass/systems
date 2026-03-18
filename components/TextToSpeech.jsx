@@ -3,13 +3,12 @@
 import { useState, useRef, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/Button'
-import { useNotification } from '@/components/Notifications'
+import { toast } from 'sonner'
 
 export default function TextToSpeech() {
   const router = useRouter()
   const pathname = usePathname()
   const isDashboard = pathname?.startsWith('/dashboard')
-  const { addNotification, removeNotification } = useNotification()
   const [text, setText] = useState('')
   const [voice, setVoice] = useState('rachel')
   const [isLoading, setIsLoading] = useState(false)
@@ -40,19 +39,19 @@ export default function TextToSpeech() {
     e.preventDefault()
 
     if (!text.trim()) {
-      addNotification('Please enter some text to convert to speech', 'warning')
+      toast.warning('Please enter some text to convert to speech')
       return
     }
 
     if (text.length > 5000) {
-      addNotification('Text must be less than 5000 characters', 'warning')
+      toast.warning('Text must be less than 5000 characters')
       return
     }
 
     setIsLoading(true)
     setError(null)
     setGeneratedAudio(null)
-    const loadingId = addNotification('🔊 Generating speech...', 'info', 0)
+    const loadingId = toast.loading('🔊 Generating speech...')
 
     try {
       setProgress(20)
@@ -75,11 +74,11 @@ export default function TextToSpeech() {
         const errorMsg = data.error || 'Failed to generate speech'
         
         if (response.status === 402 || errorMsg.includes('credit') || errorMsg.includes('limit')) {
-          addNotification('❌ Insufficient credits for text-to-speech.', 'error')
+          toast.error('❌ Insufficient credits for text-to-speech.')
         } else if (response.status === 429) {
-          addNotification('⏳ Rate limited. Please try again later.', 'warning')
+          toast.warning('⏳ Rate limited. Please try again later.')
         } else {
-          addNotification(`❌ ${errorMsg}`, 'error')
+          toast.error(`❌ ${errorMsg}`)
         }
         throw new Error(errorMsg)
       }
@@ -89,7 +88,7 @@ export default function TextToSpeech() {
       const data = await response.json()
       setGeneratedAudio(data.audio)
       setProgress(100)
-      addNotification('🎉 Speech generated successfully!', 'success')
+      toast.success('🎉 Speech generated successfully!')
 
       // Scroll to audio player
       setTimeout(() => {
@@ -101,7 +100,7 @@ export default function TextToSpeech() {
       setError(err.message)
       console.error('Speech generation error:', err)
     } finally {
-      removeNotification(loadingId)
+      toast.dismiss(loadingId)
       setIsLoading(false)
       setProgress(0)
     }

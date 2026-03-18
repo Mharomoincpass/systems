@@ -5,13 +5,12 @@ import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
-import { useNotification } from '@/components/Notifications'
+import { toast } from 'sonner'
 
 export default function ImageGenerator() {
   const router = useRouter()
   const pathname = usePathname()
   const isDashboard = pathname?.startsWith('/dashboard')
-  const { addNotification, removeNotification } = useNotification()
   const [prompt, setPrompt] = useState('')
   const [generationMode, setGenerationMode] = useState('text-to-image')
   const [model, setModel] = useState('flux')
@@ -65,24 +64,24 @@ export default function ImageGenerator() {
   const generateImage = async (e) => {
     e.preventDefault()
     if (!prompt.trim()) {
-      addNotification('Please enter a prompt', 'warning')
+      toast.warning('Please enter a prompt')
       return
     }
 
     if (generationMode === 'image-to-image' && !referenceImageFile) {
-      addNotification('Please upload a reference image', 'warning')
+      toast.warning('Please upload a reference image')
       return
     }
 
     if (generationMode === 'image-to-image' && !imageToImageModels.includes(model)) {
-      addNotification('Selected model does not support image-to-image. Use Klein or GPT Image 1 Mini.', 'warning')
+      toast.warning('Selected model does not support image-to-image. Use Klein or GPT Image 1 Mini.')
       return
     }
 
     setIsLoading(true)
     setError(null)
     setGeneratedImage(null)
-    const loadingId = addNotification('Generating image...', 'info', 0)
+    const loadingId = toast.loading('Generating image...')
 
     try {
       const formData = new FormData()
@@ -105,11 +104,11 @@ export default function ImageGenerator() {
         const errorMsg = data.error || 'Failed to generate image'
         
         if (response.status === 402 || errorMsg.includes('credit') || errorMsg.includes('limit')) {
-          addNotification('❌ Insufficient credits. Please add more credits.', 'error')
+          toast.error('❌ Insufficient credits. Please add more credits.')
         } else if (response.status === 429) {
-          addNotification('⏳ Rate limited. Please try again in a moment.', 'warning')
+          toast.warning('⏳ Rate limited. Please try again in a moment.')
         } else {
-          addNotification(`❌ ${errorMsg}`, 'error')
+          toast.error(`❌ ${errorMsg}`)
         }
         throw new Error(errorMsg)
       }
@@ -121,7 +120,7 @@ export default function ImageGenerator() {
         setReferenceImageFile(null)
         setReferenceImagePreview('')
       }
-      addNotification('✨ Image generated successfully!', 'success')
+      toast.success('✨ Image generated successfully!')
 
       // Scroll to image
       setTimeout(() => {
@@ -133,7 +132,7 @@ export default function ImageGenerator() {
       setError(err.message)
       console.error('Image generation error:', err)
     } finally {
-      removeNotification(loadingId)
+      toast.dismiss(loadingId)
       setIsLoading(false)
     }
   }

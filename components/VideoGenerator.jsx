@@ -4,13 +4,12 @@ import { useState, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
-import { useNotification } from '@/components/Notifications'
+import { toast } from 'sonner'
 
 export default function VideoGenerator() {
   const router = useRouter()
   const pathname = usePathname()
   const isDashboard = pathname?.startsWith('/dashboard')
-  const { addNotification, removeNotification } = useNotification()
   const [prompt, setPrompt] = useState('')
   const [imageUrl, setImageUrl] = useState('')
   const [imageFile, setImageFile] = useState(null)
@@ -42,12 +41,12 @@ export default function VideoGenerator() {
     if (!file) return
 
     if (!file.type.startsWith('image/')) {
-      addNotification('Please select a valid image file.', 'warning')
+      toast.warning('Please select a valid image file.')
       return
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      addNotification('Image must be 10MB or smaller.', 'warning')
+      toast.warning('Image must be 10MB or smaller.')
       return
     }
 
@@ -57,7 +56,7 @@ export default function VideoGenerator() {
 
     setImageFile(file)
     setImagePreview(URL.createObjectURL(file))
-    addNotification('Image selected for image-to-video generation.', 'success')
+    toast.success('Image selected for image-to-video generation.')
   }
 
   const clearSelectedImage = () => {
@@ -79,14 +78,14 @@ export default function VideoGenerator() {
     const hasImageFile = Boolean(imageFile)
 
     if (!hasPrompt && !hasImageUrl && !hasImageFile) {
-      addNotification('Add a prompt, an image URL, or upload an image to generate video.', 'warning')
+      toast.warning('Add a prompt, an image URL, or upload an image to generate video.')
       return
     }
 
     setIsLoading(true)
     setError(null)
     setGeneratedVideo(null)
-    const loadingId = addNotification('🎬 Generating video...', 'info', 0)
+    const loadingId = toast.loading('🎬 Generating video...')
 
     try {
       setUploadProgress(20)
@@ -151,11 +150,11 @@ export default function VideoGenerator() {
         const errorMsg = [baseError, detailText, hintText].filter(Boolean).join(' — ')
         
         if (response.status === 402 || baseError.includes('credit') || baseError.includes('limit')) {
-          addNotification('❌ Insufficient credits for video generation.', 'error')
+          toast.error('❌ Insufficient credits for video generation.')
         } else if (response.status === 429) {
-          addNotification('⏳ Rate limited. Please try again later.', 'warning')
+          toast.warning('⏳ Rate limited. Please try again later.')
         } else {
-          addNotification(`❌ ${baseError}`, 'error')
+          toast.error(`❌ ${baseError}`)
         }
         throw new Error(errorMsg)
       }
@@ -166,9 +165,9 @@ export default function VideoGenerator() {
       setGeneratedVideo(data.video)
       setUploadProgress(100)
       if (data.video?.retryMode === 'prompt-only' && (imageUrl.trim() || imageFile)) {
-        addNotification('⚠️ Image could not be used for generation — video was created from your prompt only.', 'warning')
+        toast.warning('⚠️ Image could not be used for generation — video was created from your prompt only.')
       } else {
-        addNotification('🎉 Video generated successfully!', 'success')
+        toast.success('🎉 Video generated successfully!')
       }
 
       // Scroll to video
@@ -181,7 +180,7 @@ export default function VideoGenerator() {
       setError(err.message)
       console.error('Video generation error:', err)
     } finally {
-      removeNotification(loadingId)
+      toast.dismiss(loadingId)
       setIsLoading(false)
       setUploadProgress(0)
     }

@@ -4,13 +4,12 @@ import { useState, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/Button'
 import { Input } from '@/components/Input'
-import { useNotification } from '@/components/Notifications'
+import { toast } from 'sonner'
 
 export default function MusicGenerator() {
   const router = useRouter()
   const pathname = usePathname()
   const isDashboard = pathname?.startsWith('/dashboard')
-  const { addNotification, removeNotification } = useNotification()
   const [prompt, setPrompt] = useState('')
   const [duration, setDuration] = useState(30)
   const [isLoading, setIsLoading] = useState(false)
@@ -33,14 +32,14 @@ export default function MusicGenerator() {
     e.preventDefault()
 
     if (!prompt.trim()) {
-      addNotification('Please enter a music description', 'warning')
+      toast.warning('Please enter a music description')
       return
     }
 
     setIsLoading(true)
     setError(null)
     setGeneratedAudio(null)
-    const loadingId = addNotification('🎵 Generating music...', 'info', 0)
+    const loadingId = toast.loading('🎵 Generating music...')
 
     try {
       setProgress(20)
@@ -63,11 +62,11 @@ export default function MusicGenerator() {
         const errorMsg = data.error || 'Failed to generate music'
         
         if (response.status === 402 || errorMsg.includes('credit') || errorMsg.includes('limit')) {
-          addNotification('❌ Insufficient credits for music generation.', 'error')
+          toast.error('❌ Insufficient credits for music generation.')
         } else if (response.status === 429) {
-          addNotification('⏳ Rate limited. Please try again later.', 'warning')
+          toast.warning('⏳ Rate limited. Please try again later.')
         } else {
-          addNotification(`❌ ${errorMsg}`, 'error')
+          toast.error(`❌ ${errorMsg}`)
         }
         throw new Error(errorMsg)
       }
@@ -77,7 +76,7 @@ export default function MusicGenerator() {
       const data = await response.json()
       setGeneratedAudio(data.audio)
       setProgress(100)
-      addNotification('🎉 Music generated successfully!', 'success')
+      toast.success('🎉 Music generated successfully!')
 
       // Scroll to audio player
       setTimeout(() => {
@@ -89,7 +88,7 @@ export default function MusicGenerator() {
       setError(err.message)
       console.error('Music generation error:', err)
     } finally {
-      removeNotification(loadingId)
+      toast.dismiss(loadingId)
       setIsLoading(false)
       setProgress(0)
     }

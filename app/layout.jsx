@@ -1,6 +1,5 @@
-import Script from 'next/script'
 import './globals.css'
-import { NotificationProvider } from '@/components/Notifications'
+import { Toaster } from '@/components/ui/sonner'
 import AnalyticsTracker from '@/components/AnalyticsTracker'
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
@@ -78,14 +77,12 @@ export default function RootLayout({
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <body className="font-sans">
         {/* Google Analytics */}
-        <Script
+        <script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-DEN9D68RFH"
-          strategy="afterInteractive"
-        />
-        <Script
+        ></script>
+        <script
           id="google-analytics"
-          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
@@ -94,22 +91,20 @@ export default function RootLayout({
               gtag('config', 'G-DEN9D68RFH');
             `,
           }}
-        />
+        ></script>
         {/* Google AdSense */}
-        <Script
+        <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7139373644000528"
           crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
+        ></script>
         <AnalyticsTracker />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-        />
-        <NotificationProvider>
-          {children}
-        </NotificationProvider>
+        ></script>
+        {children}
+        <Toaster />
       </body>
     </html>
   )

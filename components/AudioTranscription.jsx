@@ -3,13 +3,12 @@
 import { useState, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/Button'
-import { useNotification } from '@/components/Notifications'
+import { toast } from 'sonner'
 
 export default function AudioTranscription() {
   const router = useRouter()
   const pathname = usePathname()
   const isDashboard = pathname?.startsWith('/dashboard')
-  const { addNotification, removeNotification } = useNotification()
   const [audioFile, setAudioFile] = useState(null)
   const [audioPreview, setAudioPreview] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -50,19 +49,19 @@ export default function AudioTranscription() {
     e.preventDefault()
 
     if (!audioFile) {
-      addNotification('Please select an audio file first', 'warning')
+      toast.warning('Please select an audio file first')
       return
     }
 
     if (!audioPreview) {
-      addNotification('Audio preview failed. Try selecting again.', 'error')
+      toast.error('Audio preview failed. Try selecting again.')
       return
     }
 
     setIsLoading(true)
     setError(null)
     setTranscription(null)
-    const loadingId = addNotification('🎙️ Transcribing audio...', 'info', 0)
+    const loadingId = toast.loading('🎙️ Transcribing audio...')
 
     try {
       setProgress(20)
@@ -102,11 +101,11 @@ export default function AudioTranscription() {
         const errorMsg = data.error || 'Failed to transcribe audio'
         
         if (response.status === 402 || errorMsg.includes('credit') || errorMsg.includes('limit')) {
-          addNotification('❌ Insufficient credits for transcription.', 'error')
+          toast.error('❌ Insufficient credits for transcription.')
         } else if (response.status === 429) {
-          addNotification('⏳ Rate limited. Please try again later.', 'warning')
+          toast.warning('⏳ Rate limited. Please try again later.')
         } else {
-          addNotification(`❌ ${errorMsg}`, 'error')
+          toast.error(`❌ ${errorMsg}`)
         }
         throw new Error(errorMsg)
       }
@@ -116,7 +115,7 @@ export default function AudioTranscription() {
       const data = await response.json()
       setTranscription(data.transcription)
       setProgress(100)
-      addNotification('✨ Audio transcribed successfully!', 'success')
+      toast.success('✨ Audio transcribed successfully!')
 
       // Scroll to result
       setTimeout(() => {
@@ -128,7 +127,7 @@ export default function AudioTranscription() {
       setError(err.message)
       console.error('Transcription error:', err)
     } finally {
-      removeNotification(loadingId)
+      toast.dismiss(loadingId)
       setIsLoading(false)
       setProgress(0)
     }

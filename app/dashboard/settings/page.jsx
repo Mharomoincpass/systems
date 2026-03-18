@@ -1,10 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useNotifications } from '@/components/dashboard/GlobalNotifications'
+import { toast } from 'sonner'
 
 export default function SettingsPage() {
-  const notify = useNotifications()
   const [user, setUser] = useState(null)
   const [name, setName] = useState('')
   const [currentPassword, setCurrentPassword] = useState('')
@@ -32,13 +31,13 @@ export default function SettingsPage() {
       })
       const data = await res.json()
       if (res.ok) {
-        notify.success('Profile updated')
+        toast.success('Profile updated')
         setUser(data.user)
       } else {
-        notify.error(data.error || 'Update failed')
+        toast.error(data.error || 'Update failed')
       }
     } catch {
-      notify.error('Something went wrong')
+      toast.error('Something went wrong')
     } finally {
       setSaving(false)
     }
@@ -47,7 +46,7 @@ export default function SettingsPage() {
   const changePassword = async (e) => {
     e.preventDefault()
     if (newPassword.length < 6) {
-      notify.error('Password must be at least 6 characters')
+      toast.error('Password must be at least 6 characters')
       return
     }
     setSaving(true)
@@ -59,14 +58,14 @@ export default function SettingsPage() {
       })
       const data = await res.json()
       if (res.ok) {
-        notify.success('Password changed')
+        toast.success('Password changed')
         setCurrentPassword('')
         setNewPassword('')
       } else {
-        notify.error(data.error || 'Password change failed')
+        toast.error(data.error || 'Password change failed')
       }
     } catch {
-      notify.error('Something went wrong')
+      toast.error('Something went wrong')
     } finally {
       setSaving(false)
     }
