@@ -369,7 +369,7 @@ export default function BlogPost() {
         
         <article className="mt-8">
           <h1 className="text-3xl sm:text-4xl font-bold mb-3">{post.title}</h1>
-          <p className="text-sm text-zinc-500 mb-8">{post.date}</p>
+          <p className="text-sm text-muted-foreground mb-8">{post.date}</p>
           
           <div className="prose prose-invert max-w-none text-black space-y-4">
             <style>{`

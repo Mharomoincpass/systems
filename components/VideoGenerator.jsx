@@ -187,7 +187,7 @@ export default function VideoGenerator() {
   }
 
   return (
-    <div className={isDashboard ? 'bg-black' : 'min-h-screen bg-black pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16'}>
+    <div className={isDashboard ? 'bg-background' : 'min-h-screen bg-background pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16'}>
       {!isDashboard && (
         <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
       )}
@@ -197,7 +197,7 @@ export default function VideoGenerator() {
           <>
             <button
               onClick={() => router.back()}
-              className="mb-6 sm:mb-8 flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 hover:gap-3"
+              className="mb-6 sm:mb-8 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all duration-300 hover:gap-3"
             >
               <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -206,10 +206,10 @@ export default function VideoGenerator() {
             </button>
 
             <div className="mb-8 sm:mb-12">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4 tracking-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3 sm:mb-4 tracking-tight">
                 AI Video Generator
               </h1>
-              <p className="text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl">
+              <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-2xl">
                 Turn text prompts into dynamic videos using advanced AI models.
               </p>
             </div>
@@ -227,7 +227,7 @@ export default function VideoGenerator() {
                   placeholder="e.g., person walking, waves crashing, clouds moving..."
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  className="!bg-white/10 !border-white/20 !text-white placeholder:text-gray-500 text-sm sm:text-base"
+                  className="!bg-muted !border-border !text-foreground placeholder:text-gray-500 text-sm sm:text-base"
                   disabled={isLoading}
                 />
                 <p className="text-xs text-gray-500 mt-1">Describe the motion/animation for your video. Optional if you provide an image.</p>
@@ -240,7 +240,7 @@ export default function VideoGenerator() {
                   placeholder="https://example.com/image.jpg"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
-                  className="!bg-white/10 !border-white/20 !text-white placeholder:text-gray-500 text-sm sm:text-base"
+                  className="!bg-muted !border-border !text-foreground placeholder:text-gray-500 text-sm sm:text-base"
                   disabled={isLoading}
                 />
                 <p className="text-xs text-gray-500 mt-1">Use this for image-to-video from a public image URL</p>
@@ -248,7 +248,7 @@ export default function VideoGenerator() {
 
               {/* Image Upload (Optional) */}
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs sm:text-sm font-medium text-muted-foreground mb-2">
                   Upload Image (Optional)
                 </label>
                 <input
@@ -263,7 +263,7 @@ export default function VideoGenerator() {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isLoading}
-                  className="w-full min-h-[44px] px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border-2 border-dashed border-white/20 rounded-lg text-gray-300 hover:border-white/40 hover:bg-white/15 transition disabled:opacity-50 text-xs sm:text-sm"
+                  className="w-full min-h-[44px] px-3 sm:px-4 py-2 sm:py-3 bg-muted border-2 border-dashed border-border rounded-lg text-muted-foreground hover:border-white/40 hover:bg-white/15 transition disabled:opacity-50 text-xs sm:text-sm"
                 >
                   {imageFile ? '🖼️ ' + imageFile.name : '📤 Click to select an image'}
                 </button>
@@ -271,13 +271,13 @@ export default function VideoGenerator() {
               </div>
 
               {imagePreview && (
-                <div className="relative overflow-hidden rounded-lg border border-white/20">
+                <div className="relative overflow-hidden rounded-lg border border-border">
                   <img src={imagePreview} alt="Selected image" className="w-full h-44 object-cover" />
                   <button
                     type="button"
                     onClick={clearSelectedImage}
                     disabled={isLoading}
-                    className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white rounded-full px-3 py-1 text-sm transition disabled:opacity-50"
+                    className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-foreground rounded-full px-3 py-1 text-sm transition disabled:opacity-50"
                   >
                     Remove
                   </button>
@@ -286,17 +286,17 @@ export default function VideoGenerator() {
 
               {/* Model Selection */}
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs sm:text-sm font-medium text-muted-foreground mb-2">
                   Model
                 </label>
                 <select
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
                   disabled={isLoading}
-                  className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-white/40 disabled:opacity-50 transition-all"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:border-white/40 disabled:opacity-50 transition-all"
                 >
                   {models.map((m) => (
-                    <option key={m.id} value={m.id} className="bg-black">
+                    <option key={m.id} value={m.id} className="bg-background">
                       {m.name}
                     </option>
                   ))}
@@ -306,7 +306,7 @@ export default function VideoGenerator() {
 
               {/* Duration Selection */}
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs sm:text-sm font-medium text-muted-foreground mb-2">
                   Duration: {duration}s
                 </label>
                 <input
@@ -327,7 +327,7 @@ export default function VideoGenerator() {
 
               {/* Aspect Ratio */}
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs sm:text-sm font-medium text-muted-foreground mb-2">
                   Aspect Ratio
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -340,7 +340,7 @@ export default function VideoGenerator() {
                       className={`px-3 py-2 rounded-lg text-xs sm:text-sm border transition ${
                         aspectRatio === ratio
                           ? 'bg-white text-black border-white'
-                          : 'bg-white/10 border-white/20 text-gray-300 hover:border-white/40'
+                          : 'bg-muted border-border text-muted-foreground hover:border-white/40'
                       } disabled:opacity-50`}
                     >
                       {ratio}
@@ -359,12 +359,12 @@ export default function VideoGenerator() {
 
               {/* Progress Bar */}
               {isLoading && uploadProgress > 0 && (
-                <div className="bg-white/5 border border-white/10 rounded-lg p-3 sm:p-4">
+                <div className="bg-muted/50 border border-border rounded-lg p-3 sm:p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs sm:text-sm text-gray-300">Generating...</p>
-                    <p className="text-xs sm:text-sm text-gray-400">{uploadProgress}%</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">Generating...</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{uploadProgress}%</p>
                   </div>
-                  <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
                     <div
                       className="h-full bg-white transition-all duration-300"
                       style={{ width: `${uploadProgress}%` }}
@@ -389,9 +389,9 @@ export default function VideoGenerator() {
           {/* Video Display Section */}
           <div className="md:col-span-2 order-1 md:order-2">
             {generatedVideo ? (
-              <div ref={scrollRef} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl sm:rounded-2xl overflow-hidden hover:border-white/20 transition-all duration-300">
+              <div ref={scrollRef} className="bg-muted/50 backdrop-blur-xl border border-border rounded-xl sm:rounded-2xl overflow-hidden hover:border-border transition-all duration-300">
                 <div
-                  className="relative w-full bg-black flex items-center justify-center"
+                  className="relative w-full bg-background flex items-center justify-center"
                   style={{ aspectRatio: (generatedVideo.aspectRatio || aspectRatio).replace(':', '/') }}
                 >
                   <video
@@ -402,27 +402,27 @@ export default function VideoGenerator() {
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <div className="p-4 sm:p-6 border-t border-white/10">
+                <div className="p-4 sm:p-6 border-t border-border">
                   <div className="mb-4">
-                    <h3 className="text-xs sm:text-sm font-semibold text-gray-400 mb-2">Motion Prompt</h3>
-                    <p className="text-white text-sm leading-relaxed">
+                    <h3 className="text-xs sm:text-sm font-semibold text-muted-foreground mb-2">Motion Prompt</h3>
+                    <p className="text-foreground text-sm leading-relaxed">
                       {generatedVideo.prompt}
                     </p>
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-gray-400 text-xs">Model</p>
-                      <p className="text-white truncate">{generatedVideo.model?.split('/')?.[1] || generatedVideo.model}</p>
+                      <p className="text-muted-foreground text-xs">Model</p>
+                      <p className="text-foreground truncate">{generatedVideo.model?.split('/')?.[1] || generatedVideo.model}</p>
                     </div>
                     <div>
-                      <p className="text-gray-400 text-xs">Generated</p>
-                      <p className="text-white">
+                      <p className="text-muted-foreground text-xs">Generated</p>
+                      <p className="text-foreground">
                         {new Date(generatedVideo.generatedAt).toLocaleTimeString()}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-400 text-xs">Aspect Ratio</p>
-                      <p className="text-white">{generatedVideo.aspectRatio || aspectRatio}</p>
+                      <p className="text-muted-foreground text-xs">Aspect Ratio</p>
+                      <p className="text-foreground">{generatedVideo.aspectRatio || aspectRatio}</p>
                     </div>
                   </div>
                   <div className="mt-4 flex flex-col sm:flex-row gap-2">
@@ -433,7 +433,7 @@ export default function VideoGenerator() {
                         link.download = `video-${Date.now()}.mp4`
                         link.click()
                       }}
-                      className="w-full sm:flex-1 px-4 py-3 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition text-sm sm:text-base"
+                      className="w-full sm:flex-1 px-4 py-3 sm:py-2 bg-blue-600 hover:bg-blue-700 text-foreground rounded-lg font-medium transition text-sm sm:text-base"
                     >
                       Download Video
                     </button>
@@ -442,7 +442,7 @@ export default function VideoGenerator() {
               </div>
             ) : (
               <div
-                className="bg-gray-800 rounded-xl p-6 sm:p-8 md:p-12 flex items-center justify-center min-h-[200px] sm:min-h-[280px] md:min-h-[380px]"
+                className="bg-card rounded-xl p-6 sm:p-8 md:p-12 flex items-center justify-center min-h-[200px] sm:min-h-[280px] md:min-h-[380px]"
                 style={{ aspectRatio: aspectRatio.replace(':', '/') }}
               >
                 <div className="text-center">
@@ -452,7 +452,7 @@ export default function VideoGenerator() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <h3 className="text-gray-300 font-semibold mb-2">
+                  <h3 className="text-muted-foreground font-semibold mb-2">
                     Generated videos will appear here
                   </h3>
                   <p className="text-gray-500 text-sm">

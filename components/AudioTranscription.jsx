@@ -147,7 +147,7 @@ export default function AudioTranscription() {
   }
 
   return (
-    <div className={isDashboard ? 'bg-black' : 'min-h-screen bg-black pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16'}>
+    <div className={isDashboard ? 'bg-background' : 'min-h-screen bg-background pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16'}>
       {!isDashboard && (
         <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
       )}
@@ -157,7 +157,7 @@ export default function AudioTranscription() {
           <>
             <button
               onClick={() => router.back()}
-              className="mb-6 sm:mb-8 flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 hover:gap-3"
+              className="mb-6 sm:mb-8 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all duration-300 hover:gap-3"
             >
               <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -166,10 +166,10 @@ export default function AudioTranscription() {
             </button>
 
             <div className="mb-8 sm:mb-12">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4 tracking-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3 sm:mb-4 tracking-tight">
                 Audio Transcription
               </h1>
-              <p className="text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl">
+              <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-2xl">
                 Convert speech to text using advanced AI. Upload any audio file and get accurate transcriptions.
               </p>
             </div>
@@ -182,7 +182,7 @@ export default function AudioTranscription() {
             <form onSubmit={transcribeAudio} className="space-y-6">
               {/* Audio Upload */}
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs sm:text-sm font-medium text-muted-foreground mb-2">
                   Upload Audio File
                 </label>
                 <div className="relative">
@@ -198,7 +198,7 @@ export default function AudioTranscription() {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isLoading}
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border-2 border-dashed border-white/20 rounded-lg text-gray-300 hover:border-white/40 hover:bg-white/15 transition disabled:opacity-50 text-xs sm:text-sm"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-muted border-2 border-dashed border-border rounded-lg text-muted-foreground hover:border-white/40 hover:bg-white/15 transition disabled:opacity-50 text-xs sm:text-sm"
                   >
                     {audioFile ? '🎵 ' + audioFile.name : '📤 Click to select audio'}
                   </button>
@@ -218,7 +218,7 @@ export default function AudioTranscription() {
                     type="button"
                     onClick={removeAudio}
                     disabled={isLoading}
-                    className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white rounded-full px-3 py-1 text-sm transition disabled:opacity-50"
+                    className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-foreground rounded-full px-3 py-1 text-sm transition disabled:opacity-50"
                   >
                     Remove
                   </button>
@@ -234,10 +234,10 @@ export default function AudioTranscription() {
 
               {/* Progress Bar */}
               {isLoading && progress > 0 && (
-                <div className="bg-white/10 rounded-lg p-3 sm:p-4 backdrop-blur-xl">
+                <div className="bg-muted rounded-lg p-3 sm:p-4 backdrop-blur-xl">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs sm:text-sm text-gray-300">Transcribing...</p>
-                    <p className="text-xs sm:text-sm text-gray-400">{progress}%</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">Transcribing...</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{progress}%</p>
                   </div>
                   <div className="w-full h-2 bg-white/15 rounded-full overflow-hidden">
                     <div
@@ -259,9 +259,9 @@ export default function AudioTranscription() {
             </form>
 
             {!isDashboard && (
-              <div className="mt-4 sm:mt-6 bg-white/5 border border-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 backdrop-blur-xl">
-                <h3 className="text-xs sm:text-sm font-semibold text-white mb-2">💡 Tips</h3>
-                <ul className="text-xs text-gray-400 space-y-1">
+              <div className="mt-4 sm:mt-6 bg-muted/50 border border-border rounded-xl sm:rounded-2xl p-4 sm:p-6 backdrop-blur-xl">
+                <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-2">💡 Tips</h3>
+                <ul className="text-xs text-muted-foreground space-y-1">
                   <li>• Clear audio produces better results</li>
                   <li>• Supports multiple languages automatically</li>
                   <li>• Cost: ~0.00004 credits per second</li>
@@ -274,9 +274,9 @@ export default function AudioTranscription() {
           {/* Transcription Result Section */}
           <div className="lg:col-span-2">
             {transcription ? (
-              <div ref={scrollRef} className="bg-white/10 rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-white/20 backdrop-blur-xl">
+              <div ref={scrollRef} className="bg-muted rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-border backdrop-blur-xl">
                 <div className="flex items-center justify-between mb-4 sm:mb-6">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white">Transcription</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-foreground">Transcription</h2>
                   <button
                     onClick={copyToClipboard}
                     className="px-3 sm:px-4 py-2 sm:py-3 bg-white text-black hover:bg-gray-200 rounded-lg transition flex items-center gap-2 text-sm sm:text-base font-semibold"
@@ -286,8 +286,8 @@ export default function AudioTranscription() {
                 </div>
 
                 {/* Transcription Text */}
-                <div className="mb-4 sm:mb-6 bg-white/5 rounded-lg p-4 sm:p-6 backdrop-blur-xl">
-                  <p className="text-white text-sm sm:text-base lg:text-lg leading-relaxed whitespace-pre-wrap">
+                <div className="mb-4 sm:mb-6 bg-muted/50 rounded-lg p-4 sm:p-6 backdrop-blur-xl">
+                  <p className="text-foreground text-sm sm:text-base lg:text-lg leading-relaxed whitespace-pre-wrap">
                     {transcription.text}
                   </p>
                 </div>
@@ -295,21 +295,21 @@ export default function AudioTranscription() {
                 {/* Metadata */}
                 <div className="space-y-3 text-xs sm:text-sm">
                   <div>
-                    <span className="text-gray-400">Language:</span>
-                    <span className="text-white ml-2">{transcription.language}</span>
+                    <span className="text-muted-foreground">Language:</span>
+                    <span className="text-foreground ml-2">{transcription.language}</span>
                   </div>
                   <div>
-                    <span className="text-gray-400">Transcribed:</span>
-                    <span className="text-white ml-2">
+                    <span className="text-muted-foreground">Transcribed:</span>
+                    <span className="text-foreground ml-2">
                       {new Date(transcription.generatedAt).toLocaleString()}
                     </span>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="bg-white/5 rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-white/20 border-dashed flex flex-col items-center justify-center min-h-[400px] backdrop-blur-xl">
+              <div className="bg-muted/50 rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-border border-dashed flex flex-col items-center justify-center min-h-[400px] backdrop-blur-xl">
                 <div className="text-6xl mb-4">🎙️</div>
-                <p className="text-gray-400 text-center text-sm sm:text-base">
+                <p className="text-muted-foreground text-center text-sm sm:text-base">
                   Your transcription will appear here
                 </p>
               </div>

@@ -54,27 +54,27 @@ export default function MonitorPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="w-5 h-5 border-2 border-zinc-700 border-t-white rounded-full animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-4 sm:p-6">
+    <div className="min-h-screen bg-background text-foreground p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-lg font-semibold">System Monitor</h1>
           <div className="flex gap-2">
             <Link
               href="/dashboard/admin"
-              className="px-3 py-1.5 text-xs bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-300 hover:border-zinc-600"
+              className="px-3 py-1.5 text-xs bg-background border border-zinc-800 rounded-lg text-foreground hover:border-zinc-600"
             >
               Admin Dashboard
             </Link>
             <button
               onClick={() => window.location.reload()}
-              className="px-3 py-1.5 text-xs bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-300 hover:border-zinc-600"
+              className="px-3 py-1.5 text-xs bg-background border border-zinc-800 rounded-lg text-foreground hover:border-zinc-600"
             >
               Refresh
             </button>
@@ -94,61 +94,61 @@ export default function MonitorPage() {
             { label: 'Records Shown', value: visitors.length },
             { label: 'Top Countries', value: topCountries.length },
           ].map((item) => (
-            <div key={item.label} className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-              <p className="text-[11px] text-zinc-500 mb-1">{item.label}</p>
+            <div key={item.label} className="bg-background border border-zinc-800 rounded-lg p-4">
+              <p className="text-[11px] text-muted-foreground mb-1">{item.label}</p>
               <p className="text-lg font-semibold">{item.value}</p>
             </div>
           ))}
         </div>
 
         <div className="grid lg:grid-cols-2 gap-4">
-          <section className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-            <h2 className="text-sm font-medium mb-3 text-zinc-300">Top Countries</h2>
+          <section className="bg-background border border-zinc-800 rounded-lg p-4">
+            <h2 className="text-sm font-medium mb-3 text-foreground">Top Countries</h2>
             <div className="space-y-2">
               {topCountries.map((item) => (
                 <div key={item.country} className="flex items-center justify-between border border-zinc-800 rounded-md px-3 py-2">
                   <div>
-                    <p className="text-sm text-white">{item.country || 'Unknown'}</p>
+                    <p className="text-sm text-foreground">{item.country || 'Unknown'}</p>
                   </div>
-                  <p className="text-sm text-zinc-300">{item.count}</p>
+                  <p className="text-sm text-foreground">{item.count}</p>
                 </div>
               ))}
               {!topCountries.length && (
-                <p className="text-xs text-zinc-500">No country data yet.</p>
+                <p className="text-xs text-muted-foreground">No country data yet.</p>
               )}
             </div>
           </section>
 
-          <section className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-            <h2 className="text-sm font-medium mb-3 text-zinc-300">Latest Visitors</h2>
+          <section className="bg-background border border-zinc-800 rounded-lg p-4">
+            <h2 className="text-sm font-medium mb-3 text-foreground">Latest Visitors</h2>
             <div className="space-y-2 max-h-[420px] overflow-auto pr-1">
               {visitors.map((visitor) => (
                 <div key={visitor._id} className="border border-zinc-800 rounded-md px-3 py-2">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-                    <p className="text-xs text-zinc-300">
-                      <span className="text-zinc-500">IP:</span> {visitor.ip || 'unknown'}
+                    <p className="text-xs text-foreground">
+                      <span className="text-muted-foreground">IP:</span> {visitor.ip || 'unknown'}
                     </p>
-                    <p className="text-xs text-zinc-300">
-                      <span className="text-zinc-500">Path:</span> {visitor.path || '/'}
+                    <p className="text-xs text-foreground">
+                      <span className="text-muted-foreground">Path:</span> {visitor.path || '/'}
                     </p>
-                    <p className="text-xs text-zinc-300">
-                      <span className="text-zinc-500">Location:</span>{' '}
+                    <p className="text-xs text-foreground">
+                      <span className="text-muted-foreground">Location:</span>{' '}
                       {[visitor.city, visitor.region, visitor.country].filter(Boolean).join(', ') || 'Unknown'}
                     </p>
-                    <p className="text-xs text-zinc-300">
-                      <span className="text-zinc-500">ISP:</span> {visitor.isp || 'Unknown'}
+                    <p className="text-xs text-foreground">
+                      <span className="text-muted-foreground">ISP:</span> {visitor.isp || 'Unknown'}
                     </p>
-                    <p className="text-[11px] text-zinc-500">
+                    <p className="text-[11px] text-muted-foreground">
                       <span className="text-zinc-600">First:</span> {formatDate(visitor.firstSeen)}
                     </p>
-                    <p className="text-[11px] text-zinc-500">
+                    <p className="text-[11px] text-muted-foreground">
                       <span className="text-zinc-600">Last:</span> {formatDate(visitor.lastSeen)}
                     </p>
                   </div>
                 </div>
               ))}
               {!visitors.length && (
-                <p className="text-xs text-zinc-500">No visitor records found.</p>
+                <p className="text-xs text-muted-foreground">No visitor records found.</p>
               )}
             </div>
           </section>

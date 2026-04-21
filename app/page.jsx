@@ -11,20 +11,20 @@ const CTA = dynamic(() => import('@/components/home/CTA'))
 const siteUrl = 'https://mharomo.systems'
 
 export const metadata = {
-  title: 'Free AI Tools: Chat, Image, Video & Music | Mharomo',
-  description: 'Use free AI tools for chat, image generation, video creation, music, text-to-speech, and speech-to-text in one fast platform with no sign-up required.',
-  keywords: ['AI tools', 'AI image generator', 'AI video generator', 'AI music generator', 'text to speech', 'speech to text', 'AI chat', 'free AI tools'],
+  title: 'Mharomo AI Chatbot: Chat, Image, Video, Music & Voice',
+  description: 'Talk to one AI chatbot that can answer questions, generate images and video, create music, transcribe audio, and do text-to-speech in a single workflow.',
+  keywords: ['AI chatbot', 'multimodal AI', 'AI image generator', 'AI video generator', 'AI music generator', 'text to speech', 'speech to text', 'AI assistant'],
   openGraph: {
-    title: 'Free AI Tools: Chat, Image, Video & Music | Mharomo',
-    description: 'Use free AI tools for chat, image generation, video creation, music, text-to-speech, and speech-to-text in one fast platform with no sign-up required.',
+    title: 'Mharomo AI Chatbot: Chat, Image, Video, Music & Voice',
+    description: 'Talk to one AI chatbot that can answer questions, generate images and video, create music, transcribe audio, and do text-to-speech in a single workflow.',
     url: siteUrl,
     siteName: 'Mharomo',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Free AI Tools: Chat, Image, Video & Music | Mharomo',
-    description: 'Use free AI tools for chat, image generation, video creation, music, text-to-speech, and speech-to-text in one fast platform with no sign-up required.',
+    title: 'Mharomo AI Chatbot: Chat, Image, Video, Music & Voice',
+    description: 'Talk to one AI chatbot that can answer questions, generate images and video, create music, transcribe audio, and do text-to-speech in a single workflow.',
   },
   alternates: {
     canonical: siteUrl,
@@ -41,7 +41,7 @@ export default function Home() {
     '@type': 'WebSite',
     name: 'Mharomo',
     url: siteUrl,
-    description: 'AI Tools for Chat, Images, Video, Music, Speech-to-Text and Text-to-Speech',
+    description: 'A multi-tool AI chatbot for chat, code, images, video, music, transcription, and text-to-speech.',
     potentialAction: {
       '@type': 'SearchAction',
       target: {
@@ -55,9 +55,9 @@ export default function Home() {
   const webPageSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    name: 'Mharomo - AI Tools Platform',
+    name: 'Mharomo - Multi-Tool AI Chatbot',
     url: siteUrl,
-    description: 'Explore free AI tools for generating images, videos, music, transcribing audio, and chatting with multiple AI models.',
+    description: 'Use one AI chatbot to write, plan, code, generate visuals, create audio, and handle voice workflows in a single place.',
     breadcrumb: {
       '@type': 'BreadcrumbList',
       itemListElement: [
@@ -77,7 +77,7 @@ export default function Home() {
     name: 'Mharomo Systems',
     url: siteUrl,
     image: `${siteUrl}/icon.svg`,
-    description: 'AI tools platform for chat, image generation, video, music, and voice workflows.',
+    description: 'Multi-modal AI chatbot platform for chat, image generation, video, music, and voice workflows.',
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Delhi',
@@ -92,7 +92,7 @@ export default function Home() {
 
   return (
     <>
-      <main className="relative bg-black text-white selection:bg-white selection:text-black">
+      <main className="relative bg-background text-foreground selection:bg-white selection:text-black">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
@@ -109,10 +109,10 @@ export default function Home() {
         
         <div className="relative z-10">
           <Hero />
-          <div className="bg-black border-y border-white/10">
+          <div className="bg-background border-y border-border">
             <div className="max-w-6xl mx-auto px-6 py-4 text-center">
-              <p className="text-sm sm:text-base text-zinc-400">
-                No sign-up required. Free AI tools for chat, images, video, music, and voice.
+              <p className="text-sm sm:text-base text-muted-foreground">
+                One chatbot, many capabilities: chat, research, code, images, video, music, and voice tools in one flow.
               </p>
             </div>
           </div>

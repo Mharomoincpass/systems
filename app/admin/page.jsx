@@ -36,33 +36,33 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black p-4 sm:p-6">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 sm:p-6">
       {/* Noise texture overlay */}
       <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
       
       <div className="absolute inset-0 bg-grid opacity-5" />
-      <div className="absolute top-1/4 -left-32 w-64 sm:w-96 h-64 sm:h-96 bg-white/5 rounded-full blur-[128px]" />
-      <div className="absolute bottom-1/4 -right-32 w-64 sm:w-96 h-64 sm:h-96 bg-white/5 rounded-full blur-[128px]" />
+      <div className="absolute top-1/4 -left-32 w-64 sm:w-96 h-64 sm:h-96 bg-muted/50 rounded-full blur-[128px]" />
+      <div className="absolute bottom-1/4 -right-32 w-64 sm:w-96 h-64 sm:h-96 bg-muted/50 rounded-full blur-[128px]" />
       
       <div className="relative z-10 w-full max-w-sm sm:max-w-md">
         <div className="text-center mb-6 sm:mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 mb-4 transition-all duration-300 hover:border-white/20">
-            <svg className="w-8 h-8 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-border mb-4 transition-all duration-300 hover:border-border">
+            <svg className="w-8 h-8 text-foreground/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">Admin Portal</h1>
-          <p className="text-gray-400 text-xs sm:text-sm md:text-base transition-all duration-300">Enter 6-digit access code</p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2 tracking-tight">Admin Portal</h1>
+          <p className="text-muted-foreground text-xs sm:text-sm md:text-base transition-all duration-300">Enter 6-digit access code</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 transition-all duration-300 hover:border-white/20 hover:bg-white/[0.07]">
+        <form onSubmit={handleSubmit} className="bg-muted/50 backdrop-blur-xl border border-border rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 transition-all duration-300 hover:border-border hover:bg-white/[0.07]">
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="• • • • • •"
             maxLength="6"
-            className="w-full bg-white/10 border border-white/20 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 md:py-4 text-white placeholder-gray-500 text-lg sm:text-xl md:text-2xl tracking-[0.5em] text-center focus:outline-none focus:border-white/30 focus:bg-white/[0.15] mb-4 sm:mb-6 transition-all duration-300"
+            className="w-full bg-muted border border-border rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 md:py-4 text-foreground placeholder-gray-500 text-lg sm:text-xl md:text-2xl tracking-[0.5em] text-center focus:outline-none focus:border-white/30 focus:bg-white/[0.15] mb-4 sm:mb-6 transition-all duration-300"
             disabled={loading}
           />
 

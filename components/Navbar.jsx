@@ -25,16 +25,16 @@ export function Navbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b ${
         scrolled
-          ? 'bg-black/80 backdrop-blur-xl border-white/10'
+          ? 'bg-background/80 backdrop-blur-xl border-border'
           : 'bg-transparent border-transparent'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-4 flex items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-2 sm:gap-3 group flex-shrink-0">
-          <div className="relative w-8 h-8 sm:w-10 sm:h-10 border border-white/20 flex items-center justify-center bg-black group-hover:bg-white transition-colors duration-500 overflow-hidden">
-            <span className="relative z-10 text-white text-sm sm:text-lg font-bold group-hover:text-black transition-colors duration-500">M</span>
+          <div className="relative w-8 h-8 sm:w-10 sm:h-10 border border-border flex items-center justify-center bg-background group-hover:bg-white transition-colors duration-500 overflow-hidden">
+            <span className="relative z-10 text-foreground text-sm sm:text-lg font-bold group-hover:text-black transition-colors duration-500">M</span>
           </div>
-          <span className="text-white font-bold text-sm sm:text-xl tracking-tight">
+          <span className="text-foreground font-bold text-sm sm:text-xl tracking-tight">
             Mharomo<span className="text-zinc-600 text-xs sm:text-sm">.systems</span>
           </span>
         </Link>
@@ -43,45 +43,45 @@ export function Navbar() {
         <div className="hidden md:flex items-center gap-4 lg:gap-6">
           <Link
             href="/chat"
-            className="text-sm text-zinc-300 hover:text-white transition-colors"
+            className="text-sm text-foreground hover:text-foreground transition-colors"
           >
             Chat
           </Link>
           <Link
             href="/services"
-            className="text-sm text-zinc-300 hover:text-white transition-colors"
+            className="text-sm text-foreground hover:text-foreground transition-colors"
           >
             Services
           </Link>
           <Link
             href="/ai-tools"
-            className="text-sm text-zinc-300 hover:text-white transition-colors"
+            className="text-sm text-foreground hover:text-foreground transition-colors"
           >
             AI Tools
           </Link>
           <Link
             href="/author"
-            className="text-sm text-zinc-300 hover:text-white transition-colors"
+            className="text-sm text-foreground hover:text-foreground transition-colors"
           >
             About
           </Link>
           <Link
             href="/blogs"
-            className="text-sm text-zinc-300 hover:text-white transition-colors"
+            className="text-sm text-foreground hover:text-foreground transition-colors"
           >
             Blog
           </Link>
           <button 
             onClick={handleAction}
             disabled={loading}
-            className="group relative flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/5 border border-white/10 hover:bg-white transition-all duration-500 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="group relative flex items-center gap-2 px-6 py-2.5 rounded-full bg-muted/50 border border-border hover:bg-white transition-all duration-500 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <span className="text-white group-hover:text-black text-sm font-medium transition-colors duration-500 whitespace-nowrap">
+            <span className="text-foreground group-hover:text-black text-sm font-medium transition-colors duration-500 whitespace-nowrap">
               Start Chatting
             </span>
             {!loading && (
               <svg 
-                className="w-4 h-4 text-white group-hover:text-black transition-all duration-500 group-hover:translate-x-0.5" 
+                className="w-4 h-4 text-foreground group-hover:text-black transition-all duration-500 group-hover:translate-x-0.5" 
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
@@ -97,14 +97,14 @@ export function Navbar() {
           <button 
             onClick={handleAction}
             disabled={loading}
-            className="group relative flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:bg-white transition-all duration-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="group relative flex items-center gap-1.5 px-4 py-2 rounded-full bg-muted/50 border border-border hover:bg-white transition-all duration-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <span className="text-white group-hover:text-black text-xs font-medium transition-colors duration-500 whitespace-nowrap">
+            <span className="text-foreground group-hover:text-black text-xs font-medium transition-colors duration-500 whitespace-nowrap">
               Start Chatting
             </span>
             {!loading && (
               <svg 
-                className="w-3 h-3 text-white group-hover:text-black transition-all duration-500" 
+                className="w-3 h-3 text-foreground group-hover:text-black transition-all duration-500" 
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
@@ -117,7 +117,7 @@ export function Navbar() {
           {/* Hamburger Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 text-white hover:text-zinc-300 transition-colors"
+            className="p-2 text-foreground hover:text-foreground transition-colors"
             aria-label="Toggle menu"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,39 +133,39 @@ export function Navbar() {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-white/10 bg-black/95 backdrop-blur-xl">
+        <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-xl">
           <div className="px-4 py-4 space-y-3">
             <Link
               href="/chat"
-              className="block py-2 text-sm text-zinc-300 hover:text-white transition-colors"
+              className="block py-2 text-sm text-foreground hover:text-foreground transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               Chat
             </Link>
             <Link
               href="/services"
-              className="block py-2 text-sm text-zinc-300 hover:text-white transition-colors"
+              className="block py-2 text-sm text-foreground hover:text-foreground transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               Services
             </Link>
             <Link
               href="/ai-tools"
-              className="block py-2 text-sm text-zinc-300 hover:text-white transition-colors"
+              className="block py-2 text-sm text-foreground hover:text-foreground transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               AI Tools
             </Link>
             <Link
               href="/author"
-              className="block py-2 text-sm text-zinc-300 hover:text-white transition-colors"
+              className="block py-2 text-sm text-foreground hover:text-foreground transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               About
             </Link>
             <Link
               href="/blogs"
-              className="block py-2 text-sm text-zinc-300 hover:text-white transition-colors"
+              className="block py-2 text-sm text-foreground hover:text-foreground transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               Blog

@@ -29,26 +29,26 @@ export default function ScrollStory() {
   }, { scope: container })
 
   return (
-    <section ref={container} className="relative bg-black overflow-hidden text-white py-20 sm:py-24 border-t border-white/10 border-b border-white/10">
+    <section ref={container} className="relative bg-background overflow-hidden text-foreground py-20 sm:py-24 border-t border-border border-b border-border">
       <div className="max-w-7xl mx-auto px-6 grid gap-8 md:grid-cols-3">
-        <div className="story-card rounded-xl border border-white/10 bg-white/5 p-6 sm:p-8 text-center transition-transform duration-300 hover:-translate-y-1">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Backend</h2>
-          <p className="text-base sm:text-lg text-zinc-400">
-            Scaling systems with <span className="text-white">Node.js</span>, <span className="text-white">Python</span>, and <span className="text-white">Cloud</span>.
+        <div className="story-card rounded-xl border border-border bg-muted/50 p-6 sm:p-8 text-center transition-transform duration-300 hover:-translate-y-1">
+          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">Backend</h2>
+          <p className="text-base sm:text-lg text-muted-foreground">
+            Scaling systems with <span className="text-foreground">Node.js</span>, <span className="text-foreground">Python</span>, and <span className="text-foreground">Cloud</span>.
           </p>
         </div>
 
-        <div className="story-card rounded-xl border border-white/10 bg-white/5 p-6 sm:p-8 text-center transition-transform duration-300 hover:-translate-y-1">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Frontend</h2>
-          <p className="text-base sm:text-lg text-zinc-400">
-            Building stunning UIs with <span className="text-white">React</span>, <span className="text-white">Next.js</span>, and <span className="text-white">Tailwind</span>.
+        <div className="story-card rounded-xl border border-border bg-muted/50 p-6 sm:p-8 text-center transition-transform duration-300 hover:-translate-y-1">
+          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">Frontend</h2>
+          <p className="text-base sm:text-lg text-muted-foreground">
+            Building stunning UIs with <span className="text-foreground">React</span>, <span className="text-foreground">Next.js</span>, and <span className="text-foreground">Tailwind</span>.
           </p>
         </div>
 
-        <div className="story-card rounded-xl border border-white/10 bg-white/5 p-6 sm:p-8 text-center transition-transform duration-300 hover:-translate-y-1">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">AI/ML</h2>
-          <p className="text-base sm:text-lg text-zinc-400">
-            Integrating <span className="text-white">Vertex AI</span>, <span className="text-white">Embeddings</span>, and <span className="text-white">NLP</span>.
+        <div className="story-card rounded-xl border border-border bg-muted/50 p-6 sm:p-8 text-center transition-transform duration-300 hover:-translate-y-1">
+          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">AI/ML</h2>
+          <p className="text-base sm:text-lg text-muted-foreground">
+            Integrating <span className="text-foreground">Vertex AI</span>, <span className="text-foreground">Embeddings</span>, and <span className="text-foreground">NLP</span>.
           </p>
         </div>
       </div>

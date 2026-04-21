@@ -69,7 +69,7 @@ export default function AdminUsersPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">User Management</h1>
-        <p className="text-sm text-zinc-400 mt-1">Search users and manage account status safely.</p>
+        <p className="text-sm text-muted-foreground mt-1">Search users and manage account status safely.</p>
       </div>
 
       <form onSubmit={handleSearch} className="flex gap-2">
@@ -78,7 +78,7 @@ export default function AdminUsersPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by email or name..."
-          className="flex-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-zinc-600"
+          className="flex-1 px-3 py-2 bg-background border border-zinc-800 rounded-lg text-foreground text-sm focus:outline-none focus:border-zinc-600"
         />
         <button type="submit" className="px-4 py-2 bg-white text-black text-sm rounded-lg hover:bg-zinc-200">
           Search
@@ -91,10 +91,10 @@ export default function AdminUsersPage() {
         </div>
       ) : (
         <>
-          <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl overflow-x-auto">
+          <div className="bg-background/70 border border-zinc-800 rounded-xl overflow-x-auto">
             <table className="w-full text-sm min-w-[600px]">
               <thead>
-                <tr className="border-b border-zinc-800 text-xs text-zinc-500">
+                <tr className="border-b border-zinc-800 text-xs text-muted-foreground">
                   <th className="text-left p-3">Email</th>
                   <th className="text-left p-3">Name</th>
                   <th className="text-left p-3">Storage</th>
@@ -105,10 +105,10 @@ export default function AdminUsersPage() {
               </thead>
               <tbody>
                 {users.map((u) => (
-                  <tr key={u._id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
-                    <td className="p-3 text-white">{u.email}</td>
-                    <td className="p-3 text-zinc-400">{u.name || '—'}</td>
-                    <td className="p-3 text-zinc-400 text-xs">
+                  <tr key={u._id} className="border-b border-zinc-800/50 hover:bg-card/30 transition-colors">
+                    <td className="p-3 text-foreground">{u.email}</td>
+                    <td className="p-3 text-muted-foreground">{u.name || '—'}</td>
+                    <td className="p-3 text-muted-foreground text-xs">
                       {((u.storageUsed || 0) / (1024 * 1024)).toFixed(1)} MB
                     </td>
                     <td className="p-3">
@@ -120,7 +120,7 @@ export default function AdminUsersPage() {
                         <span className="text-xs text-emerald-400">Active</span>
                       )}
                     </td>
-                    <td className="p-3 text-zinc-500 text-xs">
+                    <td className="p-3 text-muted-foreground text-xs">
                       {new Date(u.createdAt).toLocaleDateString()}
                     </td>
                     <td className="p-3 text-right">
@@ -129,14 +129,14 @@ export default function AdminUsersPage() {
                           <button
                             onClick={() => suspendUser(u._id, u.isSuspended)}
                             disabled={actionLoading === u._id}
-                            className="text-xs text-zinc-500 hover:text-yellow-400 disabled:opacity-50"
+                            className="text-xs text-muted-foreground hover:text-yellow-400 disabled:opacity-50"
                           >
                             {u.isSuspended ? 'Unsuspend' : 'Suspend'}
                           </button>
                           <button
                             onClick={() => deleteUser(u._id, u.email)}
                             disabled={actionLoading === u._id}
-                            className="text-xs text-zinc-500 hover:text-red-400 disabled:opacity-50"
+                            className="text-xs text-muted-foreground hover:text-red-400 disabled:opacity-50"
                           >
                             Delete
                           </button>
@@ -147,7 +147,7 @@ export default function AdminUsersPage() {
                 ))}
                 {users.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="p-6 text-center text-zinc-500 text-sm">
+                    <td colSpan={6} className="p-6 text-center text-muted-foreground text-sm">
                       No users found
                     </td>
                   </tr>
@@ -161,17 +161,17 @@ export default function AdminUsersPage() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="px-3 py-1.5 text-xs bg-zinc-900 border border-zinc-800 rounded-lg disabled:opacity-50 hover:border-zinc-600 transition-colors"
+                className="px-3 py-1.5 text-xs bg-background border border-zinc-800 rounded-lg disabled:opacity-50 hover:border-zinc-600 transition-colors"
               >
                 Prev
               </button>
-              <span className="px-3 py-1.5 text-xs text-zinc-400">
+              <span className="px-3 py-1.5 text-xs text-muted-foreground">
                 {page} / {pages}
               </span>
               <button
                 onClick={() => setPage((p) => Math.min(pages, p + 1))}
                 disabled={page === pages}
-                className="px-3 py-1.5 text-xs bg-zinc-900 border border-zinc-800 rounded-lg disabled:opacity-50 hover:border-zinc-600 transition-colors"
+                className="px-3 py-1.5 text-xs bg-background border border-zinc-800 rounded-lg disabled:opacity-50 hover:border-zinc-600 transition-colors"
               >
                 Next
               </button>

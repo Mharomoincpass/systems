@@ -62,7 +62,7 @@ export default function AdminDashboard() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Admin Dashboard</h1>
-        <p className="text-sm text-zinc-400 mt-1">System status, user activity, and moderation shortcuts.</p>
+        <p className="text-sm text-muted-foreground mt-1">System status, user activity, and moderation shortcuts.</p>
       </div>
 
       {/* Stats */}
@@ -74,9 +74,9 @@ export default function AdminDashboard() {
           { label: 'Videos', value: stats?.totalVideos ?? 0 },
           { label: 'Storage', value: formatBytes(stats?.totalStorage) },
         ].map((s) => (
-          <div key={s.label} className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-5">
-            <p className="text-xs uppercase tracking-wide text-zinc-500 mb-2">{s.label}</p>
-            <p className="text-2xl font-semibold text-white">{s.value}</p>
+          <div key={s.label} className="bg-background/70 border border-zinc-800 rounded-xl p-5">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">{s.label}</p>
+            <p className="text-2xl font-semibold text-foreground">{s.value}</p>
           </div>
         ))}
       </div>
@@ -85,35 +85,35 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Link
           href="/dashboard/admin/users"
-          className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-5 hover:border-zinc-600 transition-colors"
+          className="bg-background/70 border border-zinc-800 rounded-xl p-5 hover:border-zinc-600 transition-colors"
         >
-          <h3 className="text-sm font-medium mb-1 text-white">User Management</h3>
-          <p className="text-xs text-zinc-400">Search users, suspend abusive accounts, and enforce policy quickly.</p>
+          <h3 className="text-sm font-medium mb-1 text-foreground">User Management</h3>
+          <p className="text-xs text-muted-foreground">Search users, suspend abusive accounts, and enforce policy quickly.</p>
         </Link>
         <Link
           href="/dashboard/admin/media"
-          className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-5 hover:border-zinc-600 transition-colors"
+          className="bg-background/70 border border-zinc-800 rounded-xl p-5 hover:border-zinc-600 transition-colors"
         >
-          <h3 className="text-sm font-medium mb-1 text-white">Media Browser</h3>
-          <p className="text-xs text-zinc-400">Review generated files across all users in one place.</p>
+          <h3 className="text-sm font-medium mb-1 text-foreground">Media Browser</h3>
+          <p className="text-xs text-muted-foreground">Review generated files across all users in one place.</p>
         </Link>
         <Link
           href="/dashboard/admin/audit"
-          className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-5 hover:border-zinc-600 transition-colors"
+          className="bg-background/70 border border-zinc-800 rounded-xl p-5 hover:border-zinc-600 transition-colors"
         >
-          <h3 className="text-sm font-medium mb-1 text-white">Audit Logs</h3>
-          <p className="text-xs text-zinc-400">Track important events, auth actions, and moderation history.</p>
+          <h3 className="text-sm font-medium mb-1 text-foreground">Audit Logs</h3>
+          <p className="text-xs text-muted-foreground">Track important events, auth actions, and moderation history.</p>
         </Link>
       </div>
 
       {/* Recent users */}
       {stats?.recentUsers?.length > 0 && (
         <div className="space-y-3">
-          <h2 className="text-sm font-medium text-zinc-300">Recent Users</h2>
-          <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl overflow-hidden">
+          <h2 className="text-sm font-medium text-foreground">Recent Users</h2>
+          <div className="bg-background/70 border border-zinc-800 rounded-xl overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-zinc-800 text-xs text-zinc-500">
+                <tr className="border-b border-zinc-800 text-xs text-muted-foreground">
                   <th className="text-left p-3">Email</th>
                   <th className="text-left p-3">Name</th>
                   <th className="text-left p-3">Role</th>
@@ -122,15 +122,15 @@ export default function AdminDashboard() {
               </thead>
               <tbody>
                 {stats.recentUsers.map((u) => (
-                  <tr key={u._id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
-                    <td className="p-3 text-white">{u.email}</td>
-                    <td className="p-3 text-zinc-400">{u.name || '—'}</td>
+                  <tr key={u._id} className="border-b border-zinc-800/50 hover:bg-card/30 transition-colors">
+                    <td className="p-3 text-foreground">{u.email}</td>
+                    <td className="p-3 text-muted-foreground">{u.name || '—'}</td>
                     <td className="p-3">
-                      <span className={`text-xs ${u.role === 'admin' ? 'text-yellow-500' : 'text-zinc-500'}`}>
+                      <span className={`text-xs ${u.role === 'admin' ? 'text-yellow-500' : 'text-muted-foreground'}`}>
                         {u.role}
                       </span>
                     </td>
-                    <td className="p-3 text-zinc-500 text-xs">
+                    <td className="p-3 text-muted-foreground text-xs">
                       {new Date(u.createdAt).toLocaleDateString()}
                     </td>
                   </tr>
@@ -144,23 +144,23 @@ export default function AdminDashboard() {
       {/* Generated content from all users */}
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-sm font-medium text-zinc-300">
+          <h2 className="text-sm font-medium text-foreground">
             Generated Content (All Users) - {latestMedia.length} items loaded
           </h2>
-          <Link href="/dashboard/admin/media" className="text-xs text-zinc-400 hover:text-white transition-colors">
+          <Link href="/dashboard/admin/media" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
             View all
           </Link>
         </div>
 
         {latestMedia.length === 0 ? (
-          <div className="bg-zinc-900/60 border border-zinc-800 rounded-xl p-6 text-sm text-zinc-500">
+          <div className="bg-background/60 border border-zinc-800 rounded-xl p-6 text-sm text-muted-foreground">
             No generated content found yet.
           </div>
         ) : (
-          <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl overflow-x-auto">
+          <div className="bg-background/70 border border-zinc-800 rounded-xl overflow-x-auto">
             <table className="w-full text-sm min-w-[760px]">
               <thead>
-                <tr className="border-b border-zinc-800 text-xs text-zinc-500">
+                <tr className="border-b border-zinc-800 text-xs text-muted-foreground">
                   <th className="text-left p-3">Type</th>
                   <th className="text-left p-3">User</th>
                   <th className="text-left p-3">Prompt</th>
@@ -171,14 +171,14 @@ export default function AdminDashboard() {
               </thead>
               <tbody>
                 {latestMedia.map((item) => (
-                  <tr key={item._id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
+                  <tr key={item._id} className="border-b border-zinc-800/50 hover:bg-card/30 transition-colors">
                     <td className="p-3">
-                      <span className="text-xs uppercase text-zinc-300">{item.type}</span>
+                      <span className="text-xs uppercase text-foreground">{item.type}</span>
                     </td>
-                    <td className="p-3 text-zinc-400 text-xs truncate max-w-[220px]">{item.userId?.email || item.userId?.name || 'Unknown user'}</td>
-                    <td className="p-3 text-white text-xs max-w-[320px] truncate">{item.prompt || 'Generated content'}</td>
-                    <td className="p-3 text-zinc-500 text-xs">{item.fileSize ? formatBytes(item.fileSize) : 'N/A'}</td>
-                    <td className="p-3 text-zinc-500 text-xs">{formatDate(item.createdAt)}</td>
+                    <td className="p-3 text-muted-foreground text-xs truncate max-w-[220px]">{item.userId?.email || item.userId?.name || 'Unknown user'}</td>
+                    <td className="p-3 text-foreground text-xs max-w-[320px] truncate">{item.prompt || 'Generated content'}</td>
+                    <td className="p-3 text-muted-foreground text-xs">{item.fileSize ? formatBytes(item.fileSize) : 'N/A'}</td>
+                    <td className="p-3 text-muted-foreground text-xs">{formatDate(item.createdAt)}</td>
                     <td className="p-3">
                       {item.blobUrl ? (
                         <a href={item.blobUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 hover:underline">

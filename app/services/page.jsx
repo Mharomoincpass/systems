@@ -96,7 +96,7 @@ export default function ServicesPage() {
   return (
     <>
       <SmoothScroll>
-        <main className="bg-black text-white min-h-screen selection:bg-white selection:text-black">
+        <main className="bg-background text-foreground min-h-screen selection:bg-white selection:text-black">
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageSchema) }}

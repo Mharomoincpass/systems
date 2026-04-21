@@ -134,7 +134,7 @@ export default function TextToSpeech() {
   }, [])
 
   return (
-    <div className={isDashboard ? 'bg-black' : 'min-h-screen bg-black pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16'}>
+    <div className={isDashboard ? 'bg-background' : 'min-h-screen bg-background pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16'}>
       {!isDashboard && (
         <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
       )}
@@ -144,7 +144,7 @@ export default function TextToSpeech() {
           <>
             <button
               onClick={() => router.back()}
-              className="mb-6 sm:mb-8 flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 hover:gap-3"
+              className="mb-6 sm:mb-8 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all duration-300 hover:gap-3"
             >
               <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -153,10 +153,10 @@ export default function TextToSpeech() {
             </button>
 
             <div className="mb-8 sm:mb-12">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4 tracking-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3 sm:mb-4 tracking-tight">
                 Text-to-Speech
               </h1>
-              <p className="text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl">
+              <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-2xl">
                 Convert text into natural-sounding speech using ElevenLabs AI voices.
               </p>
             </div>
@@ -169,7 +169,7 @@ export default function TextToSpeech() {
             <form onSubmit={generateSpeech} className="space-y-6">
               {/* Text Input */}
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs sm:text-sm font-medium text-muted-foreground mb-2">
                   Text to Convert
                 </label>
                 <textarea
@@ -178,7 +178,7 @@ export default function TextToSpeech() {
                   placeholder="Enter text to convert to speech..."
                   disabled={isLoading}
                   rows={6}
-                  className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:border-white/40 disabled:opacity-50 resize-none text-xs sm:text-sm backdrop-blur-xl"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-muted border border-border rounded-lg text-foreground placeholder:text-gray-500 focus:outline-none focus:border-white/40 disabled:opacity-50 resize-none text-xs sm:text-sm backdrop-blur-xl"
                   maxLength={5000}
                 />
                 <p className="text-xs text-gray-500 mt-1">
@@ -188,7 +188,7 @@ export default function TextToSpeech() {
 
               {/* Example Texts */}
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs sm:text-sm font-medium text-muted-foreground mb-2">
                   Examples
                 </label>
                 <div className="space-y-2">
@@ -198,7 +198,7 @@ export default function TextToSpeech() {
                       type="button"
                       onClick={() => handleUseExample(example)}
                       disabled={isLoading}
-                      className="w-full text-left px-3 sm:px-4 py-2 sm:py-3 bg-white/10 hover:bg-white/15 text-gray-300 text-xs sm:text-sm rounded-lg transition disabled:opacity-50"
+                      className="w-full text-left px-3 sm:px-4 py-2 sm:py-3 bg-muted hover:bg-white/15 text-muted-foreground text-xs sm:text-sm rounded-lg transition disabled:opacity-50"
                     >
                       {example.substring(0, 50)}...
                     </button>
@@ -208,7 +208,7 @@ export default function TextToSpeech() {
 
               {/* Voice Selection */}
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs sm:text-sm font-medium text-muted-foreground mb-2">
                   Voice
                 </label>
                 <div ref={voiceMenuRef} className="relative">
@@ -216,13 +216,13 @@ export default function TextToSpeech() {
                     type="button"
                     onClick={() => !isLoading && setVoiceOpen((prev) => !prev)}
                     disabled={isLoading}
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-white/40 disabled:opacity-50 text-xs sm:text-sm backdrop-blur-xl flex items-center justify-between"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-muted border border-border rounded-lg text-foreground focus:outline-none focus:border-white/40 disabled:opacity-50 text-xs sm:text-sm backdrop-blur-xl flex items-center justify-between"
                     aria-haspopup="listbox"
                     aria-expanded={voiceOpen}
                   >
                     <span>{voices.find((v) => v.id === voice)?.name || 'Select voice'}</span>
                     <svg
-                      className={`w-4 h-4 text-zinc-400 transition-transform ${voiceOpen ? 'rotate-180' : ''}`}
+                      className={`w-4 h-4 text-muted-foreground transition-transform ${voiceOpen ? 'rotate-180' : ''}`}
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >
@@ -233,7 +233,7 @@ export default function TextToSpeech() {
                   {voiceOpen && (
                     <div
                       role="listbox"
-                      className="absolute z-30 mt-1 w-full bg-zinc-950 border border-zinc-700 rounded-lg shadow-2xl overflow-hidden"
+                      className="absolute z-30 mt-1 w-full bg-background border border-zinc-700 rounded-lg shadow-2xl overflow-hidden"
                     >
                       {voices.map((v) => (
                         <button
@@ -247,8 +247,8 @@ export default function TextToSpeech() {
                           }}
                           className={`w-full text-left px-3 sm:px-4 py-2.5 text-xs sm:text-sm transition ${
                             voice === v.id
-                              ? 'bg-zinc-800 text-white'
-                              : 'text-zinc-300 hover:bg-zinc-900'
+                              ? 'bg-card text-foreground'
+                              : 'text-foreground hover:bg-background'
                           }`}
                         >
                           {v.name}
@@ -268,10 +268,10 @@ export default function TextToSpeech() {
 
               {/* Progress Bar */}
               {isLoading && progress > 0 && (
-                <div className="bg-white/10 rounded-lg p-3 sm:p-4 backdrop-blur-xl">
+                <div className="bg-muted rounded-lg p-3 sm:p-4 backdrop-blur-xl">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs sm:text-sm text-gray-300">Generating...</p>
-                    <p className="text-xs sm:text-sm text-gray-400">{progress}%</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">Generating...</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{progress}%</p>
                   </div>
                   <div className="w-full h-2 bg-white/15 rounded-full overflow-hidden">
                     <div
@@ -293,9 +293,9 @@ export default function TextToSpeech() {
             </form>
 
             {!isDashboard && (
-              <div className="mt-4 sm:mt-6 bg-white/5 border border-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 backdrop-blur-xl">
-                <h3 className="text-xs sm:text-sm font-semibold text-white mb-2">💡 Tips</h3>
-                <ul className="text-xs text-gray-400 space-y-1">
+              <div className="mt-4 sm:mt-6 bg-muted/50 border border-border rounded-xl sm:rounded-2xl p-4 sm:p-6 backdrop-blur-xl">
+                <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-2">💡 Tips</h3>
+                <ul className="text-xs text-muted-foreground space-y-1">
                   <li>• Use punctuation for natural pauses</li>
                   <li>• Different voices suit different content</li>
                   <li>• Cost: ~0.18 credits per 1K characters</li>
@@ -308,9 +308,9 @@ export default function TextToSpeech() {
           {/* Audio Player Section */}
           <div className="lg:col-span-2">
             {generatedAudio ? (
-              <div ref={scrollRef} className="bg-white/10 rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-white/20 backdrop-blur-xl">
+              <div ref={scrollRef} className="bg-muted rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-border backdrop-blur-xl">
                 <div className="flex items-center justify-between mb-4 sm:mb-6">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white">Generated Speech</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-foreground">Generated Speech</h2>
                   <button
                     onClick={downloadAudio}
                     className="px-3 sm:px-4 py-2 sm:py-3 bg-white text-black hover:bg-gray-200 rounded-lg transition flex items-center gap-2 text-sm sm:text-base font-semibold"
@@ -332,8 +332,8 @@ export default function TextToSpeech() {
                 </div>
 
                 {/* Original Text */}
-                <div className="mb-4 bg-white/5 rounded-lg p-4 sm:p-6 backdrop-blur-xl">
-                  <p className="text-gray-300 text-xs sm:text-sm leading-relaxed">
+                <div className="mb-4 bg-muted/50 rounded-lg p-4 sm:p-6 backdrop-blur-xl">
+                  <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
                     {generatedAudio.text}
                   </p>
                 </div>
@@ -341,25 +341,25 @@ export default function TextToSpeech() {
                 {/* Metadata */}
                 <div className="space-y-3 text-xs sm:text-sm">
                   <div>
-                    <span className="text-gray-400">Voice:</span>
-                    <span className="text-white ml-2 capitalize">{generatedAudio.voice}</span>
+                    <span className="text-muted-foreground">Voice:</span>
+                    <span className="text-foreground ml-2 capitalize">{generatedAudio.voice}</span>
                   </div>
                   <div>
-                    <span className="text-gray-400">Characters:</span>
-                    <span className="text-white ml-2">{generatedAudio.characterCount}</span>
+                    <span className="text-muted-foreground">Characters:</span>
+                    <span className="text-foreground ml-2">{generatedAudio.characterCount}</span>
                   </div>
                   <div>
-                    <span className="text-gray-400">Generated:</span>
-                    <span className="text-white ml-2">
+                    <span className="text-muted-foreground">Generated:</span>
+                    <span className="text-foreground ml-2">
                       {new Date(generatedAudio.generatedAt).toLocaleString()}
                     </span>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="bg-white/5 rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-white/20 border-dashed flex flex-col items-center justify-center min-h-[400px] backdrop-blur-xl">
+              <div className="bg-muted/50 rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-border border-dashed flex flex-col items-center justify-center min-h-[400px] backdrop-blur-xl">
                 <div className="text-6xl mb-4">🔊</div>
-                <p className="text-gray-400 text-center text-sm sm:text-base">
+                <p className="text-muted-foreground text-center text-sm sm:text-base">
                   Your generated speech will appear here
                 </p>
               </div>

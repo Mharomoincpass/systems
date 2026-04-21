@@ -138,7 +138,7 @@ export default function ImageGenerator() {
   }
 
   return (
-    <div className={isDashboard ? 'bg-black' : 'min-h-screen bg-black pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16'}>
+    <div className={isDashboard ? 'bg-background' : 'min-h-screen bg-background pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16'}>
       {!isDashboard && (
         <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
       )}
@@ -148,7 +148,7 @@ export default function ImageGenerator() {
           <>
             <button
               onClick={() => router.back()}
-              className="mb-6 sm:mb-8 flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 hover:gap-3"
+              className="mb-6 sm:mb-8 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all duration-300 hover:gap-3"
             >
               <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -157,10 +157,10 @@ export default function ImageGenerator() {
             </button>
 
             <div className="mb-8 sm:mb-12">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4 tracking-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3 sm:mb-4 tracking-tight">
                 AI Image Generator
               </h1>
-              <p className="text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl">
+              <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-2xl">
                 Generate stunning images from text prompts using advanced AI models.
               </p>
             </div>
@@ -178,21 +178,21 @@ export default function ImageGenerator() {
                   placeholder="Describe the image you want to generate..."
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  className="!bg-gray-800 !border-gray-700 !text-white placeholder:text-gray-500"
+                  className="!bg-card !border-gray-700 !text-foreground placeholder:text-gray-500"
                   disabled={isLoading}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Mode</label>
+                <label className="block text-sm font-medium text-muted-foreground mb-2">Mode</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setGenerationMode('text-to-image')}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                       generationMode === 'text-to-image'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-800 text-gray-300 border border-gray-700 hover:border-gray-600'
+                        ? 'bg-blue-600 text-foreground'
+                        : 'bg-card text-muted-foreground border border-gray-700 hover:border-gray-600'
                     }`}
                     disabled={isLoading}
                   >
@@ -206,8 +206,8 @@ export default function ImageGenerator() {
                     }}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                       generationMode === 'image-to-image'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-800 text-gray-300 border border-gray-700 hover:border-gray-600'
+                        ? 'bg-blue-600 text-foreground'
+                        : 'bg-card text-muted-foreground border border-gray-700 hover:border-gray-600'
                     }`}
                     disabled={isLoading}
                   >
@@ -221,7 +221,7 @@ export default function ImageGenerator() {
 
               {generationMode === 'image-to-image' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Reference Image</label>
+                  <label className="block text-sm font-medium text-muted-foreground mb-2">Reference Image</label>
                   <input
                     type="file"
                     accept="image/*"
@@ -239,7 +239,7 @@ export default function ImageGenerator() {
                         setReferenceImagePreview('')
                       }
                     }}
-                    className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-gray-700 file:text-gray-100 hover:file:bg-gray-600"
+                    className="w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-gray-700 file:text-gray-100 hover:file:bg-gray-600"
                   />
                   {referenceImagePreview && (
                     <div className="mt-3 rounded-lg overflow-hidden border border-gray-700 bg-gray-900">
@@ -258,14 +258,14 @@ export default function ImageGenerator() {
 
               {/* Model Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Model
                 </label>
                 <select
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
                   disabled={isLoading}
-                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  className="w-full px-3 py-2 bg-card border border-gray-700 rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                 >
                   {models.map((m) => (
                     <option key={m.id} value={m.id}>
@@ -278,7 +278,7 @@ export default function ImageGenerator() {
 
               {/* Dimensions */}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   Dimensions
                 </label>
                 <div className="grid grid-cols-2 gap-2">
@@ -292,8 +292,8 @@ export default function ImageGenerator() {
                       }}
                       className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                         width === dim.width && height === dim.height
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-800 text-gray-300 border border-gray-700 hover:border-gray-600'
+                          ? 'bg-blue-600 text-foreground'
+                          : 'bg-card text-muted-foreground border border-gray-700 hover:border-gray-600'
                       } disabled:opacity-50`}
                       disabled={isLoading}
                     >
@@ -306,26 +306,26 @@ export default function ImageGenerator() {
               {/* Custom Dimensions */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">
                     Width
                   </label>
                   <Input
                     type="number"
                     value={width}
                     onChange={(e) => setWidth(Math.min(1024, Math.max(256, parseInt(e.target.value))))}
-                    className="!bg-gray-800 !border-gray-700 !text-white"
+                    className="!bg-card !border-gray-700 !text-foreground"
                     disabled={isLoading}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-400 mb-1">
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">
                     Height
                   </label>
                   <Input
                     type="number"
                     value={height}
                     onChange={(e) => setHeight(Math.min(1024, Math.max(256, parseInt(e.target.value))))}
-                    className="!bg-gray-800 !border-gray-700 !text-white"
+                    className="!bg-card !border-gray-700 !text-foreground"
                     disabled={isLoading}
                   />
                 </div>
@@ -353,7 +353,7 @@ export default function ImageGenerator() {
           {/* Generated Image Section */}
           <div className="lg:col-span-2">
             {generatedImage ? (
-              <div ref={scrollRef} className="bg-gray-800 rounded-xl overflow-hidden shadow-2xl">
+              <div ref={scrollRef} className="bg-card rounded-xl overflow-hidden shadow-2xl">
                 <div className="relative w-full bg-gray-900 flex items-center justify-center" style={{ aspectRatio: `${width}/${height}` }}>
                   <Image
                     src={generatedImage.url}
@@ -366,19 +366,19 @@ export default function ImageGenerator() {
                 </div>
                 <div className="p-6 border-t border-gray-700">
                   <div className="mb-4">
-                    <h3 className="text-sm font-semibold text-gray-400 mb-2">Prompt</h3>
-                    <p className="text-white text-sm leading-relaxed">
+                    <h3 className="text-sm font-semibold text-muted-foreground mb-2">Prompt</h3>
+                    <p className="text-foreground text-sm leading-relaxed">
                       {generatedImage.prompt}
                     </p>
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-gray-400 text-xs">Model</p>
-                          <p className="text-white">{generatedImage.model}</p>
+                      <p className="text-muted-foreground text-xs">Model</p>
+                          <p className="text-foreground">{generatedImage.model}</p>
                     </div>
                     <div>
-                      <p className="text-gray-400 text-xs">Dimensions</p>
-                      <p className="text-white">{generatedImage.width}x{generatedImage.height}</p>
+                      <p className="text-muted-foreground text-xs">Dimensions</p>
+                      <p className="text-foreground">{generatedImage.width}x{generatedImage.height}</p>
                     </div>
                   </div>
                   <div className="mt-4 flex gap-2">
@@ -389,7 +389,7 @@ export default function ImageGenerator() {
                         link.download = `image-${generatedImage.id}.png`
                         link.click()
                       }}
-                      className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition"
+                      className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-foreground rounded-lg font-medium transition"
                     >
                       Download
                     </button>
@@ -397,7 +397,7 @@ export default function ImageGenerator() {
                       onClick={() => {
                         navigator.clipboard.writeText(generatedImage.prompt)
                       }}
-                      className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition"
+                      className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-foreground rounded-lg font-medium transition"
                     >
                       Copy Prompt
                     </button>
@@ -405,14 +405,14 @@ export default function ImageGenerator() {
                 </div>
               </div>
             ) : (
-              <div className="bg-gray-800 rounded-xl p-12 flex items-center justify-center min-h-96">
+              <div className="bg-card rounded-xl p-12 flex items-center justify-center min-h-96">
                 <div className="text-center">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-700 flex items-center justify-center">
                     <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
-                  <h3 className="text-gray-300 font-semibold mb-2">
+                  <h3 className="text-muted-foreground font-semibold mb-2">
                     Generated images will appear here
                   </h3>
                   <p className="text-gray-500 text-sm">

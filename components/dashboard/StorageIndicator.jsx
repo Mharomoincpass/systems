@@ -9,11 +9,11 @@ export default function StorageIndicator({ storageUsed = 0, storageLimit = 20971
   if (isAdmin) {
     return (
       <div className="px-4 py-3">
-        <div className="flex items-center justify-between text-xs text-zinc-400 mb-1.5">
+        <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
           <span>Storage</span>
           <span>Unlimited</span>
         </div>
-        <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+        <div className="h-1.5 bg-card rounded-full overflow-hidden">
           <div className="h-full rounded-full bg-white" style={{ width: '100%' }} />
         </div>
       </div>
@@ -22,11 +22,11 @@ export default function StorageIndicator({ storageUsed = 0, storageLimit = 20971
 
   return (
     <div className="px-4 py-3">
-      <div className="flex items-center justify-between text-xs text-zinc-400 mb-1.5">
+      <div className="flex items-center justify-between text-xs text-muted-foreground mb-1.5">
         <span>Storage</span>
         <span>{usedMB} / {limitMB} MB</span>
       </div>
-      <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+      <div className="h-1.5 bg-card rounded-full overflow-hidden">
         <div
           className={`h-full rounded-full ${
             percentage > 90 ? 'bg-red-500' : percentage > 70 ? 'bg-yellow-500' : 'bg-white'

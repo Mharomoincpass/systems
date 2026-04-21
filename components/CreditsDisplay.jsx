@@ -43,12 +43,12 @@ export default function CreditsDisplay() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 border border-white/20">
-        <svg className="w-4 h-4 text-gray-400 animate-spin" viewBox="0 0 24 24">
+      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted border border-border">
+        <svg className="w-4 h-4 text-muted-foreground animate-spin" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
         </svg>
-        <span className="text-xs sm:text-sm text-gray-400">Credits</span>
+        <span className="text-xs sm:text-sm text-muted-foreground">Credits</span>
       </div>
     )
   }
@@ -66,11 +66,11 @@ export default function CreditsDisplay() {
 
   if (balance === null) {
     return (
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 border border-white/20">
-        <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted border border-border">
+        <svg className="w-4 h-4 text-muted-foreground" fill="currentColor" viewBox="0 0 20 20">
           <path d="M8.16 2.75a.75.75 0 0 0-.576 1.248l7.44 8.502a.75.75 0 0 0 1.152-.096l.001-.001 2.377-5.816a.75.75 0 0 0-1.399-.572l-1.889 4.621L7.836 2.902a.75.75 0 0 0-.576-.152z" />
         </svg>
-        <span className="text-xs sm:text-sm text-gray-400">Credits Unavailable</span>
+        <span className="text-xs sm:text-sm text-muted-foreground">Credits Unavailable</span>
       </div>
     )
   }

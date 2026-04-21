@@ -12,7 +12,7 @@ export default function MimirMCPPage() {
             BETA
           </span>
         </div>
-        <p className="text-sm text-zinc-400 mt-1">Configure and monitor your MCP integrations.</p>
+        <p className="text-sm text-muted-foreground mt-1">Configure and monitor your MCP integrations.</p>
       </div>
       <MimirMCP />
     </div>

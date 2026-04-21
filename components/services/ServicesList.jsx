@@ -57,17 +57,17 @@ export default function ServicesList() {
   }, { scope: container })
 
   return (
-    <section ref={container} className="relative py-20 bg-black" aria-label="Our Services">
+    <section ref={container} className="relative py-20 bg-background" aria-label="Our Services">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((service, idx) => (
             <article key={idx} className="service-card h-full" aria-label={service.title}>
-              <div className="h-full p-8 rounded-2xl border border-white/10 bg-zinc-900/50 hover:bg-zinc-900/80 hover:border-white/20 transition-all duration-300 flex flex-col">
-                <h3 className="text-2xl font-bold text-white mb-4">{service.title}</h3>
-                <p className="text-zinc-400 mb-6 flex-grow leading-relaxed">{service.description}</p>
+              <div className="h-full p-8 rounded-2xl border border-border bg-background/50 hover:bg-background/80 hover:border-border transition-all duration-300 flex flex-col">
+                <h3 className="text-2xl font-bold text-foreground mb-4">{service.title}</h3>
+                <p className="text-muted-foreground mb-6 flex-grow leading-relaxed">{service.description}</p>
                 <div className="flex flex-wrap gap-2 mt-auto">
                   {service.tags.map((tag, tIdx) => (
-                    <span key={tIdx} className="px-3 py-1 rounded-full bg-white/5 text-zinc-300 text-xs font-medium border border-white/5">
+                    <span key={tIdx} className="px-3 py-1 rounded-full bg-muted/50 text-foreground text-xs font-medium border border-white/5">
                       {tag}
                     </span>
                   ))}

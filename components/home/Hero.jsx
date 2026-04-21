@@ -68,7 +68,7 @@ export default function Hero() {
   }, { scope: container })
 
   return (
-    <section ref={container} className="relative min-h-screen flex items-center justify-center overflow-x-hidden z-0 bg-black pt-20 sm:pt-24 pb-6 sm:pb-8">
+    <section ref={container} className="relative min-h-screen flex items-center justify-center overflow-x-hidden z-0 bg-background pt-20 sm:pt-24 pb-6 sm:pb-8">
       {/* Dynamic Background */}
       <div ref={bgRef} className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-900/20 to-black z-10" />
@@ -80,14 +80,14 @@ export default function Hero() {
 
       <div ref={textRef} className="relative z-20 text-center px-4 sm:px-6 max-w-6xl mx-auto">
         <div className="overflow-hidden mb-4 sm:mb-6">
-          <h1 className="hero-text-line text-5xl sm:text-6xl lg:text-7xl 2xl:text-8xl font-black tracking-tighter text-white leading-[0.95]">
-            Free AI Tools <span className="block text-zinc-500 mt-2 sm:mt-3 text-[0.88em]">for Chat, Images, Video, Music & Voice</span>
+          <h1 className="hero-text-line text-5xl sm:text-6xl lg:text-7xl 2xl:text-8xl font-black tracking-tighter text-foreground leading-[0.95]">
+            One AI Chatbot <span className="block text-muted-foreground mt-2 sm:mt-3 text-[0.88em]">for Chat, Code, Images, Video, Music & Voice</span>
           </h1>
         </div>
 
-        <div className="hero-subtitle max-w-4xl mx-auto mt-4 sm:mt-6 backdrop-blur-sm bg-white/5 p-5 sm:p-6 rounded-xl border border-white/10">
-          <p className="text-base sm:text-lg lg:text-xl text-zinc-400 font-light tracking-wide mb-5 sm:mb-6">
-            Mharomo Systems provides a complete suite of free AI tools. Generate high-quality images, create videos from text, compose original music, convert text to speech, and transcribe audio. Chat with advanced AI models like OpenAI and Claude without any sign-up required.
+        <div className="hero-subtitle max-w-4xl mx-auto mt-4 sm:mt-6 backdrop-blur-sm bg-muted/50 p-5 sm:p-6 rounded-xl border border-border">
+          <p className="text-base sm:text-lg lg:text-xl text-muted-foreground font-light tracking-wide mb-5 sm:mb-6">
+            This AI chatbot is your all-in-one teammate. Ask anything in plain language, switch between top models, generate visuals, create music, transcribe recordings, and produce natural voice output without juggling separate apps.
           </p>
           <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row justify-center gap-4">
             <button
@@ -95,24 +95,24 @@ export default function Hero() {
               disabled={loading}
               className="inline-flex items-center justify-center px-6 py-3 rounded-full bg-white text-black text-sm font-semibold hover:bg-zinc-200 transition disabled:opacity-50"
             >
-              {loading ? 'Starting...' : 'Try AI Tools'}
+              {loading ? 'Starting...' : 'Start Chatting'}
             </button>
             <Link
               href="#projects"
-              className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-white/20 text-white text-sm font-semibold hover:bg-white hover:text-black transition"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-border text-foreground text-sm font-semibold hover:bg-white hover:text-black transition"
             >
               View Projects
             </Link>
             <Link
-              href="/author"
-              className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-white/20 text-white text-sm font-semibold hover:bg-white hover:text-black transition"
+              href="/systems/documentation"
+              className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-border text-foreground text-sm font-semibold hover:bg-white hover:text-black transition"
             >
-              About Me
+              How It Works
             </Link>
           </div>
           <div className="mt-6 sm:mt-8 flex justify-center gap-6">
             <div className="h-px w-12 bg-white/20"></div>
-            <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 font-semibold">Scroll to Explore</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-semibold">Scroll to Explore</p>
             <div className="h-px w-12 bg-white/20"></div>
           </div>
         </div>

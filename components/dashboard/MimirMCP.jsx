@@ -105,8 +105,8 @@ export default function MimirMCP() {
   return (
     <div className="max-w-4xl space-y-6">
       {/* Description */}
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
-        <p className="text-sm text-zinc-400">
+      <div className="bg-background/50 border border-zinc-800 rounded-xl p-4">
+        <p className="text-sm text-muted-foreground">
           Enter a topic and the MCP agent will autonomously plan, generate images, create video,
           compose music, and produce voiceover &mdash; all in one run. You&apos;ll see the agent&apos;s live
           decision log below.
@@ -114,8 +114,8 @@ export default function MimirMCP() {
       </div>
 
       {/* Single input */}
-      <div className="bg-zinc-900/30 border border-zinc-800 rounded-xl p-6">
-        <label className="block text-sm text-zinc-400 mb-2">What should the reel be about?</label>
+      <div className="bg-background/30 border border-zinc-800 rounded-xl p-6">
+        <label className="block text-sm text-muted-foreground mb-2">What should the reel be about?</label>
         <div className="flex gap-3">
           <input
             type="text"
@@ -124,12 +124,12 @@ export default function MimirMCP() {
             onKeyDown={handleKeyDown}
             disabled={running}
             placeholder="e.g. Morning skincare routine, Gym motivation, AI productivity tips..."
-            className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 disabled:opacity-50"
+            className="flex-1 bg-background border border-zinc-800 rounded-lg px-4 py-2.5 text-sm text-foreground placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 disabled:opacity-50"
           />
           <button
             onClick={startGeneration}
             disabled={running || !topic.trim()}
-            className="px-5 py-2.5 bg-violet-600 hover:bg-violet-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap"
+            className="px-5 py-2.5 bg-violet-600 hover:bg-violet-500 disabled:bg-card disabled:text-zinc-600 text-foreground text-sm font-medium rounded-lg transition-colors whitespace-nowrap"
           >
             {running ? (
               <span className="flex items-center gap-2">
@@ -151,15 +151,15 @@ export default function MimirMCP() {
 
       {/* Live agent log */}
       {log.length > 0 && (
-        <div className="bg-zinc-900/30 border border-zinc-800 rounded-xl p-5">
-          <h2 className="text-sm font-medium text-zinc-300 mb-3 flex items-center gap-2">
+        <div className="bg-background/30 border border-zinc-800 rounded-xl p-5">
+          <h2 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
             <span className="text-base">{'\uD83D\uDCCB'}</span> Agent Activity Log
             {running && <Spinner />}
           </h2>
           <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
             {log.map((entry, i) => {
               const meta = STEP_META[entry.step] || { icon: '\u2699\uFE0F', label: entry.step }
-              const colors = STATUS_COLORS[entry.status] || 'text-zinc-400 border-zinc-800 bg-zinc-900'
+              const colors = STATUS_COLORS[entry.status] || 'text-muted-foreground border-zinc-800 bg-background'
               return (
                 <div
                   key={`${entry.step}-${entry.status}-${i}`}
@@ -205,14 +205,14 @@ export default function MimirMCP() {
           </div>
 
           {assets && (
-            <div className="bg-zinc-900/30 border border-zinc-800 rounded-xl p-6 space-y-6">
-              <h3 className="text-sm font-medium text-white">Generated Assets</h3>
+            <div className="bg-background/30 border border-zinc-800 rounded-xl p-6 space-y-6">
+              <h3 className="text-sm font-medium text-foreground">Generated Assets</h3>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   {assets.video ? (
                     <div>
-                      <p className="text-xs text-zinc-500 mb-2">Video ({assets.video.duration}s, {assets.video.aspectRatio})</p>
+                      <p className="text-xs text-muted-foreground mb-2">Video ({assets.video.duration}s, {assets.video.aspectRatio})</p>
                       <video
                         src={assets.video.url}
                         controls
@@ -221,7 +221,7 @@ export default function MimirMCP() {
                     </div>
                   ) : assets.image ? (
                     <div>
-                      <p className="text-xs text-zinc-500 mb-2">Image ({assets.image.width}{'\u00D7'}{assets.image.height})</p>
+                      <p className="text-xs text-muted-foreground mb-2">Image ({assets.image.width}{'\u00D7'}{assets.image.height})</p>
                       <img
                         src={assets.image.url}
                         alt="Generated visual"
@@ -236,7 +236,7 @@ export default function MimirMCP() {
                 <div className="space-y-4">
                   {assets.music ? (
                     <div>
-                      <p className="text-xs text-zinc-500 mb-2">Background Music ({assets.music.duration}s)</p>
+                      <p className="text-xs text-muted-foreground mb-2">Background Music ({assets.music.duration}s)</p>
                       <audio src={assets.music.url} controls className="w-full" />
                     </div>
                   ) : (
@@ -244,7 +244,7 @@ export default function MimirMCP() {
                   )}
                   {assets.voiceover ? (
                     <div>
-                      <p className="text-xs text-zinc-500 mb-2">
+                      <p className="text-xs text-muted-foreground mb-2">
                         Voiceover ({assets.voiceover.characterCount} chars, {assets.voiceover.voice})
                       </p>
                       <audio src={assets.voiceover.url} controls className="w-full" />
@@ -256,7 +256,7 @@ export default function MimirMCP() {
               </div>
 
               <div className="pt-4 border-t border-zinc-800">
-                <p className="text-xs text-zinc-500 mb-3">
+                <p className="text-xs text-muted-foreground mb-3">
                   Download assets individually and combine in your editor (CapCut, Premiere, etc.)
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -286,7 +286,7 @@ export default function MimirMCP() {
                         a.click()
                         URL.revokeObjectURL(url)
                       }}
-                      className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs rounded-lg transition-colors"
+                      className="px-3 py-1.5 bg-card hover:bg-zinc-700 text-foreground text-xs rounded-lg transition-colors"
                     >
                       {'\uD83D\uDCC4'} Plan JSON
                     </button>
@@ -304,17 +304,17 @@ export default function MimirMCP() {
 function PlanPreview({ plan }) {
   const [collapsed, setCollapsed] = useState(true)
   return (
-    <div className="bg-zinc-900/30 border border-zinc-800 rounded-xl p-4">
+    <div className="bg-background/30 border border-zinc-800 rounded-xl p-4">
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-200 transition-colors w-full"
+        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-zinc-200 transition-colors w-full"
       >
         <span>{'\uD83E\uDDE0'}</span>
         <span className="font-medium">Agent Plan</span>
         <span className="ml-auto text-xs">{collapsed ? 'Show \u25BC' : 'Hide \u25B2'}</span>
       </button>
       {!collapsed && (
-        <div className="mt-3 space-y-2 text-xs text-zinc-400">
+        <div className="mt-3 space-y-2 text-xs text-muted-foreground">
           <PlanField label="Hook" value={plan.hook} />
           <PlanField label="Script" value={plan.script} />
           <PlanField label="Image Prompt" value={plan.imagePrompt} />
@@ -330,15 +330,15 @@ function PlanPreview({ plan }) {
 function PlanField({ label, value }) {
   return (
     <div>
-      <span className="text-zinc-500">{label}:</span>{' '}
-      <span className="text-zinc-300">{value}</span>
+      <span className="text-muted-foreground">{label}:</span>{' '}
+      <span className="text-foreground">{value}</span>
     </div>
   )
 }
 
 function EmptyCard({ text }) {
   return (
-    <div className="flex items-center justify-center h-20 bg-zinc-900 rounded-lg border border-zinc-800">
+    <div className="flex items-center justify-center h-20 bg-background rounded-lg border border-zinc-800">
       <p className="text-xs text-zinc-600">{text}</p>
     </div>
   )
@@ -354,7 +354,7 @@ function DownloadBtn({ label, url, filename }) {
         a.click()
         a.remove()
       }}
-      className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs rounded-lg transition-colors"
+      className="px-3 py-1.5 bg-card hover:bg-zinc-700 text-foreground text-xs rounded-lg transition-colors"
     >
       {'\u2B07\uFE0F'} {label}
     </button>

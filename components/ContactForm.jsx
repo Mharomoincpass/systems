@@ -49,20 +49,20 @@ export default function ContactForm() {
   }
 
   return (
-    <section className="py-20 bg-black relative overflow-hidden" id="contact-form">
+    <section className="py-20 bg-background relative overflow-hidden" id="contact-form">
       <div className="max-w-3xl mx-auto px-6 relative z-10">
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-4 uppercase tracking-tighter">
-            Contact <span className="text-zinc-500">Us</span>
+          <h2 className="text-4xl md:text-5xl font-black text-foreground mb-4 uppercase tracking-tighter">
+            Contact <span className="text-muted-foreground">Us</span>
           </h2>
-          <p className="text-zinc-400">Tell us about what you want to build and we will get back to you.</p>
+          <p className="text-muted-foreground">Tell us about what you want to build and we will get back to you.</p>
         </div>
 
         <div className="w-full">
-          <form onSubmit={handleSubmit} className="bg-zinc-900/50 border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
+          <form onSubmit={handleSubmit} className="bg-background/50 border border-border rounded-2xl p-8 backdrop-blur-sm">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
-                <label className="block text-zinc-400 text-sm font-medium mb-2" htmlFor="name">Name</label>
+                <label className="block text-muted-foreground text-sm font-medium mb-2" htmlFor="name">Name</label>
                 <input
                   type="text"
                   id="name"
@@ -70,12 +70,12 @@ export default function ContactForm() {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white/30 transition-colors"
+                  className="w-full bg-background/50 border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-white/30 transition-colors"
                   placeholder="Your Name"
                 />
               </div>
               <div>
-                <label className="block text-zinc-400 text-sm font-medium mb-2" htmlFor="email">Email</label>
+                <label className="block text-muted-foreground text-sm font-medium mb-2" htmlFor="email">Email</label>
                 <input
                   type="email"
                   id="email"
@@ -83,7 +83,7 @@ export default function ContactForm() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white/30 transition-colors"
+                  className="w-full bg-background/50 border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-white/30 transition-colors"
                   placeholder="john@example.com"
                 />
               </div>
@@ -91,7 +91,7 @@ export default function ContactForm() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
-                <label className="block text-zinc-400 text-sm font-medium mb-2" htmlFor="phone">Phone Number</label>
+                <label className="block text-muted-foreground text-sm font-medium mb-2" htmlFor="phone">Phone Number</label>
                 <input
                   type="tel"
                   id="phone"
@@ -99,28 +99,28 @@ export default function ContactForm() {
                   value={formData.phone}
                   onChange={handleChange}
                   required
-                  className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white/30 transition-colors"
+                  className="w-full bg-background/50 border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-white/30 transition-colors"
                   placeholder="+1 (555) 000-0000"
                 />
               </div>
               <div>
-                <label className="block text-zinc-400 text-sm font-medium mb-2" htmlFor="serviceType">Service Type</label>
+                <label className="block text-muted-foreground text-sm font-medium mb-2" htmlFor="serviceType">Service Type</label>
                 <select
                   id="serviceType"
                   name="serviceType"
                   value={formData.serviceType}
                   onChange={handleChange}
-                  className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white/30 transition-colors appearance-none"
+                  className="w-full bg-background/50 border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-white/30 transition-colors appearance-none"
                 >
                   {services.map((s) => (
-                    <option key={s} value={s} className="bg-zinc-900">{s}</option>
+                    <option key={s} value={s} className="bg-background">{s}</option>
                   ))}
                 </select>
               </div>
             </div>
 
             <div className="mb-8">
-              <label className="block text-zinc-400 text-sm font-medium mb-2" htmlFor="message">Project Details</label>
+              <label className="block text-muted-foreground text-sm font-medium mb-2" htmlFor="message">Project Details</label>
               <textarea
                 id="message"
                 name="message"
@@ -128,7 +128,7 @@ export default function ContactForm() {
                 onChange={handleChange}
                 required
                 rows="4"
-                className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-white/30 transition-colors resize-none"
+                className="w-full bg-background/50 border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-white/30 transition-colors resize-none"
                 placeholder="Describe your project goals, timeline, and requirements..."
               ></textarea>
             </div>

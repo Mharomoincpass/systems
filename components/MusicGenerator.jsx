@@ -110,7 +110,7 @@ export default function MusicGenerator() {
   }
 
   return (
-    <div className={isDashboard ? 'bg-black' : 'min-h-screen bg-black pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16'}>
+    <div className={isDashboard ? 'bg-background' : 'min-h-screen bg-background pt-20 sm:pt-24 md:pt-32 pb-12 sm:pb-16'}>
       {!isDashboard && (
         <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
       )}
@@ -120,7 +120,7 @@ export default function MusicGenerator() {
           <>
             <button
               onClick={() => router.back()}
-              className="mb-6 sm:mb-8 flex items-center gap-2 text-gray-400 hover:text-white transition-all duration-300 hover:gap-3"
+              className="mb-6 sm:mb-8 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all duration-300 hover:gap-3"
             >
               <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -129,10 +129,10 @@ export default function MusicGenerator() {
             </button>
 
             <div className="mb-8 sm:mb-12">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4 tracking-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3 sm:mb-4 tracking-tight">
                 AI Music Generator
               </h1>
-              <p className="text-gray-400 text-sm sm:text-base md:text-lg max-w-2xl">
+              <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-2xl">
                 Create custom music tracks using AI. Describe the style, mood, and instruments you want.
               </p>
             </div>
@@ -150,7 +150,7 @@ export default function MusicGenerator() {
                   placeholder="e.g., upbeat electronic dance music..."
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  className="!bg-white/10 !border-white/20 !text-white placeholder:text-gray-500"
+                  className="!bg-muted !border-border !text-foreground placeholder:text-gray-500"
                   disabled={isLoading}
                   required
                 />
@@ -159,7 +159,7 @@ export default function MusicGenerator() {
 
               {/* Example Prompts */}
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs sm:text-sm font-medium text-muted-foreground mb-2">
                   Examples
                 </label>
                 <div className="space-y-2">
@@ -169,7 +169,7 @@ export default function MusicGenerator() {
                       type="button"
                       onClick={() => handleUseExample(example)}
                       disabled={isLoading}
-                      className="w-full text-left px-3 sm:px-4 py-2 sm:py-3 bg-white/10 hover:bg-white/15 text-gray-300 text-xs sm:text-sm rounded-lg transition disabled:opacity-50"
+                      className="w-full text-left px-3 sm:px-4 py-2 sm:py-3 bg-muted hover:bg-white/15 text-muted-foreground text-xs sm:text-sm rounded-lg transition disabled:opacity-50"
                     >
                       {example}
                     </button>
@@ -179,7 +179,7 @@ export default function MusicGenerator() {
 
               {/* Duration Slider */}
               <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-xs sm:text-sm font-medium text-muted-foreground mb-2">
                   Duration: {duration}s
                 </label>
                 <input
@@ -200,19 +200,19 @@ export default function MusicGenerator() {
 
               {/* Error Message */}
               {error && (
-                <div className="bg-white/5 border border-red-500/30 rounded-lg p-3">
+                <div className="bg-muted/50 border border-red-500/30 rounded-lg p-3">
                   <p className="text-red-400 text-xs sm:text-sm">{error}</p>
                 </div>
               )}
 
               {/* Progress Bar */}
               {isLoading && progress > 0 && (
-                <div className="bg-white/5 border border-white/10 rounded-lg p-3 sm:p-4">
+                <div className="bg-muted/50 border border-border rounded-lg p-3 sm:p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs sm:text-sm text-gray-300">Generating...</p>
-                    <p className="text-xs sm:text-sm text-gray-400">{progress}%</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">Generating...</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{progress}%</p>
                   </div>
-                  <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
                     <div
                       className="h-full bg-white transition-all duration-300"
                       style={{ width: `${progress}%` }}
@@ -232,9 +232,9 @@ export default function MusicGenerator() {
             </form>
 
             {!isDashboard && (
-              <div className="mt-4 sm:mt-6 bg-white/5 border border-white/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 backdrop-blur-xl">
-                <h3 className="text-xs sm:text-sm font-semibold text-white mb-2">💡 Tips</h3>
-                <ul className="text-xs text-gray-400 space-y-1">
+              <div className="mt-4 sm:mt-6 bg-muted/50 border border-border rounded-xl sm:rounded-2xl p-4 sm:p-6 backdrop-blur-xl">
+                <h3 className="text-xs sm:text-sm font-semibold text-foreground mb-2">💡 Tips</h3>
+                <ul className="text-xs text-muted-foreground space-y-1">
                   <li>• Be specific about instruments and style</li>
                   <li>• Include mood and tempo descriptors</li>
                   <li>• Longer durations take more time to generate</li>
@@ -247,9 +247,9 @@ export default function MusicGenerator() {
           {/* Audio Player Section */}
           <div className="lg:col-span-2">
             {generatedAudio ? (
-              <div ref={scrollRef} className="bg-white/10 rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-white/20 backdrop-blur-xl">
+              <div ref={scrollRef} className="bg-muted rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-border backdrop-blur-xl">
                 <div className="flex items-center justify-between mb-4 sm:mb-6">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white">Generated Music</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-foreground">Generated Music</h2>
                   <button
                     onClick={downloadAudio}
                     className="px-3 sm:px-4 py-2 sm:py-3 bg-white text-black hover:bg-gray-200 rounded-lg transition flex items-center gap-2 text-sm sm:text-base font-semibold"
@@ -272,25 +272,25 @@ export default function MusicGenerator() {
                 {/* Metadata */}
                 <div className="space-y-3 text-xs sm:text-sm">
                   <div>
-                    <span className="text-gray-400">Prompt:</span>
-                    <p className="text-white mt-1">{generatedAudio.prompt}</p>
+                    <span className="text-muted-foreground">Prompt:</span>
+                    <p className="text-foreground mt-1">{generatedAudio.prompt}</p>
                   </div>
                   <div>
-                    <span className="text-gray-400">Duration:</span>
-                    <span className="text-white ml-2">{generatedAudio.duration}s</span>
+                    <span className="text-muted-foreground">Duration:</span>
+                    <span className="text-foreground ml-2">{generatedAudio.duration}s</span>
                   </div>
                   <div>
-                    <span className="text-gray-400">Generated:</span>
-                    <span className="text-white ml-2">
+                    <span className="text-muted-foreground">Generated:</span>
+                    <span className="text-foreground ml-2">
                       {new Date(generatedAudio.generatedAt).toLocaleString()}
                     </span>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="bg-white/5 rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-white/20 border-dashed flex flex-col items-center justify-center min-h-[400px] backdrop-blur-xl">
+              <div className="bg-muted/50 rounded-xl sm:rounded-2xl p-6 sm:p-8 border border-border border-dashed flex flex-col items-center justify-center min-h-[400px] backdrop-blur-xl">
                 <div className="text-6xl mb-4">🎵</div>
-                <p className="text-gray-400 text-center text-sm sm:text-base">
+                <p className="text-muted-foreground text-center text-sm sm:text-base">
                   Your generated music will appear here
                 </p>
               </div>

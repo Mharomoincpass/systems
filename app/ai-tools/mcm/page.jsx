@@ -121,13 +121,13 @@ export default function MultiChatModelsPage() {
         </section>
 
         <section className="mt-10 flex flex-col sm:flex-row gap-3">
-          <Link href="/dashboard/chat" className="px-5 py-2 rounded-lg bg-black text-white text-sm font-semibold hover:scale-105 hover:shadow-xl hover:shadow-black/20 transition-all duration-300 ease-out">
+          <Link href="/dashboard/chat" className="px-5 py-2 rounded-lg bg-background text-foreground text-sm font-semibold hover:scale-105 hover:shadow-xl hover:shadow-black/20 transition-all duration-300 ease-out">
             Try the tool
           </Link>
-          <Link href="/blogs" className="px-5 py-2 rounded-lg border border-zinc-300 text-black text-sm font-semibold hover:bg-black hover:text-white hover:scale-105 transition-all duration-300 ease-out">
+          <Link href="/blogs" className="px-5 py-2 rounded-lg border border-zinc-300 text-black text-sm font-semibold hover:bg-background hover:text-foreground hover:scale-105 transition-all duration-300 ease-out">
             Read the blog
           </Link>
-          <Link href="/systems/documentation/mcm" className="px-5 py-2 rounded-lg border border-zinc-300 text-black text-sm font-semibold hover:bg-black hover:text-white hover:scale-105 transition-all duration-300 ease-out">
+          <Link href="/systems/documentation/mcm" className="px-5 py-2 rounded-lg border border-zinc-300 text-black text-sm font-semibold hover:bg-background hover:text-foreground hover:scale-105 transition-all duration-300 ease-out">
             View documentation
           </Link>
         </section>

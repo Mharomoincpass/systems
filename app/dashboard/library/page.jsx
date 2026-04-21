@@ -99,7 +99,7 @@ export default function LibraryPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Library</h1>
-        <p className="text-sm text-zinc-400 mt-1">Browse, filter, and manage your generated media.</p>
+        <p className="text-sm text-muted-foreground mt-1">Browse, filter, and manage your generated media.</p>
       </div>
 
       {/* Filters */}
@@ -111,7 +111,7 @@ export default function LibraryPage() {
             className={`px-3 py-1.5 text-xs rounded-lg border transition-colors ${
               type === f
                 ? 'bg-white text-black border-white'
-                : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:border-zinc-600'
+                : 'bg-background text-muted-foreground border-zinc-800 hover:border-zinc-600'
             }`}
           >
             {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -124,8 +124,8 @@ export default function LibraryPage() {
           <div className="w-5 h-5 border-2 border-zinc-700 border-t-white rounded-full animate-spin" />
         </div>
       ) : media.length === 0 ? (
-        <div className="text-center py-16 bg-zinc-900/40 border border-zinc-800 rounded-xl">
-          <p className="text-zinc-500 text-sm">No media found</p>
+        <div className="text-center py-16 bg-background/40 border border-zinc-800 rounded-xl">
+          <p className="text-muted-foreground text-sm">No media found</p>
           <p className="text-zinc-600 text-xs mt-1">Generated content will appear here</p>
         </div>
       ) : (
@@ -133,10 +133,10 @@ export default function LibraryPage() {
           {media.map((item) => (
             <article
               key={item._id}
-              className="bg-zinc-900/70 border border-zinc-800 rounded-xl overflow-hidden"
+              className="bg-background/70 border border-zinc-800 rounded-xl overflow-hidden"
             >
               {item.type === 'image' && item.blobUrl && (
-                <div className="bg-zinc-950">
+                <div className="bg-background">
                   <img
                     src={item.blobUrl}
                     alt={item.prompt || 'Generated image'}
@@ -147,7 +147,7 @@ export default function LibraryPage() {
               )}
 
               {item.type === 'video' && item.blobUrl && (
-                <div className="bg-zinc-950 relative">
+                <div className="bg-background relative">
                   {activeVideos[item._id] ? (
                     <video
                       src={item.blobUrl}
@@ -159,11 +159,11 @@ export default function LibraryPage() {
                   ) : (
                     <div
                       onClick={() => handlePlayVideo(item._id)}
-                      className="w-full aspect-video bg-zinc-900 flex items-center justify-center cursor-pointer group hover:bg-zinc-800 transition-colors"
+                      className="w-full aspect-video bg-background flex items-center justify-center cursor-pointer group hover:bg-card transition-colors"
                       title="Play video"
                     >
-                      <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 transition-colors shadow-sm">
-                        <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center group-hover:bg-white/20 transition-colors shadow-sm">
+                        <svg className="w-6 h-6 text-foreground ml-1" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M8 5v14l11-7z" />
                         </svg>
                       </div>
@@ -173,25 +173,25 @@ export default function LibraryPage() {
               )}
 
               {item.type === 'audio' && item.blobUrl && (
-                <div className="p-4 bg-zinc-950">
+                <div className="p-4 bg-background">
                   <audio src={item.blobUrl} controls preload="none" className="w-full" />
                 </div>
               )}
 
               <div className="p-4">
-                <p className="text-sm text-white line-clamp-2 mb-3">{item.prompt || item.type}</p>
+                <p className="text-sm text-foreground line-clamp-2 mb-3">{item.prompt || item.type}</p>
 
                 <div className="flex items-center gap-2 flex-wrap mb-3">
-                  <span className="text-[10px] px-2 py-0.5 rounded border border-zinc-700 text-zinc-400 uppercase">
+                  <span className="text-[10px] px-2 py-0.5 rounded border border-zinc-700 text-muted-foreground uppercase">
                     {item.type}
                   </span>
                   {item.userId?.email && (
-                    <span className="text-[10px] px-2 py-0.5 rounded border border-zinc-700 text-zinc-500">
+                    <span className="text-[10px] px-2 py-0.5 rounded border border-zinc-700 text-muted-foreground">
                       {item.userId.email}
                     </span>
                   )}
                   {getRatioLabel(item) && (
-                    <span className="text-[10px] px-2 py-0.5 rounded border border-zinc-700 text-zinc-500">
+                    <span className="text-[10px] px-2 py-0.5 rounded border border-zinc-700 text-muted-foreground">
                       {getRatioLabel(item)}
                     </span>
                   )}
@@ -206,7 +206,7 @@ export default function LibraryPage() {
                         href={item.blobUrl}
                         download
                         rel="noopener noreferrer"
-                        className="text-xs px-2.5 py-1 rounded border border-zinc-700 text-zinc-400 hover:text-blue-300 hover:border-blue-400/50"
+                        className="text-xs px-2.5 py-1 rounded border border-zinc-700 text-muted-foreground hover:text-blue-300 hover:border-blue-400/50"
                       >
                         Download
                       </a>
@@ -214,7 +214,7 @@ export default function LibraryPage() {
                     <button
                       onClick={() => handleDelete(item._id)}
                       disabled={deleting === item._id}
-                      className="text-xs px-2.5 py-1 rounded border border-zinc-700 text-zinc-400 hover:text-red-300 hover:border-red-400/50 disabled:opacity-50"
+                      className="text-xs px-2.5 py-1 rounded border border-zinc-700 text-muted-foreground hover:text-red-300 hover:border-red-400/50 disabled:opacity-50"
                     >
                       {deleting === item._id ? 'Deleting...' : 'Delete'}
                     </button>
@@ -231,7 +231,7 @@ export default function LibraryPage() {
           <button
             onClick={handleLoadMore}
             disabled={loadingMore}
-            className="px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white text-sm rounded-lg transition-colors disabled:opacity-50"
+            className="px-6 py-2 bg-card hover:bg-zinc-700 text-foreground text-sm rounded-lg transition-colors disabled:opacity-50"
           >
             {loadingMore ? 'Loading...' : 'Load More'}
           </button>

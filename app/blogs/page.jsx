@@ -87,7 +87,7 @@ export default function BlogsPage() {
               <div className="py-4 hover:bg-zinc-50 px-2 rounded transition-colors">
                 <div className="flex items-center justify-between gap-4">
                   <h2 className="text-base sm:text-lg font-medium">{post.title}</h2>
-                  <span className="text-xs text-zinc-500 whitespace-nowrap">{post.date}</span>
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">{post.date}</span>
                 </div>
                 <p className="text-sm text-zinc-600 mt-2">{post.excerpt}</p>
               </div>

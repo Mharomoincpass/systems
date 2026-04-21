@@ -93,7 +93,7 @@ export default function AuthorPage() {
           <div>
             <h1 className="text-3xl sm:text-4xl font-bold">Mharomo Ezung</h1>
             <p className="text-sm text-zinc-600 mt-2">Software Developer</p>
-            <p className="text-xs text-zinc-500 mt-1">Delhi, India</p>
+            <p className="text-xs text-muted-foreground mt-1">Delhi, India</p>
             <EmailLink email="mharomolotha6@gmail.com" className="underline hover:text-black text-sm">
               mharomolotha6@gmail.com
             </EmailLink>
@@ -140,7 +140,7 @@ export default function AuthorPage() {
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-semibold text-black">Tech Lead, Grocliq - Gurugram, IN</h3>
-              <p className="text-xs text-zinc-500 mt-1">Jan 2025 - Present</p>
+              <p className="text-xs text-muted-foreground mt-1">Jan 2025 - Present</p>
               <ul className="list-disc list-inside space-y-2 mt-3">
                 <li>Leading a team to design and deliver scalable web applications using Node.js and React.js.</li>
                 <li>Developed ML microservices using Python, Hugging Face models, and NLP toolkits.</li>
@@ -151,7 +151,7 @@ export default function AuthorPage() {
             </div>
             <div>
               <h3 className="text-lg font-semibold text-black">Software Developer, OnDemand International LLP - Gurgaon, IN</h3>
-              <p className="text-xs text-zinc-500 mt-1">Aug 2024 - Dec 2024</p>
+              <p className="text-xs text-muted-foreground mt-1">Aug 2024 - Dec 2024</p>
               <ul className="list-disc list-inside space-y-2 mt-3">
                 <li>Maintained and enhanced CodeIgniter 3 systems optimized for E2E integration.</li>
                 <li>Designed and implemented new modules to boost system scalability.</li>

@@ -43,43 +43,43 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 border border-white/20 flex items-center justify-center bg-black">
-              <span className="text-white text-sm font-bold">M</span>
+            <div className="w-8 h-8 border border-border flex items-center justify-center bg-background">
+              <span className="text-foreground text-sm font-bold">M</span>
             </div>
-            <span className="text-white font-bold text-lg tracking-tight">
+            <span className="text-foreground font-bold text-lg tracking-tight">
               Mharomo<span className="text-zinc-600 text-xs">.systems</span>
             </span>
           </Link>
-          <h1 className="text-xl font-semibold text-white">Sign in to your account</h1>
+          <h1 className="text-xl font-semibold text-foreground">Sign in to your account</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1.5">Email</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={loading}
-              className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-zinc-600 disabled:opacity-50"
+              className="w-full px-3 py-2.5 bg-background border border-zinc-800 rounded-lg text-foreground text-sm focus:outline-none focus:border-zinc-600 disabled:opacity-50"
               placeholder="you@example.com"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-zinc-400 mb-1.5">Password</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={loading}
-              className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-zinc-600 disabled:opacity-50"
+              className="w-full px-3 py-2.5 bg-background border border-zinc-800 rounded-lg text-foreground text-sm focus:outline-none focus:border-zinc-600 disabled:opacity-50"
               placeholder="••••••"
             />
           </div>
@@ -100,12 +100,12 @@ function LoginForm() {
         </form>
 
         <div className="mt-4 text-center space-y-2">
-          <Link href="/forgot-password" className="block text-xs text-zinc-500 hover:text-white">
+          <Link href="/forgot-password" className="block text-xs text-muted-foreground hover:text-foreground">
             Forgot password?
           </Link>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-muted-foreground">
             Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-white hover:underline">
+            <Link href="/signup" className="text-foreground hover:underline">
               Sign up
             </Link>
           </p>
@@ -117,7 +117,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+    <Suspense fallback={<div className="min-h-screen bg-background" />}>
       <LoginForm />
     </Suspense>
   )

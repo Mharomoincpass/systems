@@ -234,7 +234,7 @@ export default function AIToolsPage() {
               >
                 <h3 className="text-lg font-semibold">{tool.title}</h3>
                 <p className="text-sm text-zinc-600 mt-2">{tool.desc}</p>
-                <div className="text-xs text-zinc-500 mt-3">Learn more</div>
+                <div className="text-xs text-muted-foreground mt-3">Learn more</div>
               </Link>
             ))}
           </div>

@@ -110,17 +110,17 @@ export default function ImagesDocPage() {
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Best Practices</h2>
           <ul className="space-y-2 text-gray-700">
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span><strong>Start with FLUX:</strong> Free, fast model - good for testing prompts</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span><strong>Iterate:</strong> Try variations and adjust prompts based on results</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span><strong>Compare Models:</strong> Use same prompt across models to find best fit</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span><strong>Edit Results:</strong> Use image editors to refine generated images</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span><strong>Start with FLUX:</strong> Free, fast model - good for testing prompts</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span><strong>Iterate:</strong> Try variations and adjust prompts based on results</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span><strong>Compare Models:</strong> Use same prompt across models to find best fit</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span><strong>Edit Results:</strong> Use image editors to refine generated images</span></li>
           </ul>
         </section>
 
         <section className="bg-blue-50 border border-blue-200 rounded-lg p-8 text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">Create Your First Image</h2>
           <p className="text-gray-700 mb-6">Turn your ideas into stunning visuals.</p>
-          <button onClick={() => router.push('/images')} className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
+          <button onClick={() => router.push('/images')} className="inline-block px-6 py-3 bg-blue-600 text-foreground font-semibold rounded-lg hover:bg-blue-700 transition">
             Launch Image Generator
           </button>
         </section>

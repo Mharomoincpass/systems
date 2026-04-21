@@ -102,28 +102,28 @@ export default function TTSDocPage() {
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-4">Limitations</h2>
           <ul className="space-y-2 text-gray-700">
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>5,000 character limit per generation</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Complex pronunciations may need manual correction</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Limited control over emphasis and emotion</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Processing time varies with text length</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Technical terms may need clarification</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span>5,000 character limit per generation</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span>Complex pronunciations may need manual correction</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span>Limited control over emphasis and emotion</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span>Processing time varies with text length</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span>Technical terms may need clarification</span></li>
           </ul>
         </section>
 
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-4">Pro Tips</h2>
           <ul className="space-y-2 text-gray-700">
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Use SSML markup for advanced control over speech</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Add emphasis with punctuation: !!!, ...</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Use parentheses for asides or stage directions</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Break scripts into natural speaking sections</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span>Use SSML markup for advanced control over speech</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span>Add emphasis with punctuation: !!!, ...</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span>Use parentheses for asides or stage directions</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span>Break scripts into natural speaking sections</span></li>
           </ul>
         </section>
 
         <section className="bg-blue-50 border border-blue-200 rounded-lg p-8 text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">Generate Your Voice Now</h2>
           <p className="text-gray-700 mb-6">Turn text into natural-sounding audio.</p>
-          <button onClick={() => router.push('/tts')} className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
+          <button onClick={() => router.push('/tts')} className="inline-block px-6 py-3 bg-blue-600 text-foreground font-semibold rounded-lg hover:bg-blue-700 transition">
             Launch Text-to-Speech
           </button>
         </section>

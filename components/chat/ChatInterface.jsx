@@ -585,12 +585,12 @@ export default function ChatInterface({ conversationId, allowMediaGeneration = f
 
   if (isLoading) {
     return (
-      <div className="absolute inset-0 flex items-center justify-center bg-black text-white z-20">
+      <div className="absolute inset-0 flex items-center justify-center bg-background text-foreground z-20">
         {!isDashboard && <div className="fixed inset-0 pointer-events-none opacity-[0.05] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>}
         
         <div className="relative z-10 flex flex-col items-center gap-3">
-          <svg className="animate-spin h-5 w-5 sm:h-6 sm:w-6 text-white" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-          <p className="text-xs sm:text-sm text-gray-400">Loading chat...</p>
+          <svg className="animate-spin h-5 w-5 sm:h-6 sm:w-6 text-foreground" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+          <p className="text-xs sm:text-sm text-muted-foreground">Loading chat...</p>
         </div>
       </div>
     )
@@ -599,16 +599,16 @@ export default function ChatInterface({ conversationId, allowMediaGeneration = f
   return (
     <div
       ref={containerRef}
-      className={`h-full w-full flex flex-col bg-black text-white font-sans overflow-hidden relative`}
+      className={`h-full w-full flex flex-col bg-background text-foreground font-sans overflow-hidden relative`}
     >
       {!isDashboard && <div className="absolute inset-0 pointer-events-none opacity-[0.05] z-0 mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>}
       
       {/* Header */}
-      <div className="shrink-0 bg-black/50 backdrop-blur-xl border-b border-white/10 z-10">
+      <div className="shrink-0 bg-background/50 backdrop-blur-xl border-b border-border z-10">
         <div className="max-w-4xl mx-auto w-full flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center gap-2 sm:gap-3 hidden lg:flex">
-            <Link href="/" className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg sm:rounded-xl bg-white/10 border border-white/20 hover:border-white/30 transition">
-              <span className="font-bold text-white text-xs">M</span>
+            <Link href="/" className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg sm:rounded-xl bg-muted border border-border hover:border-white/30 transition">
+              <span className="font-bold text-foreground text-xs">M</span>
             </Link>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-green-400" />
@@ -619,17 +619,17 @@ export default function ChatInterface({ conversationId, allowMediaGeneration = f
             <select
               value={selectedModel}
               onChange={(e) => setSelectedModel(e.target.value)}
-              className="block px-2 py-1.5 text-xs font-medium bg-white/10 text-white border border-white/20 rounded-lg hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
+              className="block px-2 py-1.5 text-xs font-medium bg-muted text-foreground border border-border rounded-lg hover:bg-white/15 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all"
             >
               {models.map((model) => (
-                <option key={model.id} value={model.id} className="bg-black">
+                <option key={model.id} value={model.id} className="bg-background">
                   {model.name}
                 </option>
               ))}
             </select>
             <button
               onClick={() => window.location.reload()}
-              className="px-3 py-1.5 text-xs sm:text-sm font-medium text-white bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg sm:rounded-xl hover:bg-white/15 hover:border-white/30 hover:scale-105 active:scale-95 transition-all duration-300"
+              className="px-3 py-1.5 text-xs sm:text-sm font-medium text-foreground bg-muted backdrop-blur-sm border border-border rounded-lg sm:rounded-xl hover:bg-white/15 hover:border-white/30 hover:scale-105 active:scale-95 transition-all duration-300"
             >
               New Chat
             </button>
@@ -650,7 +650,7 @@ export default function ChatInterface({ conversationId, allowMediaGeneration = f
                 🤖
               </div>
               <h3 className="text-lg font-bold text-gray-200 mb-2">Welcome to Multi Chat Models</h3>
-              <p className="text-sm text-gray-400 max-w-[280px]">
+              <p className="text-sm text-muted-foreground max-w-[280px]">
                 Your AI assistant that can chat, generate images, videos, music, and more. Just ask!
               </p>
               
@@ -659,10 +659,10 @@ export default function ChatInterface({ conversationId, allowMediaGeneration = f
                   <button
                     key={idx}
                     onClick={() => handleSend(null, suggestion.text)}
-                    className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 transition-all text-left group"
+                    className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 hover:bg-muted border border-white/5 hover:border-border transition-all text-left group"
                   >
                     <span className="text-xl group-hover:scale-110 transition-transform">{suggestion.icon}</span>
-                    <span className="text-sm text-gray-300">{suggestion.text}</span>
+                    <span className="text-sm text-muted-foreground">{suggestion.text}</span>
                   </button>
                 ))}
               </div>
@@ -677,8 +677,8 @@ export default function ChatInterface({ conversationId, allowMediaGeneration = f
                   onClick={() => copy(msg.content)}
                   className={`max-w-[88%] px-4 py-3 rounded-2xl text-[15px] leading-relaxed break-words whitespace-pre-wrap transition-all duration-300 ${
                     msg.role === 'user'
-                      ? 'bg-zinc-800 text-white rounded-tr-sm'
-                      : 'bg-zinc-900 text-gray-200 border border-zinc-800 rounded-tl-sm'
+                      ? 'bg-card text-foreground rounded-tr-sm'
+                      : 'bg-background text-gray-200 border border-zinc-800 rounded-tl-sm'
                   }`}
                 >
                   {(msg.role === 'assistant' ? sanitizeAssistantText(msg.content) : msg.content) || (
@@ -689,7 +689,7 @@ export default function ChatInterface({ conversationId, allowMediaGeneration = f
                           <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.16s]" />
                           <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" />
                         </div>
-                        <span className="text-xs text-gray-400 font-medium">Multi Chat Models is thinking...</span>
+                        <span className="text-xs text-muted-foreground font-medium">Multi Chat Models is thinking...</span>
                       </div>
                     )
                   )}
@@ -702,14 +702,14 @@ export default function ChatInterface({ conversationId, allowMediaGeneration = f
           )}
           {isStreaming && (
             <div className="flex justify-start">
-              <div className="max-w-[88%] px-4 py-3 rounded-2xl text-[15px] leading-relaxed break-words whitespace-pre-wrap bg-white/5 text-gray-200 border border-white/10 backdrop-blur-sm rounded-tl-sm">
+              <div className="max-w-[88%] px-4 py-3 rounded-2xl text-[15px] leading-relaxed break-words whitespace-pre-wrap bg-muted/50 text-gray-200 border border-border backdrop-blur-sm rounded-tl-sm">
                 <div className="flex items-center gap-2 py-1">
                   <div className="flex gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.32s]" />
                     <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.16s]" />
                     <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" />
                   </div>
-                  <span className="text-xs text-gray-400 font-medium">Multi Chat Models is thinking...</span>
+                  <span className="text-xs text-muted-foreground font-medium">Multi Chat Models is thinking...</span>
                 </div>
               </div>
             </div>
@@ -728,30 +728,30 @@ export default function ChatInterface({ conversationId, allowMediaGeneration = f
       )}
 
       {/* Input */}
-      <div className="shrink-0 p-3 sm:p-4 bg-black/50 backdrop-blur-xl border-t border-white/10 pb-[max(12px,env(safe-area-inset-bottom))]">
+      <div className="shrink-0 p-3 sm:p-4 bg-background/50 backdrop-blur-xl border-t border-border pb-[max(12px,env(safe-area-inset-bottom))]">
         <div className="max-w-3xl mx-auto w-full flex flex-col gap-2">
           
           {/* Image Previews */}
           {(attachments.length > 0 || audioAttachments.length > 0) && (
             <div className="flex gap-2 px-2 overflow-x-auto pb-1">
               {attachments.map((url, i) => (
-                <div key={i} className="relative w-16 h-16 shrink-0 rounded-lg border border-zinc-700 bg-zinc-900 overflow-hidden">
+                <div key={i} className="relative w-16 h-16 shrink-0 rounded-lg border border-zinc-700 bg-background overflow-hidden">
                   <img src={url} alt="upload" className="w-full h-full object-cover" />
-                  <button onClick={() => removeAttachment(i)} className="absolute top-1 right-1 w-5 h-5 bg-black/70 rounded-full flex items-center justify-center text-white hover:bg-red-500 transition-colors">
+                  <button onClick={() => removeAttachment(i)} className="absolute top-1 right-1 w-5 h-5 bg-background/70 rounded-full flex items-center justify-center text-foreground hover:bg-red-500 transition-colors">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
                   </button>
                 </div>
               ))}
               {audioAttachments.map((url, i) => (
-                <div key={`audio-${i}`} className="relative w-48 h-16 shrink-0 rounded-lg border border-zinc-700 bg-zinc-900 px-2 py-2">
+                <div key={`audio-${i}`} className="relative w-48 h-16 shrink-0 rounded-lg border border-zinc-700 bg-background px-2 py-2">
                   <audio src={url} controls className="w-full h-10" preload="metadata" />
-                  <button onClick={() => removeAudioAttachment(i)} className="absolute -top-1 -right-1 w-5 h-5 bg-black/80 rounded-full flex items-center justify-center text-white hover:bg-red-500 transition-colors">
+                  <button onClick={() => removeAudioAttachment(i)} className="absolute -top-1 -right-1 w-5 h-5 bg-background/80 rounded-full flex items-center justify-center text-foreground hover:bg-red-500 transition-colors">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
                   </button>
                 </div>
               ))}
               {isUploading && (
-                <div className="w-16 h-16 shrink-0 rounded-lg border border-zinc-700 bg-zinc-900 flex items-center justify-center">
+                <div className="w-16 h-16 shrink-0 rounded-lg border border-zinc-700 bg-background flex items-center justify-center">
                   <div className="w-5 h-5 border-2 border-zinc-500 border-t-white rounded-full animate-spin" />
                 </div>
               )}
@@ -783,7 +783,7 @@ export default function ChatInterface({ conversationId, allowMediaGeneration = f
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={isStreaming || isUploading}
-              className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg sm:rounded-xl bg-white/5 border border-white/10 text-zinc-400 hover:text-white hover:bg-white/10 transition-all disabled:opacity-50"
+              className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg sm:rounded-xl bg-muted/50 border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-all disabled:opacity-50"
               title="Attach image or audio"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -805,14 +805,14 @@ export default function ChatInterface({ conversationId, allowMediaGeneration = f
               placeholder="Message Multi Chat Models... (Attach image/audio or paste images with Ctrl+V)"
               disabled={isStreaming}
               rows={1}
-              className="flex-1 max-h-32 min-h-[40px] sm:min-h-[48px] resize-none bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-white placeholder-gray-500 focus:outline-none focus:border-white/40 focus:bg-white/15 transition-all duration-300 disabled:opacity-50 leading-relaxed"
+              className="flex-1 max-h-32 min-h-[40px] sm:min-h-[48px] resize-none bg-muted backdrop-blur-sm border border-border rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-foreground placeholder-gray-500 focus:outline-none focus:border-white/40 focus:bg-white/15 transition-all duration-300 disabled:opacity-50 leading-relaxed"
             />
             <button
               type="submit"
               disabled={isStreaming || isUploading || (!input.trim() && attachments.length === 0 && audioAttachments.length === 0)}
               className={`shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-lg sm:rounded-xl transition-all duration-300 ${
                 isStreaming || isUploading || (!input.trim() && attachments.length === 0 && audioAttachments.length === 0)
-                  ? 'bg-white/10 text-gray-500 opacity-50 cursor-not-allowed'
+                  ? 'bg-muted text-gray-500 opacity-50 cursor-not-allowed'
                   : 'bg-white text-black hover:bg-gray-200 active:scale-95 hover:scale-105'
               }`}
             >

@@ -83,29 +83,29 @@ export default function SettingsPage() {
     <div className="max-w-4xl space-y-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-        <p className="text-sm text-zinc-400 mt-1">Manage your account details and security preferences.</p>
+        <p className="text-sm text-muted-foreground mt-1">Manage your account details and security preferences.</p>
       </div>
 
       {/* Profile */}
-      <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-5 sm:p-6">
+      <div className="bg-background/70 border border-zinc-800 rounded-xl p-5 sm:p-6">
         <h2 className="text-sm font-medium text-zinc-200 mb-4">Profile</h2>
         <form onSubmit={updateProfile} className="space-y-3">
           <div>
-            <label className="block text-xs text-zinc-400 mb-1">Email</label>
+            <label className="block text-xs text-muted-foreground mb-1">Email</label>
             <input
               type="email"
               value={user.email}
               disabled
-              className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-500 text-sm"
+              className="w-full px-3 py-2 bg-background border border-zinc-800 rounded-lg text-muted-foreground text-sm"
             />
           </div>
           <div>
-            <label className="block text-xs text-zinc-400 mb-1">Name</label>
+            <label className="block text-xs text-muted-foreground mb-1">Name</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-zinc-600"
+              className="w-full px-3 py-2 bg-background border border-zinc-800 rounded-lg text-foreground text-sm focus:outline-none focus:border-zinc-600"
             />
           </div>
           <button
@@ -119,28 +119,28 @@ export default function SettingsPage() {
       </div>
 
       {/* Change Password */}
-      <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-5 sm:p-6">
+      <div className="bg-background/70 border border-zinc-800 rounded-xl p-5 sm:p-6">
         <h2 className="text-sm font-medium text-zinc-200 mb-4">Change Password</h2>
         <form onSubmit={changePassword} className="space-y-3">
           <div>
-            <label className="block text-xs text-zinc-400 mb-1">Current password</label>
+            <label className="block text-xs text-muted-foreground mb-1">Current password</label>
             <input
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               required
-              className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-zinc-600"
+              className="w-full px-3 py-2 bg-background border border-zinc-800 rounded-lg text-foreground text-sm focus:outline-none focus:border-zinc-600"
             />
           </div>
           <div>
-            <label className="block text-xs text-zinc-400 mb-1">New password</label>
+            <label className="block text-xs text-muted-foreground mb-1">New password</label>
             <input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-zinc-600"
+              className="w-full px-3 py-2 bg-background border border-zinc-800 rounded-lg text-foreground text-sm focus:outline-none focus:border-zinc-600"
             />
           </div>
           <button
@@ -154,22 +154,22 @@ export default function SettingsPage() {
       </div>
 
       {/* Account Info */}
-      <div className="bg-zinc-900/70 border border-zinc-800 rounded-xl p-5 sm:p-6">
+      <div className="bg-background/70 border border-zinc-800 rounded-xl p-5 sm:p-6">
         <h2 className="text-sm font-medium text-zinc-200 mb-4">Account</h2>
-        <div className="space-y-2 text-xs text-zinc-400">
+        <div className="space-y-2 text-xs text-muted-foreground">
           <div className="flex items-center justify-between py-1 border-b border-zinc-800/70">
             <span>Role</span>
-            <span className="text-white capitalize">{user.role}</span>
+            <span className="text-foreground capitalize">{user.role}</span>
           </div>
           <div className="flex items-center justify-between py-1 border-b border-zinc-800/70">
             <span>Storage used</span>
-            <span className="text-white">
+            <span className="text-foreground">
               {(user.storageUsed / (1024 * 1024)).toFixed(1)} / {(user.storageLimit / (1024 * 1024)).toFixed(0)} MB
             </span>
           </div>
           <div className="flex items-center justify-between py-1">
             <span>Joined</span>
-            <span className="text-white">
+            <span className="text-foreground">
               {new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
           </div>

@@ -58,7 +58,7 @@ export default function DocumentationPage() {
                 <h2 className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{system.name}</h2>
                 <p className="text-xs text-gray-500 mt-0.5">{system.desc}</p>
               </div>
-              <svg className="w-4 h-4 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-muted-foreground group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Link>

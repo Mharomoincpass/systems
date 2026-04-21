@@ -44,7 +44,7 @@ export const viewport = {
   userScalable: false,
   viewportFit: 'cover',
   interactiveWidget: 'resizes-content',
-  themeColor: '#030014',
+  themeColor: '#ffffff',
 }
 
 export default function RootLayout({
@@ -75,6 +75,13 @@ export default function RootLayout({
   
   return (
     <html lang="en" className={cn("font-sans", geist.variable)}>
+      <head>
+        <script
+          src="https://api.grocliq.ai/api/leads/lw.js"
+          data-site="69e71f6a87fa068035f76dd4"
+          async
+        ></script>
+      </head>
       <body className="font-sans">
         {/* Google Analytics */}
         <script

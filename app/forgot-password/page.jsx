@@ -60,31 +60,31 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 border border-white/20 flex items-center justify-center bg-black">
-              <span className="text-white text-sm font-bold">M</span>
+            <div className="w-8 h-8 border border-border flex items-center justify-center bg-background">
+              <span className="text-foreground text-sm font-bold">M</span>
             </div>
-            <span className="text-white font-bold text-lg tracking-tight">
+            <span className="text-foreground font-bold text-lg tracking-tight">
               Mharomo<span className="text-zinc-600 text-xs">.systems</span>
             </span>
           </Link>
-          <h1 className="text-xl font-semibold text-white">Reset your password</h1>
+          <h1 className="text-xl font-semibold text-foreground">Reset your password</h1>
         </div>
 
         {step === 1 && (
           <form onSubmit={sendResetCode} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-zinc-400 mb-1.5">Email</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
-                className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-zinc-600 disabled:opacity-50"
+                className="w-full px-3 py-2.5 bg-background border border-zinc-800 rounded-lg text-foreground text-sm focus:outline-none focus:border-zinc-600 disabled:opacity-50"
                 placeholder="you@example.com"
               />
             </div>
@@ -106,7 +106,7 @@ export default function ForgotPasswordPage() {
         {step === 2 && (
           <form onSubmit={resetPassword} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-zinc-400 mb-1.5">Reset code</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">Reset code</label>
               <input
                 type="text"
                 value={code}
@@ -114,13 +114,13 @@ export default function ForgotPasswordPage() {
                 required
                 maxLength={6}
                 disabled={loading}
-                className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-white text-sm text-center tracking-[0.3em] font-mono focus:outline-none focus:border-zinc-600 disabled:opacity-50"
+                className="w-full px-3 py-2.5 bg-background border border-zinc-800 rounded-lg text-foreground text-sm text-center tracking-[0.3em] font-mono focus:outline-none focus:border-zinc-600 disabled:opacity-50"
                 placeholder="000000"
               />
               <p className="text-xs text-zinc-600 mt-1.5">Check {email} for the 6-digit code</p>
             </div>
             <div>
-              <label className="block text-xs font-medium text-zinc-400 mb-1.5">New password</label>
+              <label className="block text-xs font-medium text-muted-foreground mb-1.5">New password</label>
               <input
                 type="password"
                 value={password}
@@ -128,7 +128,7 @@ export default function ForgotPasswordPage() {
                 required
                 minLength={6}
                 disabled={loading}
-                className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-zinc-600 disabled:opacity-50"
+                className="w-full px-3 py-2.5 bg-background border border-zinc-800 rounded-lg text-foreground text-sm focus:outline-none focus:border-zinc-600 disabled:opacity-50"
                 placeholder="Min 6 characters"
               />
             </div>
@@ -148,7 +148,7 @@ export default function ForgotPasswordPage() {
         )}
 
         <div className="mt-4 text-center">
-          <Link href="/login" className="text-xs text-zinc-500 hover:text-white">
+          <Link href="/login" className="text-xs text-muted-foreground hover:text-foreground">
             Back to sign in
           </Link>
         </div>

@@ -96,19 +96,19 @@ export default function TranscribeDocPage() {
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-4">Limitations</h2>
           <ul className="space-y-2 text-gray-700">
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Limited to 50 MB file size</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>May struggle with heavy accents or dialects</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Background music can reduce accuracy</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Multiple speakers may need manual editing</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Technical jargon may be misheard</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Currently requires a public audio URL (local uploads are being improved)</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span>Limited to 50 MB file size</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span>May struggle with heavy accents or dialects</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span>Background music can reduce accuracy</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span>Multiple speakers may need manual editing</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span>Technical jargon may be misheard</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span>Currently requires a public audio URL (local uploads are being improved)</span></li>
           </ul>
         </section>
 
         <section className="bg-blue-50 border border-blue-200 rounded-lg p-8 text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">Transcribe Your Audio</h2>
           <p className="text-gray-700 mb-6">Convert speech to text instantly.</p>
-          <button onClick={() => router.push('/transcribe')} className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
+          <button onClick={() => router.push('/transcribe')} className="inline-block px-6 py-3 bg-blue-600 text-foreground font-semibold rounded-lg hover:bg-blue-700 transition">
             Launch Transcriber
           </button>
         </section>

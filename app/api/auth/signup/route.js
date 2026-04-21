@@ -55,11 +55,11 @@ export async function POST(request) {
       to: [{ address: email }],
       subject: 'Your verification code — Mharomo Systems',
       htmlbody: `
-        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#000;color:#fff;border-radius:8px">
-          <h2 style="margin:0 0 16px;font-size:20px">Verify your email</h2>
-          <p style="margin:0 0 24px;color:#aaa;font-size:14px">Use the code below to complete your signup. It expires in 10 minutes.</p>
-          <div style="background:#111;border:1px solid #333;border-radius:8px;padding:20px;text-align:center;letter-spacing:8px;font-size:32px;font-weight:700">${code}</div>
-          <p style="margin:24px 0 0;color:#666;font-size:12px">If you didn't request this, ignore this email.</p>
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#ffffff;color:#000000;border-radius:8px">
+          <h2 style="margin:0 0 16px">Welcome to Mharomo Systems</h2>
+          <p style="margin:0 0 24px;color:#666666;font-size:14px">Use the code below to complete your signup. It expires in 10 minutes.</p>
+          <div style="background:#f4f4f4;border:1px solid #eaeaea;border-radius:8px;padding:20px;text-align:center;letter-spacing:8px;font-size:32px;font-weight:700">${code}</div>
+          <p style="margin:24px 0 0;color:#666666;font-size:12px">If you didn't request this, ignore this email.</p>
         </div>
       `,
     })

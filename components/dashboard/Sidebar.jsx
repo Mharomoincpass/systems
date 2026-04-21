@@ -111,29 +111,29 @@ export default function Sidebar({ user, collapsed, onClose }) {
     <>
       {/* Mobile overlay */}
       {!collapsed && (
-        <div className="fixed inset-0 bg-black/60 z-40 lg:hidden" onClick={onClose} />
+        <div className="fixed inset-0 bg-background/60 z-40 lg:hidden" onClick={onClose} />
       )}
 
       <aside
-        className={`fixed top-0 left-0 h-full w-60 bg-[#0f0f0f] border-r border-zinc-800/50 z-50 flex flex-col transition-transform duration-200 ${
+        className={`fixed top-0 left-0 h-full w-60 bg-background border-r border-zinc-800/50 z-50 flex flex-col transition-transform duration-200 ${
           collapsed ? '-translate-x-full lg:translate-x-0 lg:w-60' : 'translate-x-0'
         }`}
       >
         {/* Header - New Chat */}
         <div className="flex items-center justify-between p-3 border-b border-zinc-800/50 shrink-0">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-indigo-500/20">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-foreground text-xs font-bold shadow-lg shadow-indigo-500/20">
               {brandInitial}
             </div>
-            <span className="font-semibold text-sm text-zinc-200 group-hover:text-white transition-colors">{brandName}</span>
+            <span className="font-semibold text-sm text-zinc-200 group-hover:text-foreground transition-colors">{brandName}</span>
           </Link>
           <div className="flex items-center gap-1">
-            <button onClick={startNewChat} className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all" title="New chat">
+            <button onClick={startNewChat} className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-card transition-all" title="New chat">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 5v14M5 12h14" />
               </svg>
             </button>
-            <button onClick={onClose} className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all lg:hidden">
+            <button onClick={onClose} className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-card transition-all lg:hidden">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M15 18l-6-6 6-6" />
               </svg>
@@ -145,12 +145,12 @@ export default function Sidebar({ user, collapsed, onClose }) {
         <div className="flex-1 overflow-y-auto py-2 px-2">
           {user ? (
             loadingConv ? (
-              <div className="text-center py-4 text-xs text-zinc-500">Loading history...</div>
+              <div className="text-center py-4 text-xs text-muted-foreground">Loading history...</div>
             ) : conversations.length === 0 ? (
-              <div className="text-center py-8 text-xs text-zinc-500">No recent chats</div>
+              <div className="text-center py-8 text-xs text-muted-foreground">No recent chats</div>
             ) : (
               <div className="space-y-0.5">
-                <div className="px-2 py-1 mb-1 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Recent</div>
+                <div className="px-2 py-1 mb-1 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Recent</div>
                 {conversations.map((conv, index) => {
                   const id = conv._id || conv.id
                   const isActive = searchParams?.get('id') === id
@@ -175,8 +175,8 @@ export default function Sidebar({ user, collapsed, onClose }) {
                         onClick={onClose}
                         className={`block w-full text-left px-3 py-2.5 rounded-xl text-sm transition-all duration-200 truncate pr-8 ${
                           isActive
-                            ? 'bg-zinc-800/80 text-white font-medium shadow-sm border border-zinc-700/50'
-                            : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200 border border-transparent'
+                            ? 'bg-card/80 text-foreground font-medium shadow-sm border border-zinc-700/50'
+                            : 'text-muted-foreground hover:bg-card/50 hover:text-zinc-200 border border-transparent'
                         }`}
                         title={displayTitle}
                       >
@@ -184,7 +184,7 @@ export default function Sidebar({ user, collapsed, onClose }) {
                       </Link>
                       <button
                         onClick={(e) => deleteConversation(id, e)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-zinc-800 opacity-0 group-hover:opacity-100 transition-all focus:opacity-100"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-muted-foreground hover:text-red-400 hover:bg-card opacity-0 group-hover:opacity-100 transition-all focus:opacity-100"
                         title="Delete chat"
                       >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -197,14 +197,14 @@ export default function Sidebar({ user, collapsed, onClose }) {
               </div>
             )
           ) : (
-            <div className="text-center py-8 px-3 text-xs text-zinc-500">
+            <div className="text-center py-8 px-3 text-xs text-muted-foreground">
               Log in to save chat history and access your profile tools.
             </div>
           )}
         </div>
 
         {/* Bottom Area */}
-        <div className="border-t border-zinc-800/50 mt-auto bg-[#0f0f0f] relative shrink-0">
+        <div className="border-t border-zinc-800/50 mt-auto bg-background relative shrink-0">
           {user ? (
             <>
               <div className="px-4 py-3 border-b border-zinc-800/50">
@@ -216,32 +216,32 @@ export default function Sidebar({ user, collapsed, onClose }) {
 
               <div className="p-2 relative">
                 {userMenuOpen && (
-                  <div className="absolute bottom-full left-2 right-2 mb-2 bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-2xl z-50 animate-in fade-in slide-in-from-bottom-2">
+                  <div className="absolute bottom-full left-2 right-2 mb-2 bg-background border border-zinc-800 rounded-xl overflow-hidden shadow-2xl z-50 animate-in fade-in slide-in-from-bottom-2">
                     <div className="p-2 space-y-0.5">
-                      <Link href="/dashboard/library" onClick={() => { setUserMenuOpen(false); onClose() }} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors">
+                      <Link href="/dashboard/library" onClick={() => { setUserMenuOpen(false); onClose() }} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-foreground hover:text-foreground hover:bg-card transition-colors">
                         {icons.folder} Library
                       </Link>
-                      <Link href="/dashboard/mimir-mcp" onClick={() => { setUserMenuOpen(false); onClose() }} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors">
+                      <Link href="/dashboard/mimir-mcp" onClick={() => { setUserMenuOpen(false); onClose() }} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-foreground hover:text-foreground hover:bg-card transition-colors">
                         {icons.mimir} Mimir MCP
                       </Link>
-                      <Link href="/dashboard/settings" onClick={() => { setUserMenuOpen(false); onClose() }} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors">
+                      <Link href="/dashboard/settings" onClick={() => { setUserMenuOpen(false); onClose() }} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-foreground hover:text-foreground hover:bg-card transition-colors">
                         {icons.settings} Settings
                       </Link>
                       {isAdmin && (
                         <>
-                          <div className="h-px bg-zinc-800 my-1 mx-2" />
-                          <Link href="/dashboard/admin" onClick={() => { setUserMenuOpen(false); onClose() }} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors">
+                          <div className="h-px bg-card my-1 mx-2" />
+                          <Link href="/dashboard/admin" onClick={() => { setUserMenuOpen(false); onClose() }} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-foreground hover:text-foreground hover:bg-card transition-colors">
                             {icons.admin} Admin Panel
                           </Link>
                         </>
                       )}
-                      <div className="h-px bg-zinc-800 my-1 mx-2" />
+                      <div className="h-px bg-card my-1 mx-2" />
                       <button
                         onClick={async () => {
                           await fetch('/api/auth/logout', { method: 'POST' })
                           router.push('/login')
                         }}
-                        className="w-full text-left flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors"
+                        className="w-full text-left flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-foreground hover:text-foreground hover:bg-card transition-colors"
                       >
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
                           <path d="M6 14H3a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h3M11 12l4-4-4-4M15 8H5" />
@@ -254,18 +254,18 @@ export default function Sidebar({ user, collapsed, onClose }) {
 
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-800/50 transition-colors group"
+                  className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-card/50 transition-colors group"
                 >
                   <div className="flex items-center gap-3 overflow-hidden">
-                    <div className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center shrink-0">
-                      <span className="text-white text-xs font-semibold">{user?.email?.[0]?.toUpperCase() || 'U'}</span>
+                    <div className="w-8 h-8 rounded-full bg-card border border-zinc-700 flex items-center justify-center shrink-0">
+                      <span className="text-foreground text-xs font-semibold">{user?.email?.[0]?.toUpperCase() || 'U'}</span>
                     </div>
                     <div className="text-left truncate">
                       <div className="text-sm font-medium text-zinc-200 truncate">{user?.name || user?.email || 'User'}</div>
-                      <div className="text-[10px] text-zinc-500">{user?.role === 'admin' ? 'Administrator' : 'Free Plan'}</div>
+                      <div className="text-[10px] text-muted-foreground">{user?.role === 'admin' ? 'Administrator' : 'Free Plan'}</div>
                     </div>
                   </div>
-                  <div className="text-zinc-500 group-hover:text-zinc-300 transition-colors">
+                  <div className="text-muted-foreground group-hover:text-foreground transition-colors">
                     {icons.more}
                   </div>
                 </button>
@@ -276,7 +276,7 @@ export default function Sidebar({ user, collapsed, onClose }) {
               <Link href="/signup" className="block w-full text-center px-4 py-2 bg-white text-black text-sm font-semibold rounded-lg hover:bg-zinc-200 transition-colors">
                 Sign Up Free
               </Link>
-              <Link href="/login" className="block w-full text-center px-4 py-2 mt-2 border border-zinc-700 text-zinc-300 text-sm font-medium rounded-lg hover:bg-zinc-800 transition-colors">
+              <Link href="/login" className="block w-full text-center px-4 py-2 mt-2 border border-zinc-700 text-foreground text-sm font-medium rounded-lg hover:bg-card transition-colors">
                 Log In
               </Link>
             </div>

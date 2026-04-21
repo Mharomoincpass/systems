@@ -44,7 +44,7 @@ export default function DashboardLayout({ children }) {
 
   return (
     <div className="h-[100dvh] w-full bg-background text-foreground overflow-hidden lg:pl-60">
-      <Suspense fallback={<div className="w-60 h-full bg-[#0f0f0f]" />}>
+      <Suspense fallback={<div className="w-60 h-full bg-background" />}>
         <Sidebar
           user={user}
           collapsed={sidebarCollapsed}

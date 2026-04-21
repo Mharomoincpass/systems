@@ -95,17 +95,17 @@ export default function MusicDocPage() {
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-4">Limitations</h2>
           <ul className="space-y-2 text-gray-700">
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>5-60 second maximum length per track</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>No vocals or lyrics support</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Results vary - may need multiple attempts</span></li>
-            <li className="flex gap-3"><span className="text-gray-400">•</span><span>Quality depends on prompt clarity</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span>5-60 second maximum length per track</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span>No vocals or lyrics support</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span>Results vary - may need multiple attempts</span></li>
+            <li className="flex gap-3"><span className="text-muted-foreground">•</span><span>Quality depends on prompt clarity</span></li>
           </ul>
         </section>
 
         <section className="bg-blue-50 border border-blue-200 rounded-lg p-8 text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-3">Create Your Music Now</h2>
           <p className="text-gray-700 mb-6">Generate original, royalty-free tracks.</p>
-          <button onClick={() => router.push('/music')} className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
+          <button onClick={() => router.push('/music')} className="inline-block px-6 py-3 bg-blue-600 text-foreground font-semibold rounded-lg hover:bg-blue-700 transition">
             Launch Music Generator
           </button>
         </section>

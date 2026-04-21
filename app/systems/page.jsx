@@ -77,21 +77,21 @@ export default function SystemsPage() {
           `,
         }}
       />
-      <div className="min-h-screen bg-black text-white">
+      <div className="min-h-screen bg-background text-foreground">
       <div className="fixed inset-0 pointer-events-none opacity-[0.02] sm:opacity-[0.03] z-[50] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
 
       <div className="max-w-3xl mx-auto px-4 py-6 sm:py-10 relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-6 sm:mb-8">
           <div>
-            <h1 className="text-lg sm:text-xl font-semibold tracking-tight text-white/90">Systems</h1>
+            <h1 className="text-lg sm:text-xl font-semibold tracking-tight text-foreground/90">Systems</h1>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
               <span className="text-[11px] text-gray-500">Session active</span>
             </div>
           </div>
           <div className="flex items-center gap-2.5">
-            <Link href="/systems/documentation" className="text-[12px] text-gray-500 hover:text-gray-300 transition-colors">
+            <Link href="/systems/documentation" className="text-[12px] text-gray-500 hover:text-muted-foreground transition-colors">
               Docs
             </Link>
             <span className="text-gray-700">|</span>
@@ -109,14 +109,14 @@ export default function SystemsPage() {
             >
               <div>
                 <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-md bg-white/[0.05] border border-white/[0.08] flex items-center justify-center mb-3">
-                  <svg className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     {system.icon}
                   </svg>
                 </div>
-                <h2 className="text-[13px] sm:text-sm font-medium text-white/80 mb-0.5">{system.name}</h2>
+                <h2 className="text-[13px] sm:text-sm font-medium text-foreground/80 mb-0.5">{system.name}</h2>
                 <p className="text-[11px] sm:text-xs text-gray-500 leading-snug">{system.desc}</p>
               </div>
-              <div className="mt-3 flex items-center gap-1 text-[11px] text-gray-600 group-hover:text-gray-400 transition-colors">
+              <div className="mt-3 flex items-center gap-1 text-[11px] text-gray-600 group-hover:text-muted-foreground transition-colors">
                 <span>Open</span>
                 <svg className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />

@@ -54,16 +54,16 @@ export default function Showcase() {
   }, { scope: container })
 
   return (
-    <section id="projects" ref={container} className="relative bg-black z-10 overflow-hidden py-20 sm:py-28 border-t border-white/10">
+    <section id="projects" ref={container} className="relative bg-background z-10 overflow-hidden py-20 sm:py-28 border-t border-border">
       <div className="container mx-auto px-6">
-        <h2 className="text-4xl md:text-6xl font-bold text-white mb-4">
-          Top <span className="text-zinc-500">Projects by yours truly</span>
+        <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-4">
+          Top <span className="text-muted-foreground">Projects by yours truly</span>
         </h2>
-        <div className="w-full h-px bg-white/10 mt-8 mb-12"></div>
+        <div className="w-full h-px bg-muted mt-8 mb-12"></div>
 
         <div className="grid gap-8 lg:grid-cols-3">
           {products.map((product) => (
-            <article key={product.name} className="project-card rounded-xl border border-white/10 bg-white/5 overflow-hidden transition-transform duration-300 hover:-translate-y-1">
+            <article key={product.name} className="project-card rounded-xl border border-border bg-muted/50 overflow-hidden transition-transform duration-300 hover:-translate-y-1">
               <div className="relative w-full aspect-video overflow-hidden">
                 <Image
                   src={product.image}
@@ -74,14 +74,14 @@ export default function Showcase() {
                 />
               </div>
               <div className="p-6">
-                <h3 className="text-3xl font-bold text-white mb-2">{product.name}</h3>
-                <p className="text-xs uppercase tracking-widest text-zinc-500 mb-4">{product.category}</p>
-                <p className="text-zinc-400 leading-relaxed mb-6">{product.desc}</p>
+                <h3 className="text-3xl font-bold text-foreground mb-2">{product.name}</h3>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">{product.category}</p>
+                <p className="text-muted-foreground leading-relaxed mb-6">{product.desc}</p>
                 <a
                   href={product.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block px-6 py-2.5 border border-white/20 text-white hover:bg-white hover:text-black transition-all duration-300"
+                  className="inline-block px-6 py-2.5 border border-border text-foreground hover:bg-white hover:text-black transition-all duration-300"
                 >
                   View Project →
                 </a>

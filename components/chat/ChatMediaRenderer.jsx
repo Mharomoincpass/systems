@@ -20,7 +20,7 @@ function DownloadButton({ url, filename }) {
   return (
     <button
       onClick={handleDownload}
-      className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/60 hover:bg-black/80 text-white/70 hover:text-white opacity-0 group-hover:opacity-100 transition-all"
+      className="absolute top-2 right-2 p-1.5 rounded-lg bg-background/60 hover:bg-background/80 text-foreground/70 hover:text-foreground opacity-0 group-hover:opacity-100 transition-all"
       title="Download"
     >
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -42,14 +42,14 @@ function ImageMedia({ url, prompt }) {
           src={url}
           alt={prompt}
           onClick={() => setExpanded(true)}
-          className="rounded-xl border border-[#333537] cursor-pointer hover:border-[#444746] transition-all w-full"
+          className="rounded-xl border border-border cursor-pointer hover:border-border transition-all w-full"
           loading="lazy"
         />
         <DownloadButton url={url} filename={`mharomo-image-${Date.now()}.png`} />
       </div>
       {expanded && (
         <div
-          className="fixed inset-0 z-[9999] bg-black/90 flex items-center justify-center p-4"
+          className="fixed inset-0 z-[9999] bg-background/90 flex items-center justify-center p-4"
           onClick={() => setExpanded(false)}
         >
           <img
@@ -59,7 +59,7 @@ function ImageMedia({ url, prompt }) {
           />
           <button
             onClick={() => setExpanded(false)}
-            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition"
+            className="absolute top-4 right-4 p-2 rounded-full bg-muted hover:bg-accent text-foreground transition"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="18" y1="6" x2="6" y2="18" />
@@ -82,17 +82,17 @@ function VideoMedia({ url, prompt }) {
           src={url}
           controls
           autoPlay
-          className="rounded-xl border border-[#333537] w-full"
+          className="rounded-xl border border-border w-full"
           preload="metadata"
         />
       ) : (
         <div
           onClick={() => setPlaying(true)}
-          className="w-full aspect-video rounded-xl border border-[#333537] bg-[#1e1f20] flex items-center justify-center cursor-pointer hover:bg-[#333537] transition-colors"
+          className="w-full aspect-video rounded-xl border border-border bg-muted flex items-center justify-center cursor-pointer hover:bg-accent transition-colors"
           title="Play video"
         >
-          <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors shadow-sm">
-            <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center hover:bg-accent transition-colors shadow-sm">
+            <svg className="w-6 h-6 text-foreground ml-1" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
             </svg>
           </div>
@@ -110,7 +110,7 @@ function AudioMedia({ url, prompt, metadata }) {
   return (
     <div className="mt-2 max-w-sm">
       <div className="flex items-center gap-2 mb-1">
-        <span className="text-xs text-gray-400 font-medium">{label}</span>
+        <span className="text-xs text-muted-foreground font-medium">{label}</span>
         {metadata?.voice && (
           <span className="text-xs text-gray-500">Voice: {metadata.voice}</span>
         )}
