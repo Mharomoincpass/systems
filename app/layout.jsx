@@ -1,13 +1,12 @@
 import './globals.css'
 import { Toaster } from '@/components/ui/sonner'
-import AnalyticsTracker from '@/components/AnalyticsTracker'
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
-const siteName = 'AI Tools and Systems'
-const siteDescription = 'AI tools and systems for chat, images, video, music, transcription, and speech.'
+const siteName = 'FrsionOS — AI Studio'
+const siteDescription = 'AI Image Studio'
 const siteUrl = 'https://mharomo.systems'
 
 export const metadata = {
@@ -56,7 +55,7 @@ export default function RootLayout({
     name: 'Mharomo.systems',
     url: siteUrl,
     logo: `${siteUrl}/icon.svg`,
-    description: 'Smart AI tools and custom software solutions for businesses. Specializing in AI chat, image generation, video creation, and data integration.',
+    description: 'Smart AI tools and custom software solutions for businesses. Specializing in AI image generation and data integration.',
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'Customer Service',
@@ -76,11 +75,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <head>
-        <script
-          src="https://api.grocliq.ai/api/leads/lw.js"
-          data-site="69e71f6a87fa068035f76dd4"
-          async
-        ></script>
       </head>
       <body className="font-sans">
         {/* Google Analytics */}
@@ -105,7 +99,6 @@ export default function RootLayout({
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7139373644000528"
           crossOrigin="anonymous"
         ></script>
-        <AnalyticsTracker />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}

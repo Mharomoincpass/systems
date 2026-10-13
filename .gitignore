@@ -39,6 +39,10 @@ Thumbs.db
 
 # Temporary uploads
 public/temp/
+storage/studio-gallery/
+storage/studio-admin/
+storage/studio-generation-log/
+storage/studio-subscribers/
 
 # Local scratch UI snapshots
 temp_chat_*.jsx
