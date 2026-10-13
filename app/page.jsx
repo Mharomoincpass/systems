@@ -60,6 +60,12 @@ const QUICK_PROMPTS = [
 
 const STUDIO_TABS = ["image", "gallery", "logs"];
 
+const STUDIO_NAV_TABS = [
+  { id: "image", label: "Image", icon: ImageIcon },
+  { id: "gallery", label: "Gallery", icon: LayoutGrid },
+  { id: "logs", label: "Logs", icon: ScrollText },
+];
+
 const UPDATES_SUBSCRIBED_KEY = "frsion-updates-subscribed";
 const UPDATES_SESSION_KEY = "frsion-updates-prompt-session";
 
@@ -749,32 +755,62 @@ export default function FrsionStudioPage() {
     </div>
   );
 
+  const renderStudioNavTab = (tab, { compact = false } = {}) => {
+    const Icon = tab.icon;
+    const active = activeTab === tab.id;
+    return (
+      <button
+        key={tab.id}
+        type="button"
+        onClick={() => setActiveTab(tab.id)}
+        className={`flex items-center justify-center gap-1.5 font-mono font-semibold transition-colors cursor-pointer touch-manipulation ${
+          compact
+            ? `flex-1 flex-col min-h-[3.25rem] py-2 text-[10px] uppercase tracking-wide border-t-2 ${
+                active ? "text-black border-black bg-zinc-50" : "text-zinc-500 border-transparent"
+              }`
+            : `px-4 py-1.5 min-h-[44px] text-xs ${
+                active
+                  ? "bg-black text-white"
+                  : "bg-white text-black hover:bg-zinc-100"
+              }`
+        }`}
+      >
+        <Icon className={compact ? "w-5 h-5" : "w-3.5 h-3.5"} />
+        {tab.label}
+      </button>
+    );
+  };
+
   return (
-    <div className="h-screen w-screen overflow-hidden bg-white text-black flex flex-col font-sans select-none">
+    <div className="h-[100dvh] w-screen overflow-hidden bg-white text-black flex flex-col font-sans select-none pb-[calc(3.75rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
       {/* Top Header Bar: Clean Stark Monochrome */}
-      <header className="shrink-0 h-14 border-b border-zinc-200 px-6 flex items-center justify-between bg-white z-10">
-        {/* Left: Brand & Credits */}
-        <div className="flex items-center gap-3">
-          <span className="font-mono font-bold text-base tracking-tight text-black">
-            FrsionOS
-          </span>
-          <div className="relative">
+      <header className="shrink-0 border-b border-zinc-200 px-3 sm:px-6 pt-safe bg-white z-10">
+        <div className="relative flex items-center justify-between gap-2 min-h-12 lg:min-h-14">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="font-mono font-bold text-sm sm:text-base tracking-tight text-black shrink-0">
+              FrsionOS
+            </span>
+            <div className="relative min-w-0">
             <button
               type="button"
-              onClick={() => fetchCredits()}
+              onClick={() => {
+                fetchCredits();
+                setShowCreditsTooltip((v) => !v);
+              }}
               onMouseEnter={() => setShowCreditsTooltip(true)}
               onMouseLeave={() => setShowCreditsTooltip(false)}
-              className="border border-black px-2.5 py-0.5 text-xs font-mono font-medium hover:bg-black hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 select-none"
-              title="Resets to 0.4 Pollen in 24 hours. Click to refresh balance."
+              className="border border-black px-2 py-1 sm:px-2.5 sm:py-0.5 text-[10px] sm:text-xs font-mono font-medium hover:bg-black hover:text-white transition-colors cursor-pointer flex items-center gap-1 max-w-[11rem] sm:max-w-none truncate touch-manipulation min-h-[36px] sm:min-h-0"
+              title="Resets to 0.4 Pollen in 24 hours. Tap to refresh balance."
             >
-              <span>
-                Credits:{" "}
+              <span className="truncate">
+                <span className="hidden sm:inline">Credits: </span>
                 {credits === null
-                  ? "..."
-                  : `${Number(credits).toFixed(3)} Pollen`}
+                  ? "…"
+                  : `${Number(credits).toFixed(3)}`}
+                <span className="hidden sm:inline"> Pollen</span>
               </span>
               <RefreshCw
-                className={`w-3 h-3 ${isLoadingCredits ? "animate-spin" : "opacity-60"}`}
+                className={`w-3 h-3 shrink-0 ${isLoadingCredits ? "animate-spin" : "opacity-60"}`}
               />
             </button>
 
@@ -836,40 +872,16 @@ export default function FrsionStudioPage() {
               </div>
             )}
           </div>
-        </div>
+          </div>
 
-        {/* Center: Tabs in Stark Black & White */}
-        <div className="flex items-center border border-black p-0.5">
-          {[
-            { id: "image", label: "Image", icon: ImageIcon },
-            { id: "gallery", label: "Gallery", icon: LayoutGrid },
-            { id: "logs", label: "Logs", icon: ScrollText },
-          ].map((tab) => {
-            const Icon = tab.icon;
-            const active = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-4 py-1 text-xs font-mono font-semibold transition-colors cursor-pointer ${
-                  active
-                    ? "bg-black text-white"
-                    : "bg-white text-black hover:bg-zinc-100"
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
+          <div className="hidden lg:flex items-center border border-black p-0.5 absolute left-1/2 -translate-x-1/2">
+            {STUDIO_NAV_TABS.map((tab) => renderStudioNavTab(tab))}
+          </div>
 
-        <div className="w-[7.5rem] shrink-0 flex items-center justify-end">
           <button
             type="button"
             onClick={() => setAdminLoginOpen(true)}
-            className="w-8 h-8 shrink-0 border border-black bg-white text-black hover:bg-black hover:text-white text-xs font-mono font-bold transition-colors cursor-pointer flex items-center justify-center"
+            className="w-10 h-10 sm:w-8 sm:h-8 shrink-0 border border-black bg-white text-black hover:bg-black hover:text-white text-xs font-mono font-bold transition-colors cursor-pointer flex items-center justify-center touch-manipulation"
             title="Admin"
             aria-label="Admin"
           >
@@ -877,6 +889,17 @@ export default function FrsionStudioPage() {
           </button>
         </div>
       </header>
+
+      {!adminPanelOpen && (
+      <nav
+        className="lg:hidden fixed bottom-0 inset-x-0 z-40 border-t border-zinc-200 bg-white/95 backdrop-blur-sm pb-safe"
+        aria-label="Studio sections"
+      >
+        <div className="flex items-stretch divide-x divide-zinc-200">
+          {STUDIO_NAV_TABS.map((tab) => renderStudioNavTab(tab, { compact: true }))}
+        </div>
+      </nav>
+      )}
 
       {activeTab === "gallery" ? (
         <div className="flex-1 min-h-0 flex flex-col bg-white overflow-hidden">
@@ -898,7 +921,7 @@ export default function FrsionStudioPage() {
                 Empty gallery. Generations appear here for 24 hours — create from Image.
               </div>
             ) : (
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2">
                 {filteredCreations.map((item) => {
                   const active = galleryPreviewItem?.id === item.id;
                   return (
@@ -1017,7 +1040,7 @@ export default function FrsionStudioPage() {
             </button>
           </div>
 
-          <div className="flex-1 min-h-0 overflow-y-auto">
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto">
             {generationHistory.length === 0 ? (
               <div className="h-full min-h-[12rem] flex items-center justify-center border border-dashed border-zinc-300 m-3 text-xs font-mono text-zinc-400">
                 {historyLoading ? "Loading history…" : "No generations logged yet."}
@@ -1155,14 +1178,81 @@ export default function FrsionStudioPage() {
           )}
         </div>
       ) : (
-      <div className="flex-1 min-h-0 grid grid-cols-12 overflow-hidden">
-        {/* Left Form Column (4 cols) */}
-        <aside className="col-span-12 lg:col-span-4 h-full min-h-0 border-r border-zinc-200 flex flex-col bg-white">
+      <div className="flex-1 min-h-0 flex flex-col lg:grid lg:grid-cols-12 overflow-hidden">
+        {/* Preview first on mobile, left on desktop */}
+        <main className="order-1 lg:order-2 col-span-12 lg:col-span-8 min-h-[38dvh] max-h-[45dvh] lg:max-h-none lg:min-h-0 h-auto lg:h-full flex flex-col bg-zinc-50 lg:bg-white overflow-hidden border-b lg:border-b-0 border-zinc-200">
+          <div className="flex-1 min-h-0 flex flex-col p-3 sm:p-4 overflow-hidden relative">
+            {isGenerating ? (
+              <div className="flex-1 flex flex-col items-center justify-center text-center">
+                <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin mb-3" />
+                <p className="text-xs font-mono font-bold uppercase text-black">
+                  {progressText || "Synthesizing media..."}
+                </p>
+                {progressPct > 0 && (
+                  <div className="w-48 max-w-full h-1 bg-zinc-200 mt-3 overflow-hidden">
+                    <div
+                      className="h-full bg-black transition-all duration-200"
+                      style={{ width: `${progressPct}%` }}
+                    />
+                  </div>
+                )}
+              </div>
+            ) : selectedItem?.type === "image" ? (
+              <div className="flex-1 min-h-0 flex flex-col">
+                <div className="flex-1 min-h-0 flex items-center justify-center overflow-hidden">
+                  <img
+                    src={selectedItem.url}
+                    alt={selectedItem.prompt}
+                    className="max-h-full max-w-full object-contain border border-zinc-300 bg-white"
+                  />
+                </div>
+                <div className="shrink-0 pt-2 lg:pt-3 border-t border-zinc-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[10px] font-mono text-zinc-500 uppercase">
+                      {selectedItem.type} · {selectedItem.provider}
+                    </div>
+                    <p className="text-xs font-mono text-black line-clamp-2 sm:truncate mt-0.5">
+                      {selectedItem.prompt}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => handleCopyPrompt(selectedItem)}
+                      className="flex-1 sm:flex-none min-h-[44px] sm:min-h-0 px-3 py-2 sm:py-1.5 border border-zinc-300 hover:border-black text-xs font-mono text-black transition-colors cursor-pointer touch-manipulation"
+                    >
+                      {copiedId === selectedItem.id ? "Copied" : "Copy"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDownload(selectedItem)}
+                      className="flex-1 sm:flex-none min-h-[44px] sm:min-h-0 px-3 py-2 sm:py-1.5 bg-black text-white hover:bg-zinc-800 text-xs font-mono transition-colors cursor-pointer flex items-center justify-center gap-1.5 touch-manipulation"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center text-center p-4 text-zinc-400">
+                <p className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+                  Preview
+                </p>
+                <p className="text-[10px] font-mono text-zinc-400 mt-1 max-w-xs">
+                  Your image appears here after you generate
+                </p>
+              </div>
+            )}
+          </div>
+        </main>
+
+        <aside className="order-2 lg:order-1 col-span-12 lg:col-span-4 flex-1 min-h-0 lg:h-full border-r border-zinc-200 flex flex-col bg-white overflow-hidden">
           <form
             onSubmit={handleGenerate}
-            className="flex-1 min-h-0 flex flex-col justify-between p-4 overflow-y-auto"
+            className="flex-1 min-h-0 flex flex-col overflow-hidden"
           >
-            <div className="space-y-4">
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-3 sm:p-4 space-y-4">
               {/* Prompt Textarea */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
@@ -1184,7 +1274,7 @@ export default function FrsionStudioPage() {
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   placeholder="Describe image to generate..."
-                  className="w-full border border-zinc-300 focus:border-black p-2.5 text-xs text-black font-mono placeholder:text-zinc-400 outline-none resize-none bg-white transition-colors"
+                  className="w-full border border-zinc-300 focus:border-black p-2.5 text-base sm:text-xs text-black font-mono placeholder:text-zinc-400 outline-none resize-none bg-white transition-colors"
                 />
               </div>
 
@@ -1202,7 +1292,7 @@ export default function FrsionStudioPage() {
                             key={ar.id}
                             type="button"
                             onClick={() => setAspectRatio(ar.id)}
-                            className={`py-1.5 text-xs font-mono border transition-colors cursor-pointer ${
+                            className={`py-2.5 sm:py-1.5 text-xs font-mono border transition-colors cursor-pointer touch-manipulation min-h-[44px] sm:min-h-0 ${
                               selected
                                 ? "bg-black text-white border-black"
                                 : "bg-white text-black border-zinc-200 hover:border-black"
@@ -1432,12 +1522,11 @@ export default function FrsionStudioPage() {
                 </>
             </div>
 
-            {/* Bottom Generate Button */}
-            <div className="pt-4 mt-4 border-t border-zinc-200">
+            <div className="shrink-0 p-3 sm:p-4 pt-2 border-t border-zinc-200 bg-white">
               <button
                 type="submit"
                 disabled={isGenerating}
-                className="w-full py-3 px-4 bg-black text-white hover:bg-zinc-800 disabled:bg-zinc-400 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2"
+                className="w-full min-h-[48px] py-3 px-4 bg-black text-white hover:bg-zinc-800 disabled:bg-zinc-400 text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 touch-manipulation"
               >
                 {isGenerating ? (
                   <span>{progressText || "Processing..."}</span>
@@ -1448,75 +1537,6 @@ export default function FrsionStudioPage() {
             </div>
           </form>
         </aside>
-
-        {/* Right Output Column (8 cols) */}
-        <main className="col-span-12 lg:col-span-8 h-full min-h-0 flex flex-col bg-white overflow-hidden">
-          {/* Stage Area */}
-          <div className="flex-1 min-h-0 flex flex-col p-4 overflow-hidden relative">
-            {isGenerating ? (
-              <div className="flex-1 flex flex-col items-center justify-center text-center">
-                <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin mb-3" />
-                <p className="text-xs font-mono font-bold uppercase text-black">
-                  {progressText || "Synthesizing media..."}
-                </p>
-                {progressPct > 0 && (
-                  <div className="w-48 h-1 bg-zinc-200 mt-3 overflow-hidden">
-                    <div
-                      className="h-full bg-black transition-all duration-200"
-                      style={{ width: `${progressPct}%` }}
-                    />
-                  </div>
-                )}
-              </div>
-            ) : selectedItem?.type === "image" ? (
-              <div className="flex-1 min-h-0 flex flex-col">
-                <div className="flex-1 min-h-0 flex items-center justify-center overflow-hidden p-2">
-                  <img
-                    src={selectedItem.url}
-                    alt={selectedItem.prompt}
-                    className="max-h-full max-w-full object-contain border border-zinc-300"
-                  />
-                </div>
-
-                {/* Stage Info Bar */}
-                <div className="shrink-0 pt-3 border-t border-zinc-200 flex items-center justify-between gap-4">
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[10px] font-mono text-zinc-500 uppercase">
-                      {selectedItem.type} · {selectedItem.provider} · {selectedItem.createdAt}
-                      {statusNote && <span className="text-black ml-2">[{statusNote}]</span>}
-                    </div>
-                    <p className="text-xs font-mono text-black truncate mt-0.5">
-                      {selectedItem.prompt}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => handleCopyPrompt(selectedItem)}
-                      className="px-3 py-1.5 border border-zinc-300 hover:border-black text-xs font-mono text-black transition-colors cursor-pointer"
-                    >
-                      {copiedId === selectedItem.id ? "Copied" : "Copy Prompt"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDownload(selectedItem)}
-                      className="px-3 py-1.5 bg-black text-white hover:bg-zinc-800 text-xs font-mono transition-colors cursor-pointer flex items-center gap-1.5"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      Download
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex-1 flex flex-col items-center justify-center text-center p-6 text-zinc-400">
-                <p className="text-xs font-mono uppercase tracking-wider text-zinc-500">
-                  Preview
-                </p>
-              </div>
-            )}
-          </div>
-        </main>
       </div>
       )}
 
