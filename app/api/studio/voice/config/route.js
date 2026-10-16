@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getVoiceConfig, saveVoiceConfig } from "@/lib/voice/configStore";
-import { getVoiceMeta } from "@/lib/voice/chat";
+import { getVoiceMeta, syncAgentToElevenLabs } from "@/lib/voice/elevenAgent";
 
 export const runtime = "nodejs";
 
@@ -11,10 +11,9 @@ export async function GET() {
     ok: true,
     config,
     meta: {
-      openaiConfigured: meta.openaiConfigured,
       elevenLabsConfigured: meta.elevenLabsConfigured,
-      defaultVoiceId: meta.voiceId,
-      model: meta.model,
+      agentId: meta.agentId,
+      defaultVoiceId: meta.defaultVoiceId,
     },
   });
 }
@@ -27,8 +26,18 @@ export async function PUT(request) {
     return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 });
   }
   const saved = saveVoiceConfig({
+    agentId: body?.agentId,
     systemPrompt: body?.systemPrompt,
     voiceId: body?.voiceId,
   });
-  return NextResponse.json({ ok: true, config: saved });
+  let syncWarning = null;
+  try {
+    await syncAgentToElevenLabs({
+      systemPrompt: saved.systemPrompt,
+      voiceId: saved.voiceId || undefined,
+    });
+  } catch (e) {
+    syncWarning = e?.message || "Could not sync to ElevenLabs agent";
+  }
+  return NextResponse.json({ ok: true, config: saved, syncWarning });
 }

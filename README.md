@@ -111,7 +111,7 @@ Open https://localhost:3000 (self-signed cert — accept the browser warning onc
 
 ### Voice AI
 
-Studio → **Voice AI** (`/studio/voice`): **Call** tab (mic + replies), **Config** tab (system prompt, voice ID). Set `OPENAI_API_KEY` on the server; optional `ELEVENLABS_API_KEY` for spoken replies.
+Studio → **Voice AI** (`/studio/voice`): **Call** tab (ElevenLabs live agent), **Config** tab (agent ID, prompt, voice). Set `ELEVENLABS_API_KEY` and create an agent at [ElevenLabs Agents](https://elevenlabs.io/app/conversational-ai).
 
 ## 📱 Mobile Support
 

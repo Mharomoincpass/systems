@@ -2,25 +2,22 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Mic, MicOff, Save } from "lucide-react";
+import { ArrowLeft, Phone, PhoneOff, Save } from "lucide-react";
 import { toast } from "sonner";
-
-function getSpeechRecognition() {
-  if (typeof window === "undefined") return null;
-  return window.SpeechRecognition || window.webkitSpeechRecognition || null;
-}
 
 export default function VoiceAiPage() {
   const [tab, setTab] = useState("call");
   const [meta, setMeta] = useState(null);
-  const [config, setConfig] = useState({ systemPrompt: "", voiceId: "" });
+  const [config, setConfig] = useState({
+    agentId: "",
+    systemPrompt: "",
+    voiceId: "",
+  });
   const [saving, setSaving] = useState(false);
-  const [listening, setListening] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [transcript, setTranscript] = useState([]);
-  const recognitionRef = useRef(null);
-  const historyRef = useRef([]);
-  const audioRef = useRef(null);
+  const [callStatus, setCallStatus] = useState("idle");
+  const [agentMode, setAgentMode] = useState("");
+  const [lines, setLines] = useState([]);
+  const conversationRef = useRef(null);
 
   const load = useCallback(async () => {
     try {
@@ -36,6 +33,9 @@ export default function VoiceAiPage() {
 
   useEffect(() => {
     load();
+    return () => {
+      conversationRef.current?.endSession?.().catch(() => {});
+    };
   }, [load]);
 
   const saveConfig = async () => {
@@ -49,7 +49,9 @@ export default function VoiceAiPage() {
       const data = await res.json();
       if (!data?.ok) throw new Error(data?.error || "Save failed");
       setConfig(data.config);
-      toast.success("Config saved");
+      if (data.syncWarning) toast.message(data.syncWarning);
+      else toast.success("Saved — synced to ElevenLabs agent");
+      await load();
     } catch (e) {
       toast.error(e?.message || "Save failed");
     } finally {
@@ -57,89 +59,70 @@ export default function VoiceAiPage() {
     }
   };
 
-  const speakReply = async (data) => {
-    if (data.audioBase64 && data.audioMime) {
-      const src = `data:${data.audioMime};base64,${data.audioBase64}`;
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = src;
-        await audioRef.current.play().catch(() => {});
-        return;
-      }
-    }
-    if (typeof window !== "undefined" && window.speechSynthesis && data.replyText) {
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(data.replyText);
-      window.speechSynthesis.speak(u);
-    }
-  };
-
-  const sendMessage = async (text) => {
-    const message = text.trim();
-    if (!message || busy) return;
-    setBusy(true);
-    setTranscript((t) => [...t, { role: "user", text: message }]);
+  const endCall = async () => {
     try {
-      const res = await fetch("/api/studio/voice/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, history: historyRef.current }),
+      await conversationRef.current?.endSession?.();
+    } catch {
+      /* ignore */
+    }
+    conversationRef.current = null;
+    setCallStatus("idle");
+    setAgentMode("");
+  };
+
+  const startCall = async () => {
+    if (callStatus === "live") return;
+    if (!meta?.elevenLabsConfigured) {
+      toast.error("Set ELEVENLABS_API_KEY on the server.");
+      return;
+    }
+    const agentId = config.agentId?.trim() || meta?.agentId;
+    if (!agentId) {
+      toast.error("Add your ElevenLabs Agent ID in Config and save.");
+      setTab("config");
+      return;
+    }
+    setCallStatus("connecting");
+    setLines([]);
+    try {
+      const sessionRes = await fetch("/api/studio/voice/session");
+      const sessionData = await sessionRes.json();
+      if (!sessionData?.ok) throw new Error(sessionData?.error || "Session failed");
+
+      const { Conversation } = await import("@elevenlabs/client");
+      const conversation = await Conversation.startSession({
+        signedUrl: sessionData.signedUrl,
+        connectionType: "websocket",
+        onConnect: () => {
+          setCallStatus("live");
+          toast.success("Connected — speak");
+        },
+        onDisconnect: () => {
+          setCallStatus("idle");
+          setAgentMode("");
+          conversationRef.current = null;
+        },
+        onModeChange: (mode) => {
+          setAgentMode(mode?.mode || "");
+        },
+        onMessage: (message) => {
+          const text =
+            typeof message === "string"
+              ? message
+              : message?.message || message?.text || JSON.stringify(message);
+          setLines((prev) => [...prev.slice(-40), { at: Date.now(), text }]);
+        },
+        onError: (err) => {
+          const msg = err?.message || String(err || "Call error");
+          toast.error(msg);
+          setCallStatus("idle");
+        },
       });
-      const data = await res.json();
-      if (!data?.ok) throw new Error(data?.error || "Chat failed");
-      const reply = data.data.replyText;
-      historyRef.current = [
-        ...historyRef.current,
-        { role: "user", content: message },
-        { role: "assistant", content: reply },
-      ].slice(-20);
-      setTranscript((t) => [...t, { role: "assistant", text: reply }]);
-      await speakReply(data.data);
+      conversationRef.current = conversation;
     } catch (e) {
-      toast.error(e?.message || "Request failed");
-    } finally {
-      setBusy(false);
+      toast.error(e?.message || "Could not start call");
+      setCallStatus("idle");
     }
-  };
-
-  const stopListening = () => {
-    recognitionRef.current?.stop();
-    recognitionRef.current = null;
-    setListening(false);
-  };
-
-  const startListening = () => {
-    const SR = getSpeechRecognition();
-    if (!SR) {
-      toast.error("Speech recognition not supported in this browser. Use Chrome.");
-      return;
-    }
-    if (!meta?.openaiConfigured) {
-      toast.error("Set OPENAI_API_KEY on the server first (Config tab).");
-      return;
-    }
-    stopListening();
-    const rec = new SR();
-    rec.lang = "en-US";
-    rec.interimResults = false;
-    rec.maxAlternatives = 1;
-    rec.onresult = (ev) => {
-      const text = ev.results?.[0]?.[0]?.transcript;
-      if (text) sendMessage(text);
-    };
-    rec.onerror = () => {
-      setListening(false);
-      toast.message("Mic stopped");
-    };
-    rec.onend = () => setListening(false);
-    recognitionRef.current = rec;
-    rec.start();
-    setListening(true);
-  };
-
-  const toggleMic = () => {
-    if (listening) stopListening();
-    else startListening();
   };
 
   const tabs = [
@@ -149,7 +132,6 @@ export default function VoiceAiPage() {
 
   return (
     <div className="min-h-[100dvh] bg-white text-black font-sans flex flex-col">
-      <audio ref={audioRef} className="hidden" />
       <header className="shrink-0 border-b border-zinc-200 px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link
@@ -183,39 +165,57 @@ export default function VoiceAiPage() {
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 max-w-lg mx-auto w-full">
         {tab === "call" && (
           <div className="space-y-6 flex flex-col items-center pt-8">
-            <p className="text-xs font-mono text-zinc-500 text-center">
-              Tap the mic, speak, then listen. Uses browser speech + OpenAI + ElevenLabs (if
-              set).
+            <p className="text-xs font-mono text-zinc-500 text-center leading-relaxed">
+              Live voice with your{" "}
+              <a
+                href="https://elevenlabs.io/app/conversational-ai"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline text-black"
+              >
+                ElevenLabs agent
+              </a>
+              . Mic required — use Chrome.
             </p>
-            <button
-              type="button"
-              onClick={toggleMic}
-              disabled={busy}
-              className={`w-28 h-28 rounded-full flex items-center justify-center transition-colors disabled:opacity-50 ${
-                listening ? "bg-red-600 text-white" : "bg-black text-white"
-              }`}
-              aria-label={listening ? "Stop listening" : "Start listening"}
-            >
-              {listening ? <MicOff className="w-10 h-10" /> : <Mic className="w-10 h-10" />}
-            </button>
+            {callStatus === "live" && agentMode && (
+              <p className="text-[10px] font-mono uppercase text-zinc-600">
+                Agent: {agentMode}
+              </p>
+            )}
+            {callStatus !== "live" ? (
+              <button
+                type="button"
+                disabled={callStatus === "connecting"}
+                onClick={startCall}
+                className="w-28 h-28 rounded-full flex items-center justify-center bg-black text-white disabled:opacity-50"
+              >
+                <Phone className="w-10 h-10" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={endCall}
+                className="w-28 h-28 rounded-full flex items-center justify-center bg-red-600 text-white"
+              >
+                <PhoneOff className="w-10 h-10" />
+              </button>
+            )}
             <p className="text-[10px] font-mono uppercase text-zinc-500">
-              {busy ? "Thinking…" : listening ? "Listening…" : "Tap to talk"}
+              {callStatus === "connecting"
+                ? "Connecting…"
+                : callStatus === "live"
+                  ? "On call — tap to hang up"
+                  : "Tap to start call"}
             </p>
-            <ul className="w-full space-y-2 text-xs font-mono max-h-[40vh] overflow-y-auto">
-              {transcript.map((line, i) => (
-                <li
-                  key={`${i}-${line.role}`}
-                  className={`p-2 border ${
-                    line.role === "user"
-                      ? "border-zinc-200 bg-zinc-50 ml-4"
-                      : "border-black bg-white mr-4"
-                  }`}
-                >
-                  <span className="text-[10px] uppercase text-zinc-400">{line.role}</span>
-                  <p className="mt-1">{line.text}</p>
-                </li>
-              ))}
-            </ul>
+            {lines.length > 0 && (
+              <ul className="w-full space-y-1 text-[10px] font-mono text-zinc-600 max-h-[30vh] overflow-y-auto border border-zinc-200 p-2">
+                {lines.map((line) => (
+                  <li key={line.at} className="break-words">
+                    {line.text}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
 
@@ -223,25 +223,27 @@ export default function VoiceAiPage() {
           <div className="space-y-4 text-xs font-mono">
             <div className="border border-zinc-200 p-3 space-y-1 bg-zinc-50">
               <p>
-                OpenAI:{" "}
-                {meta?.openaiConfigured ? (
-                  <span className="text-green-700">configured</span>
-                ) : (
-                  <span className="text-red-600">set OPENAI_API_KEY in server .env</span>
-                )}
-              </p>
-              <p>
-                ElevenLabs:{" "}
+                ElevenLabs API:{" "}
                 {meta?.elevenLabsConfigured ? (
-                  <span className="text-green-700">configured (voice output)</span>
+                  <span className="text-green-700">configured (server .env)</span>
                 ) : (
-                  <span className="text-zinc-500">optional — ELEVENLABS_API_KEY</span>
+                  <span className="text-red-600">set ELEVENLABS_API_KEY on server</span>
                 )}
               </p>
-              {meta?.model && (
-                <p className="text-zinc-500">Model: {meta.model}</p>
-              )}
+              <p className="text-zinc-500 leading-relaxed">
+                Create an agent at ElevenLabs → Agents, copy the Agent ID below. Save
+                pushes prompt + voice to that agent.
+              </p>
             </div>
+            <label className="block">
+              <span className="text-[10px] uppercase text-zinc-500">Agent ID</span>
+              <input
+                value={config.agentId || ""}
+                onChange={(e) => setConfig((c) => ({ ...c, agentId: e.target.value }))}
+                placeholder="agent_..."
+                className="mt-1 w-full border border-zinc-300 px-2 py-2"
+              />
+            </label>
             <label className="block">
               <span className="text-[10px] uppercase text-zinc-500">System prompt</span>
               <textarea
@@ -255,7 +257,7 @@ export default function VoiceAiPage() {
             </label>
             <label className="block">
               <span className="text-[10px] uppercase text-zinc-500">
-                ElevenLabs voice ID (blank = env default)
+                Voice ID (optional — blank = agent default)
               </span>
               <input
                 value={config.voiceId || ""}
