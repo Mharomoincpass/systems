@@ -313,15 +313,17 @@ export default function VoiceAiPage() {
                 className="mt-1 w-full border border-zinc-300 px-2 py-2 resize-y"
               />
             </label>
-            <label className="block">
-              <span className="text-[10px] uppercase text-zinc-500">Voice ID</span>
-              <input
-                value={config.voiceId || ""}
-                onChange={(e) => setConfig((c) => ({ ...c, voiceId: e.target.value }))}
-                placeholder={meta?.defaultVoiceId || "21m00Tcm4TlvDq8ikWAM"}
-                className="mt-1 w-full border border-zinc-300 px-2 py-2"
-              />
-            </label>
+            {!(meta?.elevenLabsConfigured && meta?.agentId) && (
+              <label className="block">
+                <span className="text-[10px] uppercase text-zinc-500">Voice ID</span>
+                <input
+                  value={config.voiceId || ""}
+                  onChange={(e) => setConfig((c) => ({ ...c, voiceId: e.target.value }))}
+                  placeholder={meta?.defaultVoiceId || "21m00Tcm4TlvDq8ikWAM"}
+                  className="mt-1 w-full border border-zinc-300 px-2 py-2"
+                />
+              </label>
+            )}
             <button
               type="button"
               onClick={saveConfig}
