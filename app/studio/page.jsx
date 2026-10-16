@@ -796,6 +796,12 @@ export default function FrsionStudioPage() {
             >
               FrsionOS
             </Link>
+            <Link
+              href="/studio/voice"
+              className="text-[10px] font-mono font-bold uppercase text-zinc-500 hover:text-black shrink-0"
+            >
+              Voice AI
+            </Link>
             <div className="relative min-w-0">
             <button
               type="button"

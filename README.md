@@ -107,11 +107,11 @@ Notes:
 npm run dev
 ```
 
-Open https://localhost:3000 (self-signed cert — accept the browser warning once). HTTP will not match dev; WhatsApp webhooks need HTTPS.
+Open https://localhost:3000 (self-signed cert — accept the browser warning once).
 
-### WhatsApp bot (production)
+### Voice AI
 
-For messaging **any number** (not API Setup test recipients), use **Option B**: System User token, real WABA, templates. See [docs/WHATSAPP_PRODUCTION.md](docs/WHATSAPP_PRODUCTION.md). Studio: `/studio/whatsapp` → **Production (B)** tab. CLI: `npm run whatsapp -- phones`, `send-template`, `templates`.
+Studio → **Voice AI** (`/studio/voice`): **Call** tab (mic + replies), **Config** tab (system prompt, voice ID). Set `OPENAI_API_KEY` on the server; optional `ELEVENLABS_API_KEY` for spoken replies.
 
 ## 📱 Mobile Support
 

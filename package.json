@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test:mail": "node scripts/test-mail.mjs",
-    "whatsapp": "node scripts/whatsapp.mjs"
+    "test:mail": "node scripts/test-mail.mjs"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.31.0",

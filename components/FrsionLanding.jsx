@@ -1,9 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, ExternalLink, ImageIcon, MessageCircle } from "lucide-react";
-
-const WHATSAPP_CHAT_URL = process.env.NEXT_PUBLIC_WHATSAPP_BOT_URL?.trim();
-const WHATSAPP_FALLBACK_PAGE = "/whatsapp";
+import { ArrowRight, ImageIcon, Mic } from "lucide-react";
 
 const sectionShell =
   "px-4 sm:px-8 py-12 sm:py-20 max-w-5xl mx-auto border-t border-zinc-200 first:border-t-0";
@@ -76,29 +73,20 @@ export default function FrsionLanding() {
         </section>
 
         <section className={sectionShell}>
-          <p className={eyebrowClass}>Messaging</p>
+          <p className={eyebrowClass}>Voice</p>
           <h2 className={headlineClass}>
             FrsionOS
-            <span className={accentClass}>WhatsApp bot</span>
+            <span className={accentClass}>Voice AI</span>
           </h2>
           <p className={bodyClass}>
-            Chat on WhatsApp to generate images without opening the browser studio — built for
-            quick prompts on your phone.
+            Talk in the browser — mic in, short AI replies out. Configure the system prompt and
+            voice in two tabs.
           </p>
           <div className={actionsRowClass}>
-            <Link href="/studio/whatsapp" className={btnPrimaryClass}>
-              <MessageCircle className="w-4 h-4" />
-              Bot flow & settings
+            <Link href="/studio/voice" className={btnPrimaryClass}>
+              <Mic className="w-4 h-4" />
+              Open Voice AI
             </Link>
-            <a
-              href={WHATSAPP_CHAT_URL || WHATSAPP_FALLBACK_PAGE}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={btnSecondaryClass}
-            >
-              Open on WhatsApp
-              <ExternalLink className="w-3.5 h-3.5 opacity-70" />
-            </a>
           </div>
         </section>
       </main>
