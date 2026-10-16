@@ -4,6 +4,7 @@ import {
   saveWhatsAppFlowConfig,
 } from "@/lib/whatsapp/flowStore";
 import { getPublicAppUrl } from "@/lib/publicAppUrl";
+import { getWhatsAppConnectionStatus } from "@/lib/whatsapp/connectionStore";
 
 export const runtime = "nodejs";
 
@@ -27,6 +28,7 @@ export async function GET() {
       productionMode: process.env.WHATSAPP_PRODUCTION?.trim() === "true",
       productionGuide:
         "docs/WHATSAPP_PRODUCTION.md — System User token, real WABA, templates for cold outbound.",
+      embedded: getWhatsAppConnectionStatus(),
     },
   });
 }

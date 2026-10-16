@@ -1,6 +1,30 @@
-# WhatsApp production setup (Option B)
+# WhatsApp production setup
 
-Manual Meta + `.env` setup (no Embedded Signup UI). Matches the Grocliq Leo **System User + WABA + templates** model.
+## Embedded Signup (Meta-provided number) — recommended
+
+Same flow as **Grocliq Leo**: Meta popup assigns or links a **WABA + phone number** (including Meta’s test / provisioned number) and returns `phone_number_id` + token.
+
+### Meta Dashboard
+
+1. [developers.facebook.com](https://developers.facebook.com) → your app → **WhatsApp** → **Embedded Signup**.
+2. Create an **Embedded Signup configuration** — enable **phone number provisioning** / use Meta-provided number where offered.
+3. Copy **Configuration ID** → `WHATSAPP_EMBEDDED_CONFIG_ID`.
+4. App **Settings → Basic** → App ID → `WHATSAPP_FB_APP_ID`, App Secret → `WHATSAPP_FB_APP_SECRET`.
+
+### FrsionOS
+
+1. Set env vars on server, redeploy/restart.
+2. Open **https://mharomo.systems/studio** → admin login (**A**) → **/studio/whatsapp** → **Production (B)**.
+3. Click **Connect with Meta** — finish popup until **FINISH** (Meta shows assigned number).
+4. Token + `phone_number_id` save to `storage/whatsapp/connection.json` (overrides `.env` for sends/webhooks).
+
+Webhook stays: `https://mharomo.systems/api/whatsapp/webhook` — subscribe **messages**.
+
+---
+
+## Option B — manual `.env`
+
+Manual Meta + `.env` setup (no Embedded Signup UI). **System User + WABA + templates** model.
 
 ## 1. Meta Business
 

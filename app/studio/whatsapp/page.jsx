@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ArrowLeft, Plus, RefreshCw, Save, Trash2 } from "lucide-react";
+import WhatsappEmbeddedConnect from "@/components/whatsapp/WhatsappEmbeddedConnect";
 
 const MATCH_TYPES = [
   { id: "exact", label: "Exact" },
@@ -362,9 +363,15 @@ export default function StudioWhatsappPage() {
 
         {tab === "production" && meta && (
           <section className="space-y-4 text-xs font-mono">
+            <div className="border border-zinc-200 p-4 space-y-3">
+              <p className="font-bold uppercase text-[10px] text-zinc-500">
+                Embedded Signup (Meta-provided number)
+              </p>
+              <WhatsappEmbeddedConnect onConnected={() => load()} />
+            </div>
             <div className="border border-black p-4 space-y-2">
               <p className="font-bold uppercase text-[10px] text-zinc-500">
-                Option B — manual production
+                Option B — manual .env production
               </p>
               <p className="text-zinc-700 leading-relaxed">
                 System User token + real WABA (not API Setup temp token / +1 555 test line).
