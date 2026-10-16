@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Plus, RefreshCw, Save, Trash2 } from "lucide-react";
-import WhatsappEmbeddedConnect from "@/components/whatsapp/WhatsappEmbeddedConnect";
+import { ArrowLeft, Plus, RefreshCw, Save, Trash2, UserPlus, X } from "lucide-react";
 
 const MATCH_TYPES = [
   { id: "exact", label: "Exact" },
@@ -39,6 +38,10 @@ export default function StudioWhatsappPage() {
   const [settings, setSettings] = useState(null);
   const [rules, setRules] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [recipients, setRecipients] = useState([]);
+  const [newPhone, setNewPhone] = useState("");
+  const [newName, setNewName] = useState("");
+  const [addingRecipient, setAddingRecipient] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -66,6 +69,16 @@ export default function StudioWhatsappPage() {
     }
   }, []);
 
+  const loadRecipients = useCallback(async () => {
+    try {
+      const res = await fetch("/api/whatsapp/recipients", { credentials: "include" });
+      const data = await res.json();
+      if (data?.ok) setRecipients(data.recipients || []);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   useEffect(() => {
     load();
   }, [load]);
@@ -76,6 +89,10 @@ export default function StudioWhatsappPage() {
     const t = setInterval(loadMessages, 4000);
     return () => clearInterval(t);
   }, [tab, loadMessages]);
+
+  useEffect(() => {
+    if (tab === "recipients") loadRecipients();
+  }, [tab, loadRecipients]);
 
   const save = async () => {
     setSaving(true);
@@ -103,12 +120,52 @@ export default function StudioWhatsappPage() {
     setRules((prev) => prev.filter((r) => r.id !== id));
   };
 
+  const handleAddRecipient = async () => {
+    const phone = newPhone.replace(/\D/g, "");
+    if (!phone) {
+      toast.error("Enter a phone number");
+      return;
+    }
+    setAddingRecipient(true);
+    try {
+      const res = await fetch("/api/whatsapp/recipients", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, name: newName.trim() }),
+      });
+      const data = await res.json();
+      if (!data?.ok) throw new Error(data?.error || "Failed");
+      setRecipients(data.recipients || []);
+      setNewPhone("");
+      setNewName("");
+      toast.success(`Added +${phone}`);
+    } catch (e) {
+      toast.error(e?.message || "Failed to add");
+    } finally {
+      setAddingRecipient(false);
+    }
+  };
+
+  const handleRemoveRecipient = async (phone) => {
+    try {
+      const res = await fetch(`/api/whatsapp/recipients?phone=${phone}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (data?.ok) setRecipients(data.recipients || []);
+    } catch {
+      toast.error("Failed to remove");
+    }
+  };
+
   const tabs = [
     { id: "settings", label: "Settings" },
     { id: "flow", label: "Conversation flow" },
     { id: "log", label: "Live log" },
-    { id: "production", label: "Production (B)" },
-    { id: "test", label: "Test on WhatsApp" },
+    { id: "recipients", label: "Recipients" },
+    { id: "test", label: "Test" },
   ];
 
   if (loading || !settings) {
@@ -274,7 +331,9 @@ export default function StudioWhatsappPage() {
                 <div className="grid sm:grid-cols-2 gap-2">
                   <select
                     value={rule.matchType}
-                    onChange={(e) => updateRule(rule.id, { matchType: e.target.value })}
+                    onChange={(e) =>
+                      updateRule(rule.id, { matchType: e.target.value })
+                    }
                     className="border border-zinc-300 px-2 py-1.5 text-xs font-mono bg-white"
                   >
                     {MATCH_TYPES.map((m) => (
@@ -329,7 +388,9 @@ export default function StudioWhatsappPage() {
         {tab === "log" && (
           <section>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-xs font-mono font-bold uppercase">Recent messages</h2>
+              <h2 className="text-xs font-mono font-bold uppercase">
+                Recent messages
+              </h2>
               <button
                 type="button"
                 onClick={loadMessages}
@@ -341,7 +402,7 @@ export default function StudioWhatsappPage() {
             </div>
             {messages.length === 0 ? (
               <p className="text-xs font-mono text-zinc-400 border border-dashed border-zinc-300 p-6">
-                No messages yet. Text the Meta test number after webhook is connected.
+                No messages yet. Text the WhatsApp test number.
               </p>
             ) : (
               <ul className="space-y-2">
@@ -353,7 +414,9 @@ export default function StudioWhatsappPage() {
                     <span className="text-zinc-500">
                       {new Date(m.at).toLocaleString()} · {m.direction} · {m.from}
                     </span>
-                    <p className="text-black mt-1 break-words">{m.text || m.kind}</p>
+                    <p className="text-black mt-1 break-words">
+                      {m.text || m.kind}
+                    </p>
                   </li>
                 ))}
               </ul>
@@ -361,80 +424,111 @@ export default function StudioWhatsappPage() {
           </section>
         )}
 
-        {tab === "production" && meta && (
+        {tab === "recipients" && (
           <section className="space-y-4 text-xs font-mono">
             <div className="border border-zinc-200 p-4 space-y-3">
               <p className="font-bold uppercase text-[10px] text-zinc-500">
-                Embedded Signup (Meta-provided number)
+                Test recipients
               </p>
-              <WhatsappEmbeddedConnect onConnected={() => load()} />
+              <p className="text-zinc-600 leading-relaxed">
+                Phone numbers the bot can message. On Meta&apos;s test number (+1 555
+                677 0611), you must also add recipients in{" "}
+                <strong>Meta → API Setup → To</strong>. This list is for your own
+                tracking.
+              </p>
+              <div className="flex gap-2 items-end">
+                <label className="flex-1">
+                  <span className="text-[10px] uppercase text-zinc-500">
+                    Phone (with country code)
+                  </span>
+                  <input
+                    value={newPhone}
+                    onChange={(e) => setNewPhone(e.target.value)}
+                    placeholder="+91 6009325630"
+                    className="mt-1 w-full border border-zinc-300 px-2 py-1.5"
+                  />
+                </label>
+                <label className="w-32">
+                  <span className="text-[10px] uppercase text-zinc-500">Name</span>
+                  <input
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    placeholder="optional"
+                    className="mt-1 w-full border border-zinc-300 px-2 py-1.5"
+                  />
+                </label>
+                <button
+                  type="button"
+                  disabled={addingRecipient}
+                  onClick={handleAddRecipient}
+                  className="inline-flex items-center gap-1 min-h-[34px] px-3 bg-black text-white font-bold uppercase disabled:opacity-50"
+                >
+                  <UserPlus className="w-3 h-3" />
+                  Add
+                </button>
+              </div>
             </div>
-            <div className="border border-black p-4 space-y-2">
-              <p className="font-bold uppercase text-[10px] text-zinc-500">
-                Option B — manual .env production
+            {recipients.length === 0 ? (
+              <p className="text-zinc-400 border border-dashed border-zinc-300 p-6">
+                No recipients added yet.
               </p>
-              <p className="text-zinc-700 leading-relaxed">
-                System User token + real WABA (not API Setup temp token / +1 555 test line).
-                Full checklist: <code className="text-black">docs/WHATSAPP_PRODUCTION.md</code> in
-                the repo.
-              </p>
-              <p>
-                Production flag:{" "}
-                {meta.productionMode ? (
-                  <span className="text-green-700">WHATSAPP_PRODUCTION=true</span>
-                ) : (
-                  <span className="text-zinc-500">WHATSAPP_PRODUCTION not set (dev OK)</span>
-                )}
-              </p>
-              <p>App secret: {meta.appSecretSet ? "set" : "recommended for webhook signatures"}</p>
-            </div>
-            <ol className="list-decimal list-inside space-y-2 text-zinc-700 border border-zinc-200 p-4">
-              <li>Meta Business → System User → long-lived token with WhatsApp permissions</li>
-              <li>
-                <code className="text-black">npm run whatsapp -- phones</code> → fix{" "}
-                <code className="text-black">WHATSAPP_PHONE_NUMBER_ID</code> on server
-              </li>
-              <li>
-                <code className="text-black">npm run whatsapp -- subscribe</code> and{" "}
-                <code className="text-black">register &lt;PIN&gt;</code> if needed
-              </li>
-              <li>Webhook: {meta.webhookUrl} — subscribe <strong>messages</strong></li>
-              <li>
-                Outbound to anyone: approved <strong>templates</strong> (
-                <code className="text-black">npm run whatsapp -- send-template …</code>)
-              </li>
-              <li>Inbound replies (24h): bot flow on this page — no test recipient list</li>
-            </ol>
-            <p className="text-[10px] text-zinc-500 leading-relaxed">
-              Admin API: POST /api/whatsapp/send (studio admin cookie) with{" "}
-              <code className="text-black">templateName</code> or <code className="text-black">text</code>
-              .
-            </p>
+            ) : (
+              <ul className="space-y-1">
+                {recipients.map((r) => (
+                  <li
+                    key={r.phone}
+                    className="flex items-center justify-between border border-zinc-200 px-3 py-2"
+                  >
+                    <div>
+                      <span className="text-black">+{r.phone}</span>
+                      {r.name && (
+                        <span className="ml-2 text-zinc-500">{r.name}</span>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveRecipient(r.phone)}
+                      className="p-1 text-zinc-400 hover:text-red-600"
+                      aria-label="Remove"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
         )}
 
         {tab === "test" && meta && (
           <section className="space-y-4 text-xs font-mono">
             <div className="border border-black p-4 space-y-2">
-              <p className="font-bold uppercase text-[10px] text-zinc-500">Status</p>
-              <p>WhatsApp API: {meta.whatsappConfigured ? "configured" : "missing .env"}</p>
-              <p>ElevenLabs: {meta.voiceConfigured ? "configured" : "missing key"}</p>
-            </div>
-            <div className="border border-zinc-200 p-4 space-y-2">
               <p className="font-bold uppercase text-[10px] text-zinc-500">
-                Local webhook (use ngrok)
+                Status
               </p>
-              <p className="text-zinc-600 leading-relaxed">
-                Run <code className="text-black">npm run dev</code> then{" "}
-                <code className="text-black">ngrok http 3001</code> (your port). Paste
-                this URL in Meta → WhatsApp → Configuration:
+              <p>
+                WhatsApp API:{" "}
+                {meta.whatsappConfigured ? (
+                  <span className="text-green-700">configured</span>
+                ) : (
+                  <span className="text-red-600">missing .env</span>
+                )}
               </p>
-              <code className="block bg-zinc-100 p-2 break-all text-[10px]">
-                {meta.webhookUrl}
-              </code>
-              <p className="text-zinc-500">
-                Verify token in .env: WHATSAPP_VERIFY_TOKEN
-                {meta.verifyTokenSet ? " (set)" : " (not set)"}
+              <p>
+                ElevenLabs:{" "}
+                {meta.voiceConfigured ? "configured" : "missing key"}
+              </p>
+              <p>
+                Webhook:{" "}
+                <code className="text-black break-all">{meta.webhookUrl}</code>
+              </p>
+              <p>
+                Verify token:{" "}
+                {meta.verifyTokenSet ? (
+                  <span className="text-green-700">set</span>
+                ) : (
+                  <span className="text-red-600">not set</span>
+                )}
               </p>
             </div>
             <div className="border border-zinc-200 p-4">
@@ -442,9 +536,13 @@ export default function StudioWhatsappPage() {
                 Test from your phone
               </p>
               <ol className="list-decimal list-inside space-y-1 text-zinc-700">
-                <li>Save flow above</li>
-                <li>Message Meta test number +1 555 677 0611</li>
-                <li>Try help, a prompt, or /voice hello</li>
+                <li>Save flow above (Settings + Conversation flow tabs)</li>
+                <li>
+                  Add your number in <strong>Recipients</strong> tab + Meta API
+                  Setup → To
+                </li>
+                <li>Message test number +1 555 677 0611</li>
+                <li>Try: hi, help, a prompt, or /voice hello</li>
                 <li>Watch Live log tab</li>
               </ol>
             </div>
