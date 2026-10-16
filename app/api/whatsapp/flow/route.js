@@ -23,6 +23,10 @@ export async function GET() {
         process.env.WHATSAPP_ACCESS_TOKEN?.trim() &&
           process.env.WHATSAPP_PHONE_NUMBER_ID?.trim()
       ),
+      appSecretSet: Boolean(process.env.WHATSAPP_APP_SECRET?.trim()),
+      productionMode: process.env.WHATSAPP_PRODUCTION?.trim() === "true",
+      productionGuide:
+        "docs/WHATSAPP_PRODUCTION.md — System User token, real WABA, templates for cold outbound.",
     },
   });
 }

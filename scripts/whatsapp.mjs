@@ -74,11 +74,13 @@ function help() {
   console.log(`
 WhatsApp Cloud API CLI (Meta Graph — not MCP)
 
-Setup (Meta Developer Console → Mharomo.systems → WhatsApp → API Setup):
-  Use Meta's provided TEST phone number (no SIM needed).
-  Copy Phone number ID + temporary access token into .env.
-  Add your personal WhatsApp number as a test recipient ("To" / Manage phone list).
-  Temporary tokens expire (~24h); System User token for long-running production.
+Dev/test (API Setup):
+  Meta test number + temporary token + test recipients on "To" list.
+
+Production Option B (see docs/WHATSAPP_PRODUCTION.md):
+  Business System User long-lived token, real WABA phone, WHATSAPP_APP_SECRET,
+  npm run whatsapp -- subscribe && register <PIN>
+  Templates for messaging any number outside the 24h window.
 
 Required .env:
   WHATSAPP_ACCESS_TOKEN=
@@ -99,6 +101,9 @@ Commands:
   register <pin>     Register Meta test number with Cloud API (6-digit PIN)
   voice <text>       Test ElevenLabs TTS locally (writes /tmp not sent)
   subscribe          POST subscribed_apps on WABA (needs WHATSAPP_BUSINESS_ACCOUNT_ID)
+  phones             List phone numbers on your WABA (copy Phone number ID into .env)
+  templates [search] List approved WABA message templates
+  send-template <to> <name> [language] [body1 body2…]
   webhook            Print callback URL + verify token for Meta Configuration UI
 
 Webhook URL to paste in Meta (WhatsApp → Configuration):
@@ -209,6 +214,62 @@ async function subscribe() {
   console.log(JSON.stringify(data, null, 2));
 }
 
+async function phones() {
+  if (!wabaId) {
+    console.error("Set WHATSAPP_BUSINESS_ACCOUNT_ID (WABA id from API Setup)");
+    process.exit(1);
+  }
+  const data = await graphRequest(
+    `/${wabaId}/phone_numbers?fields=id,display_phone_number,verified_name,quality_rating`
+  );
+  console.log(JSON.stringify(data, null, 2));
+}
+
+async function templates(search = "") {
+  if (!wabaId) {
+    console.error("Set WHATSAPP_BUSINESS_ACCOUNT_ID");
+    process.exit(1);
+  }
+  let path = `/${wabaId}/message_templates?limit=100&fields=name,status,language,category`;
+  if (search) path += `&name=${encodeURIComponent(search)}`;
+  const data = await graphRequest(path);
+  console.log(JSON.stringify(data, null, 2));
+}
+
+async function sendTemplate(to, templateName, languageCode, ...bodyParts) {
+  if (!to || !templateName) {
+    console.error("Usage: npm run whatsapp -- send-template 919876543210 hello_world en");
+    process.exit(1);
+  }
+  if (!phoneNumberId) {
+    console.error("Set WHATSAPP_PHONE_NUMBER_ID");
+    process.exit(1);
+  }
+  const lang = (languageCode || "en").replace(/-/g, "_");
+  const components = [];
+  if (bodyParts.length) {
+    components.push({
+      type: "body",
+      parameters: bodyParts.map((text) => ({ type: "text", text: String(text).slice(0, 1024) })),
+    });
+  }
+  const payload = {
+    messaging_product: "whatsapp",
+    to: String(to).replace(/\D/g, ""),
+    type: "template",
+    template: {
+      name: templateName,
+      language: { code: lang },
+      ...(components.length ? { components } : {}),
+    },
+  };
+  const data = await graphRequest(`/${phoneNumberId}/messages`, {
+    method: "POST",
+    body: payload,
+  });
+  console.log(JSON.stringify(data, null, 2));
+}
+
 function webhookInfo() {
   console.log("Callback URL:");
   console.log(`  ${appUrl.replace(/\/$/, "")}/api/whatsapp/webhook`);
@@ -243,6 +304,15 @@ try {
       break;
     case "subscribe":
       await subscribe();
+      break;
+    case "phones":
+      await phones();
+      break;
+    case "templates":
+      await templates(rest[0] || "");
+      break;
+    case "send-template":
+      await sendTemplate(rest[0], rest[1], rest[2], ...rest.slice(3));
       break;
     case "webhook":
       webhookInfo();

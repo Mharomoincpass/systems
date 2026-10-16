@@ -106,6 +106,7 @@ export default function StudioWhatsappPage() {
     { id: "settings", label: "Settings" },
     { id: "flow", label: "Conversation flow" },
     { id: "log", label: "Live log" },
+    { id: "production", label: "Production (B)" },
     { id: "test", label: "Test on WhatsApp" },
   ];
 
@@ -356,6 +357,52 @@ export default function StudioWhatsappPage() {
                 ))}
               </ul>
             )}
+          </section>
+        )}
+
+        {tab === "production" && meta && (
+          <section className="space-y-4 text-xs font-mono">
+            <div className="border border-black p-4 space-y-2">
+              <p className="font-bold uppercase text-[10px] text-zinc-500">
+                Option B — manual production
+              </p>
+              <p className="text-zinc-700 leading-relaxed">
+                System User token + real WABA (not API Setup temp token / +1 555 test line).
+                Full checklist: <code className="text-black">docs/WHATSAPP_PRODUCTION.md</code> in
+                the repo.
+              </p>
+              <p>
+                Production flag:{" "}
+                {meta.productionMode ? (
+                  <span className="text-green-700">WHATSAPP_PRODUCTION=true</span>
+                ) : (
+                  <span className="text-zinc-500">WHATSAPP_PRODUCTION not set (dev OK)</span>
+                )}
+              </p>
+              <p>App secret: {meta.appSecretSet ? "set" : "recommended for webhook signatures"}</p>
+            </div>
+            <ol className="list-decimal list-inside space-y-2 text-zinc-700 border border-zinc-200 p-4">
+              <li>Meta Business → System User → long-lived token with WhatsApp permissions</li>
+              <li>
+                <code className="text-black">npm run whatsapp -- phones</code> → fix{" "}
+                <code className="text-black">WHATSAPP_PHONE_NUMBER_ID</code> on server
+              </li>
+              <li>
+                <code className="text-black">npm run whatsapp -- subscribe</code> and{" "}
+                <code className="text-black">register &lt;PIN&gt;</code> if needed
+              </li>
+              <li>Webhook: {meta.webhookUrl} — subscribe <strong>messages</strong></li>
+              <li>
+                Outbound to anyone: approved <strong>templates</strong> (
+                <code className="text-black">npm run whatsapp -- send-template …</code>)
+              </li>
+              <li>Inbound replies (24h): bot flow on this page — no test recipient list</li>
+            </ol>
+            <p className="text-[10px] text-zinc-500 leading-relaxed">
+              Admin API: POST /api/whatsapp/send (studio admin cookie) with{" "}
+              <code className="text-black">templateName</code> or <code className="text-black">text</code>
+              .
+            </p>
           </section>
         )}
 
