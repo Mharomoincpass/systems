@@ -72,7 +72,7 @@ ADMIN_PASSWORD="your-strong-admin-password"
 POLLINATIONS_API_KEY="your-pollinations-secret-key"
 ZEPTOMAIL_API_KEY="your-zeptomail-encrypted-api-key"
 ZEPTOMAIL_FROM_ADDRESS="noreply@mharomo.systems"
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
+NEXT_PUBLIC_APP_URL="https://localhost:3000"
 AZURE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...;EndpointSuffix=core.windows.net"
 AZURE_STORAGE_CONTAINER="media"
 NODE_ENV="development"
@@ -107,7 +107,7 @@ Notes:
 npm run dev
 ```
 
-Open http://localhost:3000
+Open https://localhost:3000 (self-signed cert — accept the browser warning once). HTTP will not match dev; WhatsApp webhooks need HTTPS.
 
 ## 📱 Mobile Support
 

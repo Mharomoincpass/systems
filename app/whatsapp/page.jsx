@@ -24,13 +24,21 @@ export default function WhatsAppBotPage() {
             </p>
           </div>
         </Link>
-        <Link
-          href="/studio"
-          className="shrink-0 inline-flex items-center gap-2 min-h-[44px] px-4 py-2 border border-black text-xs font-mono font-bold uppercase tracking-wide hover:bg-black hover:text-white transition-colors"
-        >
-          Web studio
-          <ArrowRight className="w-3.5 h-3.5" />
-        </Link>
+        <div className="flex flex-wrap gap-2 shrink-0">
+          <Link
+            href="/studio/whatsapp"
+            className="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 bg-black text-white text-xs font-mono font-bold uppercase tracking-wide hover:bg-zinc-800 transition-colors"
+          >
+            Bot flow & settings
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+          <Link
+            href="/studio"
+            className="inline-flex items-center gap-2 min-h-[44px] px-4 py-2 border border-black text-xs font-mono font-bold uppercase tracking-wide hover:bg-black hover:text-white transition-colors"
+          >
+            Image studio
+          </Link>
+        </div>
       </header>
 
       <main className="flex-1 px-4 sm:px-8 py-12 sm:py-16 max-w-2xl mx-auto w-full flex flex-col">

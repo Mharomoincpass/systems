@@ -1,16 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, ImageIcon, MessageCircle, Sparkles } from "lucide-react";
+import { ArrowRight, ExternalLink, ImageIcon, MessageCircle } from "lucide-react";
 
-const WHATSAPP_BOT_PAGE = "/whatsapp";
-
-const FEATURES = [
-  {
-    icon: Sparkles,
-    title: "Text & reference images",
-    body: "FLUX, DreamShaper, GPT Image, and Kontext — pick T2I or I2I with clear Pollen pricing.",
-  },
-];
+const WHATSAPP_CHAT_URL = process.env.NEXT_PUBLIC_WHATSAPP_BOT_URL?.trim();
+const WHATSAPP_FALLBACK_PAGE = "/whatsapp";
 
 const sectionShell =
   "px-4 sm:px-8 py-12 sm:py-20 max-w-5xl mx-auto border-t border-zinc-200 first:border-t-0";
@@ -93,30 +86,19 @@ export default function FrsionLanding() {
             quick prompts on your phone.
           </p>
           <div className={actionsRowClass}>
+            <Link href="/studio/whatsapp" className={btnPrimaryClass}>
+              <MessageCircle className="w-4 h-4" />
+              Bot flow & settings
+            </Link>
             <a
-              href={WHATSAPP_BOT_PAGE}
+              href={WHATSAPP_CHAT_URL || WHATSAPP_FALLBACK_PAGE}
               target="_blank"
               rel="noopener noreferrer"
-              className={btnPrimaryClass}
+              className={btnSecondaryClass}
             >
-              <MessageCircle className="w-4 h-4" />
-              Open WhatsApp bot
+              Open on WhatsApp
+              <ExternalLink className="w-3.5 h-3.5 opacity-70" />
             </a>
-          </div>
-        </section>
-
-        <section className="border-t border-zinc-200 bg-zinc-50 px-4 sm:px-8 py-12 sm:py-16">
-          <div className="max-w-5xl mx-auto grid sm:grid-cols-3 gap-4 sm:gap-6">
-            {FEATURES.map(({ icon: Icon, title, body }) => (
-              <div
-                key={title}
-                className="border border-zinc-200 bg-white p-5 flex flex-col gap-3 hover:border-black transition-colors"
-              >
-                <Icon className="w-5 h-5 text-black" strokeWidth={1.5} />
-                <h3 className="text-xs font-mono font-bold uppercase tracking-wide">{title}</h3>
-                <p className="text-[11px] font-mono text-zinc-600 leading-relaxed">{body}</p>
-              </div>
-            ))}
           </div>
         </section>
       </main>

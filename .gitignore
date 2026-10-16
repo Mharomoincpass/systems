@@ -49,3 +49,5 @@ storage/whatsapp/
 temp_chat_*.jsx
 current_ui.jsx
 *_backup.jsx
+
+certificates
