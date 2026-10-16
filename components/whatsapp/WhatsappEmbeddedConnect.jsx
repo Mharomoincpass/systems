@@ -39,11 +39,9 @@ export default function WhatsappEmbeddedConnect({ onConnected }) {
 
   const loadMeta = useCallback(async () => {
     try {
-      const res = await fetch("/api/whatsapp/auth/embedded-meta");
-      if (res.status === 401) {
-        setMeta({ enabled: false, needsAdmin: true });
-        return;
-      }
+      const res = await fetch("/api/whatsapp/auth/embedded-meta", {
+        credentials: "include",
+      });
       const data = await res.json();
       setMeta(data?.data?.enabled ? data.data : { enabled: false });
     } catch {
@@ -135,6 +133,11 @@ export default function WhatsappEmbeddedConnect({ onConnected }) {
       toast.error("Facebook SDK not ready — refresh (use HTTPS).");
       return;
     }
+    const configId = String(meta.configId || "").trim();
+    if (!configId) {
+      toast.error("Missing Embedded Signup config ID on server (WHATSAPP_EMBEDDED_CONFIG_ID).");
+      return;
+    }
     embeddedFinishRef.current = null;
     setConnecting(true);
     window.FB.login(
@@ -148,6 +151,7 @@ export default function WhatsappEmbeddedConnect({ onConnected }) {
           .then(async (finish) => {
             const res = await fetch("/api/whatsapp/auth/embedded", {
               method: "POST",
+              credentials: "include",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 code: response.authResponse.code,
@@ -173,9 +177,10 @@ export default function WhatsappEmbeddedConnect({ onConnected }) {
           .finally(() => setConnecting(false));
       },
       {
-        config_id: meta.configId,
+        config_id: configId,
         response_type: "code",
         override_default_response_type: true,
+        auth_type: "rerequest",
         // Embedded Signup v4 (2026 templates): empty extras; products set in Login configuration.
         extras: {},
       }
@@ -248,7 +253,7 @@ export default function WhatsappEmbeddedConnect({ onConnected }) {
       </label>
       <button
         type="button"
-        disabled={!fbReady || connecting}
+        disabled={!fbReady || connecting || !meta.configId}
         onClick={startConnect}
         className="inline-flex min-h-[44px] px-4 bg-[#1877F2] text-white font-bold uppercase tracking-wide disabled:opacity-50"
       >
