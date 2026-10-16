@@ -17,6 +17,10 @@ export default function VoiceAiPage() {
   const [callStatus, setCallStatus] = useState("idle");
   const [agentMode, setAgentMode] = useState("");
   const [lines, setLines] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [serverApiKey, setServerApiKey] = useState("");
+  const [serverAgentId, setServerAgentId] = useState("");
+  const [savingServer, setSavingServer] = useState(false);
   const conversationRef = useRef(null);
 
   const load = useCallback(async () => {
@@ -33,10 +37,43 @@ export default function VoiceAiPage() {
 
   useEffect(() => {
     load();
+    fetch("/api/studio/admin/voice-env", { credentials: "include" })
+      .then((r) => {
+        setIsAdmin(r.ok);
+        return r.ok ? r.json() : null;
+      })
+      .then((data) => {
+        if (data?.meta?.agentId) setServerAgentId(data.meta.agentId);
+      })
+      .catch(() => setIsAdmin(false));
     return () => {
       conversationRef.current?.endSession?.().catch(() => {});
     };
   }, [load]);
+
+  const saveServerEnv = async () => {
+    setSavingServer(true);
+    try {
+      const res = await fetch("/api/studio/admin/voice-env", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...(serverApiKey.trim() ? { apiKey: serverApiKey.trim() } : {}),
+          ...(serverAgentId.trim() ? { agentId: serverAgentId.trim() } : {}),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Save failed");
+      setServerApiKey("");
+      toast.success("Server .env updated — try Call");
+      await load();
+    } catch (e) {
+      toast.error(e?.message || "Need studio admin login (A on /studio) first");
+    } finally {
+      setSavingServer(false);
+    }
+  };
 
   const saveConfig = async () => {
     setSaving(true);
@@ -227,14 +264,63 @@ export default function VoiceAiPage() {
                 {meta?.elevenLabsConfigured ? (
                   <span className="text-green-700">configured (server .env)</span>
                 ) : (
-                  <span className="text-red-600">set ELEVENLABS_API_KEY on server</span>
+                  <span className="text-red-600">
+                    missing on server (.env is empty — use form below after admin login)
+                  </span>
                 )}
               </p>
+              {meta?.agentId && (
+                <p>
+                  Agent ID: <code className="text-black">{meta.agentId}</code>
+                </p>
+              )}
               <p className="text-zinc-500 leading-relaxed">
-                Create an agent at ElevenLabs → Agents, copy the Agent ID below. Save
-                pushes prompt + voice to that agent.
+                ElevenLabs → Agents → copy Agent ID. Save config syncs prompt + voice to
+                that agent.
               </p>
             </div>
+            {isAdmin ? (
+              <div className="border border-black p-3 space-y-2 bg-zinc-50">
+                <p className="font-bold uppercase text-[10px]">Server secrets (admin)</p>
+                <label className="block">
+                  <span className="text-[10px] uppercase text-zinc-500">
+                    ElevenLabs API key
+                  </span>
+                  <input
+                    type="password"
+                    value={serverApiKey}
+                    onChange={(e) => setServerApiKey(e.target.value)}
+                    placeholder="paste once — not shown again"
+                    className="mt-1 w-full border border-zinc-300 px-2 py-2"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-[10px] uppercase text-zinc-500">Agent ID</span>
+                  <input
+                    value={serverAgentId}
+                    onChange={(e) => setServerAgentId(e.target.value)}
+                    placeholder="agent_..."
+                    className="mt-1 w-full border border-zinc-300 px-2 py-2"
+                  />
+                </label>
+                <button
+                  type="button"
+                  disabled={savingServer}
+                  onClick={saveServerEnv}
+                  className="inline-flex min-h-[40px] px-3 bg-black text-white font-bold uppercase disabled:opacity-50"
+                >
+                  {savingServer ? "Saving…" : "Save to server .env"}
+                </button>
+              </div>
+            ) : (
+              <p className="text-[10px] text-zinc-500 border border-dashed border-zinc-300 p-3">
+                Log in on{" "}
+                <Link href="/studio" className="underline text-black">
+                  /studio
+                </Link>{" "}
+                (admin <strong>A</strong>) to paste API key + Agent ID here without SSH.
+              </p>
+            )}
             <label className="block">
               <span className="text-[10px] uppercase text-zinc-500">Agent ID</span>
               <input
