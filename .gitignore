@@ -43,6 +43,7 @@ storage/studio-gallery/
 storage/studio-admin/
 storage/studio-generation-log/
 storage/studio-subscribers/
+storage/whatsapp/
 
 # Local scratch UI snapshots
 temp_chat_*.jsx

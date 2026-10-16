@@ -97,6 +97,7 @@ Commands:
   send <to> <text>   Send a test text (to = country code + number, no +)
   send-image <to> <url> [caption]
   register <pin>     Register Meta test number with Cloud API (6-digit PIN)
+  voice <text>       Test ElevenLabs TTS locally (writes /tmp not sent)
   subscribe          POST subscribed_apps on WABA (needs WHATSAPP_BUSINESS_ACCOUNT_ID)
   webhook            Print callback URL + verify token for Meta Configuration UI
 
