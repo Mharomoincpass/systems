@@ -176,11 +176,8 @@ export default function WhatsappEmbeddedConnect({ onConnected }) {
         config_id: meta.configId,
         response_type: "code",
         override_default_response_type: true,
-        extras: {
-          featureType: "whatsapp_business_messaging",
-          sessionInfoVersion: "3",
-          version: "v3",
-        },
+        // Embedded Signup v4 (2026 templates): empty extras; products set in Login configuration.
+        extras: {},
       }
     );
   };
