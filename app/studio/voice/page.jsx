@@ -258,78 +258,50 @@ export default function VoiceAiPage() {
 
         {tab === "config" && (
           <div className="space-y-4 text-xs font-mono">
-            <div className="border border-zinc-200 p-3 space-y-1 bg-zinc-50">
-              <p>
-                ElevenLabs API:{" "}
-                {meta?.elevenLabsConfigured ? (
-                  <span className="text-green-700">configured (server .env)</span>
-                ) : (
-                  <span className="text-red-600">
-                    missing on server (.env is empty — use form below after admin login)
-                  </span>
-                )}
-              </p>
-              {meta?.agentId && (
-                <p>
-                  Agent ID: <code className="text-black">{meta.agentId}</code>
+            {!(meta?.elevenLabsConfigured && meta?.agentId) && (
+              <>
+                <p className="text-red-600 border border-red-200 bg-red-50 p-3">
+                  Voice AI is not wired up on the server yet (API key or agent missing).
                 </p>
-              )}
-              <p className="text-zinc-500 leading-relaxed">
-                ElevenLabs → Agents → copy Agent ID. Save config syncs prompt + voice to
-                that agent.
-              </p>
-            </div>
-            {isAdmin ? (
-              <div className="border border-black p-3 space-y-2 bg-zinc-50">
-                <p className="font-bold uppercase text-[10px]">Server secrets (admin)</p>
-                <label className="block">
-                  <span className="text-[10px] uppercase text-zinc-500">
-                    ElevenLabs API key
-                  </span>
-                  <input
-                    type="password"
-                    value={serverApiKey}
-                    onChange={(e) => setServerApiKey(e.target.value)}
-                    placeholder="paste once — not shown again"
-                    className="mt-1 w-full border border-zinc-300 px-2 py-2"
-                  />
-                </label>
-                <label className="block">
-                  <span className="text-[10px] uppercase text-zinc-500">Agent ID</span>
-                  <input
-                    value={serverAgentId}
-                    onChange={(e) => setServerAgentId(e.target.value)}
-                    placeholder="agent_..."
-                    className="mt-1 w-full border border-zinc-300 px-2 py-2"
-                  />
-                </label>
-                <button
-                  type="button"
-                  disabled={savingServer}
-                  onClick={saveServerEnv}
-                  className="inline-flex min-h-[40px] px-3 bg-black text-white font-bold uppercase disabled:opacity-50"
-                >
-                  {savingServer ? "Saving…" : "Save to server .env"}
-                </button>
-              </div>
-            ) : (
-              <p className="text-[10px] text-zinc-500 border border-dashed border-zinc-300 p-3">
-                Log in on{" "}
-                <Link href="/studio" className="underline text-black">
-                  /studio
-                </Link>{" "}
-                (admin <strong>A</strong>) to paste API key + Agent ID here without SSH.
-              </p>
+                {isAdmin ? (
+                  <div className="border border-zinc-300 p-3 space-y-2">
+                    <label className="block">
+                      <span className="text-[10px] uppercase text-zinc-500">
+                        ElevenLabs API key
+                      </span>
+                      <input
+                        type="password"
+                        value={serverApiKey}
+                        onChange={(e) => setServerApiKey(e.target.value)}
+                        className="mt-1 w-full border border-zinc-300 px-2 py-2"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="text-[10px] uppercase text-zinc-500">Agent ID</span>
+                      <input
+                        value={serverAgentId}
+                        onChange={(e) => setServerAgentId(e.target.value)}
+                        placeholder="agent_..."
+                        className="mt-1 w-full border border-zinc-300 px-2 py-2"
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      disabled={savingServer}
+                      onClick={saveServerEnv}
+                      className="inline-flex min-h-[40px] px-3 bg-black text-white font-bold uppercase disabled:opacity-50"
+                    >
+                      {savingServer ? "Saving…" : "Save server setup"}
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-[10px] text-zinc-500">
+                    Studio admin login required to add keys, or set{" "}
+                    <code className="text-black">.env</code> on the server.
+                  </p>
+                )}
+              </>
             )}
-            <label className="block">
-              <span className="text-[10px] uppercase text-zinc-500">Agent ID</span>
-              <input
-                value={config.agentId || ""}
-                onChange={(e) => setConfig((c) => ({ ...c, agentId: e.target.value }))}
-                placeholder="agent_..."
-                className="mt-1 w-full border border-zinc-300 px-2 py-2"
-              />
-            </label>
             <label className="block">
               <span className="text-[10px] uppercase text-zinc-500">System prompt</span>
               <textarea
@@ -342,9 +314,7 @@ export default function VoiceAiPage() {
               />
             </label>
             <label className="block">
-              <span className="text-[10px] uppercase text-zinc-500">
-                Voice ID (optional — blank = agent default)
-              </span>
+              <span className="text-[10px] uppercase text-zinc-500">Voice ID</span>
               <input
                 value={config.voiceId || ""}
                 onChange={(e) => setConfig((c) => ({ ...c, voiceId: e.target.value }))}
