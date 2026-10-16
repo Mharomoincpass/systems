@@ -5,8 +5,9 @@ import { cn } from "@/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
-const siteName = 'FrsionOS — AI Studio'
-const siteDescription = 'AI Image Studio'
+const siteName = 'FrsionOS'
+const siteDescription =
+  'Pollinations-powered AI image studio — prompts, engines, gallery, and transparent Pollen pricing.'
 const siteUrl = 'https://mharomo.systems'
 
 export const metadata = {
