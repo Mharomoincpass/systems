@@ -19,19 +19,6 @@ function waitForEmbeddedFinish(getSnapshot, timeoutMs = 20000) {
   });
 }
 
-function buildEmbeddedOAuthUrl({ appId, configId, graphVersion, redirectUri, state }) {
-  const url = new URL(
-    `https://www.facebook.com/${graphVersion || "v21.0"}/dialog/oauth`
-  );
-  url.searchParams.set("client_id", appId);
-  url.searchParams.set("redirect_uri", redirectUri);
-  url.searchParams.set("config_id", configId);
-  url.searchParams.set("response_type", "code");
-  url.searchParams.set("override_default_response_type", "true");
-  url.searchParams.set("state", state);
-  return url.toString();
-}
-
 export default function WhatsappEmbeddedConnect({ onConnected }) {
   const [meta, setMeta] = useState({ enabled: false });
   const [status, setStatus] = useState({ connected: false });
@@ -40,6 +27,7 @@ export default function WhatsappEmbeddedConnect({ onConnected }) {
   const embeddedFinishRef = useRef(null);
   const popupRef = useRef(null);
   const oauthHandledRef = useRef(false);
+  const metaRef = useRef({ enabled: false });
 
   const loadStatus = useCallback(async () => {
     try {
@@ -55,10 +43,14 @@ export default function WhatsappEmbeddedConnect({ onConnected }) {
     try {
       const res = await fetch("/api/whatsapp/auth/embedded-meta", {
         credentials: "include",
+        cache: "no-store",
       });
       const data = await res.json();
-      setMeta(data?.data?.enabled ? data.data : { enabled: false });
+      const next = data?.data?.enabled ? data.data : { enabled: false };
+      metaRef.current = next;
+      setMeta(next);
     } catch {
+      metaRef.current = { enabled: false };
       setMeta({ enabled: false });
     }
   }, []);
@@ -67,6 +59,7 @@ export default function WhatsappEmbeddedConnect({ onConnected }) {
     async (code) => {
       if (!code) return;
       setConnecting(true);
+      const m = metaRef.current;
       try {
         const finish = await waitForEmbeddedFinish(() => embeddedFinishRef.current);
         const res = await fetch("/api/whatsapp/auth/embedded", {
@@ -75,7 +68,7 @@ export default function WhatsappEmbeddedConnect({ onConnected }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             code,
-            redirectUri: meta.redirectUri,
+            redirectUri: m.redirectUri,
             wabaId: finish?.wabaId,
             phoneNumberId: finish?.phoneNumberId,
             businessId: finish?.businessId,
@@ -98,7 +91,7 @@ export default function WhatsappEmbeddedConnect({ onConnected }) {
         embeddedFinishRef.current = null;
       }
     },
-    [loadStatus, meta.redirectUri, onConnected, registerPin]
+    [loadStatus, onConnected, registerPin]
   );
 
   useEffect(() => {
@@ -146,7 +139,8 @@ export default function WhatsappEmbeddedConnect({ onConnected }) {
         setConnecting(false);
         return;
       }
-      if (payload.state && meta.oauthState && payload.state !== meta.oauthState) {
+      const expectedState = metaRef.current.oauthState || "mha_wa_embedded_v1";
+      if (payload.state && payload.state !== expectedState) {
         toast.error("Meta login state mismatch — try again.");
         setConnecting(false);
         return;
@@ -155,29 +149,21 @@ export default function WhatsappEmbeddedConnect({ onConnected }) {
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [completeWithCode, meta.oauthState]);
+  }, [completeWithCode]);
 
   const startConnect = () => {
-    const configId = String(meta.configId || "").trim();
-    const appId = String(meta.appId || "").trim();
-    const redirectUri = String(meta.redirectUri || "").trim();
-    const state = meta.oauthState || "mha_wa_embedded_v1";
-    if (!appId || !configId || !redirectUri) {
-      toast.error("Embedded Signup is not configured on the server.");
+    const m = metaRef.current;
+    if (!m.enabled || !m.configId) {
+      toast.error("Embedded Signup not loaded — refresh the page.");
       return;
     }
     embeddedFinishRef.current = null;
     oauthHandledRef.current = false;
     setConnecting(true);
-    const oauthUrl = buildEmbeddedOAuthUrl({
-      appId,
-      configId,
-      graphVersion: meta.graphVersion,
-      redirectUri,
-      state,
-    });
+
+    const startPath = m.oauthStartPath || "/api/whatsapp/auth/embedded-start";
     const popup = window.open(
-      oauthUrl,
+      `${window.location.origin}${startPath}`,
       "mha_wa_embedded_signup",
       "width=600,height=720,scrollbars=yes"
     );
@@ -245,10 +231,20 @@ export default function WhatsappEmbeddedConnect({ onConnected }) {
           (stored on server, not in git).
         </p>
       )}
-      <p className="text-[10px] text-zinc-500 leading-relaxed">
-        Meta → Facebook Login for Business → Settings → add OAuth redirect URI:{" "}
-        <code className="text-black break-all">{meta.redirectUri}</code>
-      </p>
+      <div className="text-[10px] text-zinc-500 leading-relaxed space-y-1 border border-zinc-200 p-2 bg-zinc-50">
+        <p>
+          Configuration ID on server:{" "}
+          <code className="text-black">{meta.configId}</code>
+        </p>
+        <p>
+          Must match Meta → Facebook Login for Business → Configurations (WhatsApp
+          embedded sign-up template row).
+        </p>
+        <p>
+          OAuth redirect URI:{" "}
+          <code className="text-black break-all">{meta.redirectUri}</code>
+        </p>
+      </div>
       <label className="block text-[10px] uppercase text-zinc-500">
         Optional 6-digit Cloud API PIN
         <input
