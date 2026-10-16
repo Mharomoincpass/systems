@@ -19,13 +19,27 @@ function waitForEmbeddedFinish(getSnapshot, timeoutMs = 20000) {
   });
 }
 
+function buildEmbeddedOAuthUrl({ appId, configId, graphVersion, redirectUri, state }) {
+  const url = new URL(
+    `https://www.facebook.com/${graphVersion || "v21.0"}/dialog/oauth`
+  );
+  url.searchParams.set("client_id", appId);
+  url.searchParams.set("redirect_uri", redirectUri);
+  url.searchParams.set("config_id", configId);
+  url.searchParams.set("response_type", "code");
+  url.searchParams.set("override_default_response_type", "true");
+  url.searchParams.set("state", state);
+  return url.toString();
+}
+
 export default function WhatsappEmbeddedConnect({ onConnected }) {
   const [meta, setMeta] = useState({ enabled: false });
   const [status, setStatus] = useState({ connected: false });
-  const [fbReady, setFbReady] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [registerPin, setRegisterPin] = useState("");
   const embeddedFinishRef = useRef(null);
+  const popupRef = useRef(null);
+  const oauthHandledRef = useRef(false);
 
   const loadStatus = useCallback(async () => {
     try {
@@ -49,6 +63,44 @@ export default function WhatsappEmbeddedConnect({ onConnected }) {
     }
   }, []);
 
+  const completeWithCode = useCallback(
+    async (code) => {
+      if (!code) return;
+      setConnecting(true);
+      try {
+        const finish = await waitForEmbeddedFinish(() => embeddedFinishRef.current);
+        const res = await fetch("/api/whatsapp/auth/embedded", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            code,
+            redirectUri: meta.redirectUri,
+            wabaId: finish?.wabaId,
+            phoneNumberId: finish?.phoneNumberId,
+            businessId: finish?.businessId,
+            ...(registerPin.replace(/\D/g, "").length >= 6
+              ? { registerPin: registerPin.replace(/\D/g, "") }
+              : {}),
+          }),
+        });
+        const data = await res.json();
+        if (!data?.ok) throw new Error(data?.error || "Connect failed");
+        toast.success(
+          `Connected ${data.data?.displayPhoneNumber || data.data?.phoneNumberId}`
+        );
+        await loadStatus();
+        onConnected?.(data.data);
+      } catch (err) {
+        toast.error(err?.message || "Embedded signup failed");
+      } finally {
+        setConnecting(false);
+        embeddedFinishRef.current = null;
+      }
+    },
+    [loadStatus, meta.redirectUri, onConnected, registerPin]
+  );
+
   useEffect(() => {
     loadMeta();
     loadStatus();
@@ -57,134 +109,96 @@ export default function WhatsappEmbeddedConnect({ onConnected }) {
   useEffect(() => {
     const onMessage = (ev) => {
       const origin = ev.origin || "";
-      if (!origin.includes("facebook.com")) return;
-      let payload = ev.data;
-      if (typeof payload === "string") {
-        try {
-          payload = JSON.parse(payload);
-        } catch {
-          return;
+      if (origin.includes("facebook.com")) {
+        let payload = ev.data;
+        if (typeof payload === "string") {
+          try {
+            payload = JSON.parse(payload);
+          } catch {
+            return;
+          }
         }
+        if (payload?.type !== "WA_EMBEDDED_SIGNUP") return;
+        if (payload.event === "FINISH" && payload.data) {
+          const d = payload.data;
+          embeddedFinishRef.current = {
+            wabaId: d.waba_id ?? d.wabaId,
+            phoneNumberId: d.phone_number_id ?? d.phoneNumberId,
+            businessId: d.business_id ?? d.businessId,
+          };
+        }
+        if (payload.event === "CANCEL") {
+          embeddedFinishRef.current = null;
+        }
+        return;
       }
-      if (payload?.type !== "WA_EMBEDDED_SIGNUP") return;
-      if (payload.event === "FINISH" && payload.data) {
-        const d = payload.data;
-        embeddedFinishRef.current = {
-          wabaId: d.waba_id ?? d.wabaId,
-          phoneNumberId: d.phone_number_id ?? d.phoneNumberId,
-          businessId: d.business_id ?? d.businessId,
-        };
+
+      if (ev.origin !== window.location.origin) return;
+      const payload = ev.data;
+      if (payload?.type !== "MHA_WA_EMBEDDED_OAUTH") return;
+      if (popupRef.current && !popupRef.current.closed) {
+        popupRef.current.close();
       }
-      if (payload.event === "CANCEL") {
-        embeddedFinishRef.current = null;
+      popupRef.current = null;
+      oauthHandledRef.current = true;
+      if (payload.error) {
+        toast.error(String(payload.error));
+        setConnecting(false);
+        return;
       }
+      if (payload.state && meta.oauthState && payload.state !== meta.oauthState) {
+        toast.error("Meta login state mismatch — try again.");
+        setConnecting(false);
+        return;
+      }
+      completeWithCode(payload.code);
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, []);
-
-  useEffect(() => {
-    if (!meta.enabled || !meta.appId) {
-      setFbReady(false);
-      return undefined;
-    }
-    const graphV = meta.graphVersion || "v21.0";
-    const tryInit = () => {
-      if (!window?.FB) return false;
-      try {
-        window.FB.init({
-          appId: meta.appId,
-          cookie: true,
-          xfbml: true,
-          version: graphV,
-        });
-        setFbReady(true);
-        return true;
-      } catch {
-        return false;
-      }
-    };
-    window.fbAsyncInit = tryInit;
-    if (window.FB && tryInit()) return undefined;
-
-    let existing = document.getElementById("facebook-jssdk");
-    if (!existing) {
-      const s = document.createElement("script");
-      s.id = "facebook-jssdk";
-      s.async = true;
-      s.defer = true;
-      s.crossOrigin = "anonymous";
-      s.src = "https://connect.facebook.net/en_US/sdk.js";
-      document.body.appendChild(s);
-      existing = s;
-    }
-    const poll = window.setInterval(() => {
-      if (tryInit()) window.clearInterval(poll);
-    }, 150);
-    const stop = window.setTimeout(() => window.clearInterval(poll), 20000);
-    return () => {
-      window.clearInterval(poll);
-      window.clearTimeout(stop);
-    };
-  }, [meta.enabled, meta.appId, meta.graphVersion]);
+  }, [completeWithCode, meta.oauthState]);
 
   const startConnect = () => {
-    if (!window.FB) {
-      toast.error("Facebook SDK not ready — refresh (use HTTPS).");
-      return;
-    }
     const configId = String(meta.configId || "").trim();
-    if (!configId) {
-      toast.error("Missing Embedded Signup config ID on server (WHATSAPP_EMBEDDED_CONFIG_ID).");
+    const appId = String(meta.appId || "").trim();
+    const redirectUri = String(meta.redirectUri || "").trim();
+    const state = meta.oauthState || "mha_wa_embedded_v1";
+    if (!appId || !configId || !redirectUri) {
+      toast.error("Embedded Signup is not configured on the server.");
       return;
     }
     embeddedFinishRef.current = null;
+    oauthHandledRef.current = false;
     setConnecting(true);
-    window.FB.login(
-      (response) => {
-        if (!response.authResponse?.code) {
-          setConnecting(false);
-          toast.message("Signup cancelled or incomplete");
-          return;
-        }
-        waitForEmbeddedFinish(() => embeddedFinishRef.current)
-          .then(async (finish) => {
-            const res = await fetch("/api/whatsapp/auth/embedded", {
-              method: "POST",
-              credentials: "include",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                code: response.authResponse.code,
-                wabaId: finish?.wabaId,
-                phoneNumberId: finish?.phoneNumberId,
-                businessId: finish?.businessId,
-                ...(registerPin.replace(/\D/g, "").length >= 6
-                  ? { registerPin: registerPin.replace(/\D/g, "") }
-                  : {}),
-              }),
-            });
-            const data = await res.json();
-            if (!data?.ok) throw new Error(data?.error || "Connect failed");
-            toast.success(
-              `Connected ${data.data?.displayPhoneNumber || data.data?.phoneNumberId}`
-            );
-            await loadStatus();
-            onConnected?.(data.data);
-          })
-          .catch((err) => {
-            toast.error(err?.message || "Embedded signup failed");
-          })
-          .finally(() => setConnecting(false));
-      },
-      {
-        config_id: configId,
-        response_type: "code",
-        override_default_response_type: true,
-        auth_type: "rerequest",
-        // Embedded Signup v4 (2026 templates): empty extras; products set in Login configuration.
-        extras: {},
-      }
+    const oauthUrl = buildEmbeddedOAuthUrl({
+      appId,
+      configId,
+      graphVersion: meta.graphVersion,
+      redirectUri,
+      state,
+    });
+    const popup = window.open(
+      oauthUrl,
+      "mha_wa_embedded_signup",
+      "width=600,height=720,scrollbars=yes"
     );
+    if (!popup) {
+      setConnecting(false);
+      toast.error("Popup blocked — allow popups for this site and try again.");
+      return;
+    }
+    popupRef.current = popup;
+    const poll = window.setInterval(() => {
+      if (popup.closed) {
+        window.clearInterval(poll);
+        popupRef.current = null;
+        setConnecting((c) => {
+          if (c && !oauthHandledRef.current) {
+            toast.message("Signup cancelled or window closed");
+          }
+          return false;
+        });
+      }
+    }, 500);
   };
 
   const disconnect = async () => {
@@ -198,21 +212,13 @@ export default function WhatsappEmbeddedConnect({ onConnected }) {
     toast.success("Disconnected — using .env credentials again");
   };
 
-  if (meta.needsAdmin) {
-    return (
-      <p className="text-xs font-mono text-zinc-600 leading-relaxed">
-        Log in to studio admin (A button on /studio) first, then return here to connect
-        Embedded Signup.
-      </p>
-    );
-  }
-
   if (!meta.enabled) {
     return (
       <p className="text-xs font-mono text-zinc-600 leading-relaxed">
         Set <code className="text-black">WHATSAPP_FB_APP_ID</code> and{" "}
         <code className="text-black">WHATSAPP_EMBEDDED_CONFIG_ID</code> in server{" "}
-        <code className="text-black">.env</code> (Meta → WhatsApp → Embedded Signup).
+        <code className="text-black">.env</code> (Meta → Facebook Login for Business →
+        Configurations → WhatsApp embedded template).
       </p>
     );
   }
@@ -239,6 +245,10 @@ export default function WhatsappEmbeddedConnect({ onConnected }) {
           (stored on server, not in git).
         </p>
       )}
+      <p className="text-[10px] text-zinc-500 leading-relaxed">
+        Meta → Facebook Login for Business → Settings → add OAuth redirect URI:{" "}
+        <code className="text-black break-all">{meta.redirectUri}</code>
+      </p>
       <label className="block text-[10px] uppercase text-zinc-500">
         Optional 6-digit Cloud API PIN
         <input
@@ -253,15 +263,12 @@ export default function WhatsappEmbeddedConnect({ onConnected }) {
       </label>
       <button
         type="button"
-        disabled={!fbReady || connecting || !meta.configId}
+        disabled={connecting || !meta.configId}
         onClick={startConnect}
         className="inline-flex min-h-[44px] px-4 bg-[#1877F2] text-white font-bold uppercase tracking-wide disabled:opacity-50"
       >
         {connecting ? "Connecting…" : "Connect with Meta"}
       </button>
-      {!fbReady && meta.enabled && (
-        <p className="text-[10px] text-zinc-500">Loading Facebook SDK…</p>
-      )}
     </div>
   );
 }

@@ -8,8 +8,10 @@ Same flow as **Grocliq Leo**: Meta popup assigns or links a **WABA + phone numbe
 
 1. [developers.facebook.com](https://developers.facebook.com) → your app → **WhatsApp** → **Embedded Signup**.
 2. Create an **Embedded Signup configuration** — enable **phone number provisioning** / use Meta-provided number where offered.
-3. Copy **Configuration ID** → `WHATSAPP_EMBEDDED_CONFIG_ID`.
-4. App **Settings → Basic** → App ID → `WHATSAPP_FB_APP_ID`, App Secret → `WHATSAPP_FB_APP_SECRET`.
+3. **Facebook Login for Business → Configurations → Create from template** (WhatsApp embedded sign-up) — copy **Configuration ID** → `WHATSAPP_EMBEDDED_CONFIG_ID`.
+4. **Facebook Login for Business → Settings** — **Login with JavaScript SDK = Yes**, allowed domain `mharomo.systems`, **Valid OAuth Redirect URIs** must include:
+   `https://mharomo.systems/studio/whatsapp/embedded-callback`
+5. App **Settings → Basic** → App ID → `WHATSAPP_FB_APP_ID`, App Secret → `WHATSAPP_FB_APP_SECRET`.
 
 ### FrsionOS
 

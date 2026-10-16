@@ -24,6 +24,7 @@ export async function POST(request) {
       phoneNumberId: body?.phoneNumberId,
       businessId: body?.businessId,
       registerPin: body?.registerPin,
+      redirectUri: body?.redirectUri,
     });
     saveWhatsAppConnection(data);
     return NextResponse.json({
