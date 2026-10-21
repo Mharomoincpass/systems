@@ -4,6 +4,12 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, Phone, PhoneOff, Save } from "lucide-react";
 import { toast } from "sonner";
+import {
+  patchPermissionsQuery,
+  checkMobileAudioSupport,
+  unlockUserGestureAudio,
+  attachMobileAudioOutput,
+} from "@/lib/voice/mobileAudioShim";
 
 export default function VoiceAiPage() {
   const [tab, setTab] = useState("call");
@@ -36,6 +42,10 @@ export default function VoiceAiPage() {
   }, []);
 
   useEffect(() => {
+    // 1. Patch WebKit permissions.query bug for iOS Safari
+    patchPermissionsQuery();
+    // 2. Warm up client module
+    import("@elevenlabs/client").catch(() => {});
     load();
     fetch("/api/studio/admin/voice-env", { credentials: "include" })
       .then((r) => {
@@ -108,7 +118,15 @@ export default function VoiceAiPage() {
   };
 
   const startCall = async () => {
-    if (callStatus === "live") return;
+    if (callStatus === "live" || callStatus === "connecting") return;
+
+    // 1. Verify browser compatibility and HTTPS context on mobile
+    const support = checkMobileAudioSupport();
+    if (!support.ok) {
+      toast.error(support.message);
+      return;
+    }
+
     if (!meta?.elevenLabsConfigured) {
       toast.error("Set ELEVENLABS_API_KEY on the server.");
       return;
@@ -119,6 +137,31 @@ export default function VoiceAiPage() {
       setTab("config");
       return;
     }
+
+    // 2. Unlock AudioContext & AudioElement IMMEDIATELY inside the user tap/click gesture
+    await unlockUserGestureAudio();
+
+    // 3. Request microphone access upfront inside the user gesture
+    // This ensures iOS Safari and Android Chrome grant mic permission while user activation is active
+    let preStream = null;
+    try {
+      preStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (micErr) {
+      if (micErr?.name === "NotAllowedError" || micErr?.name === "PermissionDeniedError") {
+        toast.error(
+          "Microphone access was denied. Please allow microphone access in your browser settings and try again."
+        );
+      } else {
+        toast.error(micErr?.message || "Could not access microphone.");
+      }
+      return;
+    } finally {
+      // Stop preliminary tracks so ElevenLabs can initialize its own stream
+      if (preStream) {
+        preStream.getTracks().forEach((t) => t.stop());
+      }
+    }
+
     setCallStatus("connecting");
     setLines([]);
     try {
@@ -130,9 +173,10 @@ export default function VoiceAiPage() {
       const conversation = await Conversation.startSession({
         signedUrl: sessionData.signedUrl,
         connectionType: "websocket",
+        connectionDelay: { android: 1000, ios: 0, default: 0 },
         onConnect: () => {
           setCallStatus("live");
-          toast.success("Connected — speak");
+          toast.success("Connected — speak now");
         },
         onDisconnect: () => {
           setCallStatus("idle");
@@ -155,6 +199,9 @@ export default function VoiceAiPage() {
           setCallStatus("idle");
         },
       });
+
+      // 4. Ensure audio plays through mobile speakers
+      attachMobileAudioOutput(conversation);
       conversationRef.current = conversation;
     } catch (e) {
       toast.error(e?.message || "Could not start call");
@@ -203,7 +250,7 @@ export default function VoiceAiPage() {
         {tab === "call" && (
           <div className="space-y-6 flex flex-col items-center pt-8">
             <p className="text-xs font-mono text-zinc-500 text-center leading-relaxed">
-              Live voice with your{" "}
+              Live voice conversation with your{" "}
               <a
                 href="https://elevenlabs.io/app/conversational-ai"
                 target="_blank"
@@ -212,7 +259,7 @@ export default function VoiceAiPage() {
               >
                 ElevenLabs agent
               </a>
-              . Mic required — use Chrome.
+              . Works on iOS, Android, and desktop.
             </p>
             {callStatus === "live" && agentMode && (
               <p className="text-[10px] font-mono uppercase text-zinc-600">
@@ -224,7 +271,8 @@ export default function VoiceAiPage() {
                 type="button"
                 disabled={callStatus === "connecting"}
                 onClick={startCall}
-                className="w-28 h-28 rounded-full flex items-center justify-center bg-black text-white disabled:opacity-50"
+                className="w-28 h-28 rounded-full flex items-center justify-center bg-black text-white disabled:opacity-50 touch-manipulation active:scale-95 transition-transform shadow-lg cursor-pointer"
+                aria-label="Start voice call"
               >
                 <Phone className="w-10 h-10" />
               </button>
@@ -232,7 +280,8 @@ export default function VoiceAiPage() {
               <button
                 type="button"
                 onClick={endCall}
-                className="w-28 h-28 rounded-full flex items-center justify-center bg-red-600 text-white"
+                className="w-28 h-28 rounded-full flex items-center justify-center bg-red-600 text-white touch-manipulation active:scale-95 transition-transform shadow-lg cursor-pointer"
+                aria-label="End voice call"
               >
                 <PhoneOff className="w-10 h-10" />
               </button>
