@@ -6,6 +6,7 @@ import { ArrowLeft, Phone, PhoneOff, Save } from "lucide-react";
 import { toast } from "sonner";
 import {
   patchPermissionsQuery,
+  patchGetUserMedia,
   checkMobileAudioSupport,
   unlockUserGestureAudio,
   attachMobileAudioOutput,
@@ -42,8 +43,9 @@ export default function VoiceAiPage() {
   }, []);
 
   useEffect(() => {
-    // 1. Patch WebKit permissions.query bug for iOS Safari
+    // 1. Patch WebKit permissions.query & getUserMedia bugs for iOS Safari & iOS Chrome
     patchPermissionsQuery();
+    patchGetUserMedia();
     // 2. Warm up client module
     import("@elevenlabs/client").catch(() => {});
     load();
@@ -141,27 +143,6 @@ export default function VoiceAiPage() {
     // 2. Unlock AudioContext & AudioElement IMMEDIATELY inside the user tap/click gesture
     await unlockUserGestureAudio();
 
-    // 3. Request microphone access upfront inside the user gesture
-    // This ensures iOS Safari and Android Chrome grant mic permission while user activation is active
-    let preStream = null;
-    try {
-      preStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    } catch (micErr) {
-      if (micErr?.name === "NotAllowedError" || micErr?.name === "PermissionDeniedError") {
-        toast.error(
-          "Microphone access was denied. Please allow microphone access in your browser settings and try again."
-        );
-      } else {
-        toast.error(micErr?.message || "Could not access microphone.");
-      }
-      return;
-    } finally {
-      // Stop preliminary tracks so ElevenLabs can initialize its own stream
-      if (preStream) {
-        preStream.getTracks().forEach((t) => t.stop());
-      }
-    }
-
     setCallStatus("connecting");
     setLines([]);
     try {
@@ -173,9 +154,19 @@ export default function VoiceAiPage() {
       const conversation = await Conversation.startSession({
         signedUrl: sessionData.signedUrl,
         connectionType: "websocket",
-        connectionDelay: { android: 1000, ios: 0, default: 0 },
+        connectionDelay: { android: 1000, ios: 500, default: 0 },
+        workletPaths: {
+          rawAudioProcessor: "/worklets/rawAudioProcessor.js",
+          audioConcatProcessor: "/worklets/audioConcatProcessor.js",
+        },
+        libsampleratePath: "/libsamplerate.worklet.js",
+        onConversationCreated: (conv) => {
+          conversationRef.current = conv;
+          attachMobileAudioOutput(conv);
+        },
         onConnect: () => {
           setCallStatus("live");
+          attachMobileAudioOutput(conversationRef.current);
           toast.success("Connected — speak now");
         },
         onDisconnect: () => {
@@ -195,16 +186,38 @@ export default function VoiceAiPage() {
         },
         onError: (err) => {
           const msg = err?.message || String(err || "Call error");
-          toast.error(msg);
+          console.error("ElevenLabs Call Error:", err);
+          if (
+            msg.includes("Permission") ||
+            msg.includes("NotAllowedError") ||
+            msg.includes("denied")
+          ) {
+            toast.error(
+              "Microphone permission needed. In iOS Settings > Chrome > allow Microphone."
+            );
+          } else {
+            toast.error(msg);
+          }
           setCallStatus("idle");
         },
       });
 
-      // 4. Ensure audio plays through mobile speakers
       attachMobileAudioOutput(conversation);
       conversationRef.current = conversation;
     } catch (e) {
-      toast.error(e?.message || "Could not start call");
+      console.error("Call start error:", e);
+      const msg = e?.message || "Could not start call";
+      if (
+        msg.includes("Permission") ||
+        msg.includes("NotAllowedError") ||
+        msg.includes("denied")
+      ) {
+        toast.error(
+          "Microphone permission needed. In iOS Settings > Chrome > allow Microphone."
+        );
+      } else {
+        toast.error(msg);
+      }
       setCallStatus("idle");
     }
   };
