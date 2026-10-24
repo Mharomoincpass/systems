@@ -8,6 +8,7 @@ import { Conversation } from "@elevenlabs/client";
 import {
   patchPermissionsQuery,
   patchGetUserMedia,
+  patchAudioContext,
   checkMobileAudioSupport,
   unlockUserGestureAudio,
   attachMobileAudioOutput,
@@ -45,9 +46,10 @@ export default function VoiceAiPage() {
   }, []);
 
   useEffect(() => {
-    // 1. Patch WebKit permissions.query & getUserMedia bugs for iOS Safari & iOS Chrome
+    // 1. Patch WebKit permissions, getUserMedia & AudioContext bugs for iOS Safari & iOS Chrome
     patchPermissionsQuery();
     patchGetUserMedia();
+    patchAudioContext();
     load();
     fetch("/api/studio/admin/voice-env", { credentials: "include" })
       .then((r) => {
@@ -147,15 +149,17 @@ export default function VoiceAiPage() {
       }
 
       // 4. Start ElevenLabs conversational AI session
+      const workletOrigin = typeof window !== "undefined" ? window.location.origin : "";
       const conversation = await Conversation.startSession({
         signedUrl: sessionData.signedUrl,
         connectionType: "websocket",
-        connectionDelay: { android: 1000, ios: 500, default: 0 },
-        workletPaths: {
-          rawAudioProcessor: "/worklets/rawAudioProcessor.js",
-          audioConcatProcessor: "/worklets/audioConcatProcessor.js",
-        },
-        libsampleratePath: "/libsamplerate.worklet.js",
+        connectionDelay: { android: 500, ios: 100, default: 0 },
+        workletPaths: workletOrigin
+          ? {
+              rawAudioProcessor: `${workletOrigin}/worklets/rawAudioProcessor.js`,
+              audioConcatProcessor: `${workletOrigin}/worklets/audioConcatProcessor.js`,
+            }
+          : undefined,
         onConversationCreated: (conv) => {
           conversationRef.current = conv;
           attachMobileAudioOutput(conv);
