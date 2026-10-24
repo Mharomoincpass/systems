@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, Phone, PhoneOff, Save } from "lucide-react";
 import { toast } from "sonner";
+import { Conversation } from "@elevenlabs/client";
 import {
   patchPermissionsQuery,
   patchGetUserMedia,
@@ -24,6 +25,7 @@ export default function VoiceAiPage() {
   const [callStatus, setCallStatus] = useState("idle");
   const [agentMode, setAgentMode] = useState("");
   const [lines, setLines] = useState([]);
+  const [error, setError] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [serverApiKey, setServerApiKey] = useState("");
   const [serverAgentId, setServerAgentId] = useState("");
@@ -38,7 +40,7 @@ export default function VoiceAiPage() {
       setConfig(data.config);
       setMeta(data.meta);
     } catch (e) {
-      toast.error(e?.message || "Could not load config");
+      console.warn("Could not load config:", e?.message);
     }
   }, []);
 
@@ -46,8 +48,6 @@ export default function VoiceAiPage() {
     // 1. Patch WebKit permissions.query & getUserMedia bugs for iOS Safari & iOS Chrome
     patchPermissionsQuery();
     patchGetUserMedia();
-    // 2. Warm up client module
-    import("@elevenlabs/client").catch(() => {});
     load();
     fetch("/api/studio/admin/voice-env", { credentials: "include" })
       .then((r) => {
@@ -122,35 +122,31 @@ export default function VoiceAiPage() {
   const startCall = async () => {
     if (callStatus === "live" || callStatus === "connecting") return;
 
-    // 1. Verify browser compatibility and HTTPS context on mobile
-    const support = checkMobileAudioSupport();
-    if (!support.ok) {
-      toast.error(support.message);
-      return;
-    }
-
-    if (!meta?.elevenLabsConfigured) {
-      toast.error("Set ELEVENLABS_API_KEY on the server.");
-      return;
-    }
-    const agentId = config.agentId?.trim() || meta?.agentId;
-    if (!agentId) {
-      toast.error("Add your ElevenLabs Agent ID in Config and save.");
-      setTab("config");
-      return;
-    }
-
-    // 2. Unlock AudioContext & AudioElement IMMEDIATELY inside the user tap/click gesture
-    await unlockUserGestureAudio();
-
+    setError("");
     setCallStatus("connecting");
     setLines([]);
+
+    // 1. Unlock AudioContext & AudioElement immediately in user gesture window
+    unlockUserGestureAudio();
+
+    // 2. Verify environment security (HTTPS)
+    const support = checkMobileAudioSupport();
+    if (!support.ok) {
+      setError(support.message);
+      toast.error(support.message);
+      setCallStatus("idle");
+      return;
+    }
+
     try {
+      // 3. Fetch fresh session signed URL from server
       const sessionRes = await fetch("/api/studio/voice/session");
       const sessionData = await sessionRes.json();
-      if (!sessionData?.ok) throw new Error(sessionData?.error || "Session failed");
+      if (!sessionData?.ok) {
+        throw new Error(sessionData?.error || "Could not create voice session");
+      }
 
-      const { Conversation } = await import("@elevenlabs/client");
+      // 4. Start ElevenLabs conversational AI session
       const conversation = await Conversation.startSession({
         signedUrl: sessionData.signedUrl,
         connectionType: "websocket",
@@ -166,6 +162,7 @@ export default function VoiceAiPage() {
         },
         onConnect: () => {
           setCallStatus("live");
+          setError("");
           attachMobileAudioOutput(conversationRef.current);
           toast.success("Connected — speak now");
         },
@@ -187,17 +184,17 @@ export default function VoiceAiPage() {
         onError: (err) => {
           const msg = err?.message || String(err || "Call error");
           console.error("ElevenLabs Call Error:", err);
+          let userMsg = msg;
           if (
             msg.includes("Permission") ||
             msg.includes("NotAllowedError") ||
             msg.includes("denied")
           ) {
-            toast.error(
-              "Microphone permission needed. In iOS Settings > Chrome > allow Microphone."
-            );
-          } else {
-            toast.error(msg);
+            userMsg =
+              "Microphone permission denied. In iPhone Settings > Chrome, turn ON Microphone.";
           }
+          setError(userMsg);
+          toast.error(userMsg);
           setCallStatus("idle");
         },
       });
@@ -206,18 +203,17 @@ export default function VoiceAiPage() {
       conversationRef.current = conversation;
     } catch (e) {
       console.error("Call start error:", e);
-      const msg = e?.message || "Could not start call";
+      let userMsg = e?.message || "Could not start call";
       if (
-        msg.includes("Permission") ||
-        msg.includes("NotAllowedError") ||
-        msg.includes("denied")
+        userMsg.includes("Permission") ||
+        userMsg.includes("NotAllowedError") ||
+        userMsg.includes("denied")
       ) {
-        toast.error(
-          "Microphone permission needed. In iOS Settings > Chrome > allow Microphone."
-        );
-      } else {
-        toast.error(msg);
+        userMsg =
+          "Microphone permission needed. In iPhone Settings > Chrome, enable Microphone.";
       }
+      setError(userMsg);
+      toast.error(userMsg);
       setCallStatus("idle");
     }
   };
@@ -248,7 +244,7 @@ export default function VoiceAiPage() {
             key={t.id}
             type="button"
             onClick={() => setTab(t.id)}
-            className={`px-3 py-2.5 text-[10px] font-mono font-bold uppercase border-b-2 transition-colors ${
+            className={`px-3 py-2.5 text-[10px] font-mono font-bold uppercase border-b-2 transition-colors cursor-pointer ${
               tab === t.id
                 ? "border-black text-black"
                 : "border-transparent text-zinc-500 hover:text-black"
@@ -306,6 +302,13 @@ export default function VoiceAiPage() {
                   ? "On call — tap to hang up"
                   : "Tap to start call"}
             </p>
+
+            {error && (
+              <div className="w-full border border-red-300 bg-red-50 p-3 text-red-700 text-xs font-mono text-center">
+                {error}
+              </div>
+            )}
+
             {lines.length > 0 && (
               <ul className="w-full space-y-1 text-[10px] font-mono text-zinc-600 max-h-[30vh] overflow-y-auto border border-zinc-200 p-2">
                 {lines.map((line) => (
