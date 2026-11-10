@@ -4,6 +4,28 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Code2, Globe2, ImageIcon, Layers3, Mic, Tv } from "lucide-react";
+import { Syne, Manrope } from "next/font/google";
+
+const display = Syne({
+  subsets: ["latin"],
+  weight: ["600", "700", "800"],
+  variable: "--font-display",
+});
+
+const body = Manrope({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-body",
+});
+
+const PROJECTS = [
+  {
+    href: "https://www.miloniwater.com/",
+    title: "MILONI Water",
+    copy: "Brand site and commerce presence for packaged drinking water from Wokha, Nagaland — products, purification story, and wholesale/order flows.",
+    external: true,
+  },
+];
 
 const APPS = [
   {
@@ -25,19 +47,6 @@ const APPS = [
     icon: Tv,
   },
 ];
-import { Syne, Manrope } from "next/font/google";
-
-const display = Syne({
-  subsets: ["latin"],
-  weight: ["600", "700", "800"],
-  variable: "--font-display",
-});
-
-const body = Manrope({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-body",
-});
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -89,7 +98,10 @@ export default function FrsionLanding() {
             <a href="#services" className="px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
               Services
             </a>
-            <a href="#apps" className="px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
+            <a href="#projects" className="px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
+              Projects
+            </a>
+            <a href="#apps" className="hidden md:inline px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
               Apps
             </a>
             <a href="#contact" className="hidden sm:inline px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
@@ -261,20 +273,74 @@ export default function FrsionLanding() {
           </div>
         </section>
 
-        {/* Apps — keep existing products visible */}
-        <section id="apps" className="border-t border-[var(--line)] bg-white px-4 py-20 sm:px-8">
+        {/* Actual projects */}
+        <section id="projects" className="border-t border-[var(--line)] bg-white px-4 py-20 sm:px-8">
           <div className="mx-auto max-w-6xl">
             <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--signal)]">
-              Apps
+              Actual projects
             </p>
             <h2
               className="max-w-2xl text-3xl sm:text-4xl font-bold tracking-tight"
               style={{ fontFamily: "var(--font-display), sans-serif" }}
             >
-              Products already live on this system.
+              Client work shipped in the wild.
             </h2>
             <p className="mt-4 max-w-2xl text-[var(--muted)] leading-relaxed">
-              Studio, Voice AI, and more — same stack, same domain, still here.
+              Real brands and businesses — sites and systems built to run every day.
+            </p>
+
+            <ul className="mt-12 divide-y divide-[var(--line)] border-y border-[var(--line)]">
+              {PROJECTS.map((project) => (
+                <li key={project.href}>
+                  <a
+                    href={project.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-start gap-4 py-6 sm:items-center sm:gap-6 hover:bg-[#F7F9FB] transition-colors -mx-2 px-2 sm:-mx-4 sm:px-4"
+                  >
+                    <Globe2
+                      className="mt-0.5 h-5 w-5 shrink-0 text-[var(--signal)]"
+                      strokeWidth={1.75}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p
+                        className="text-lg font-bold tracking-tight"
+                        style={{ fontFamily: "var(--font-display), sans-serif" }}
+                      >
+                        {project.title}
+                      </p>
+                      <p className="mt-1 text-sm leading-relaxed text-[var(--muted)]">
+                        {project.copy}
+                      </p>
+                      <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--signal)]">
+                        {new URL(project.href).host.replace(/^www\./, "")}
+                      </p>
+                    </div>
+                    <span className="inline-flex shrink-0 items-center gap-1 pt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink)] opacity-60 group-hover:opacity-100 transition-opacity">
+                      Visit
+                      <ArrowUpRight className="h-3.5 w-3.5" />
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* Timepass apps */}
+        <section id="apps" className="border-t border-[var(--line)] bg-[#F7F9FB] px-4 py-20 sm:px-8">
+          <div className="mx-auto max-w-6xl">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--muted)]">
+              Timepass apps
+            </p>
+            <h2
+              className="max-w-2xl text-3xl sm:text-4xl font-bold tracking-tight"
+              style={{ fontFamily: "var(--font-display), sans-serif" }}
+            >
+              Side experiments on this domain.
+            </h2>
+            <p className="mt-4 max-w-2xl text-[var(--muted)] leading-relaxed">
+              Fun internal tools and demos — not client delivery. Still open if you want to poke around.
             </p>
 
             <ul className="mt-12 divide-y divide-[var(--line)] border-y border-[var(--line)]">
@@ -282,10 +348,10 @@ export default function FrsionLanding() {
                 <li key={app.href}>
                   <Link
                     href={app.href}
-                    className="group flex items-start gap-4 py-6 sm:items-center sm:gap-6 hover:bg-[#F7F9FB] transition-colors -mx-2 px-2 sm:-mx-4 sm:px-4"
+                    className="group flex items-start gap-4 py-6 sm:items-center sm:gap-6 hover:bg-white transition-colors -mx-2 px-2 sm:-mx-4 sm:px-4"
                   >
                     <app.icon
-                      className="mt-0.5 h-5 w-5 shrink-0 text-[var(--signal)]"
+                      className="mt-0.5 h-5 w-5 shrink-0 text-[var(--muted)]"
                       strokeWidth={1.75}
                     />
                     <div className="min-w-0 flex-1">
@@ -408,18 +474,20 @@ export default function FrsionLanding() {
             </p>
           </div>
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
-            <a href="#apps" className="hover:text-[var(--ink)]">
-              Apps
+            <a href="#projects" className="hover:text-[var(--ink)]">
+              Projects
             </a>
-            <Link href="/studio" className="hover:text-[var(--ink)]">
-              Studio
-            </Link>
-            <Link href="/studio/voice" className="hover:text-[var(--ink)]">
-              Voice AI
-            </Link>
-            <Link href="/rick-and-morty" className="hover:text-[var(--ink)]">
-              Rick &amp; Morty
-            </Link>
+            <a href="#apps" className="hover:text-[var(--ink)]">
+              Timepass apps
+            </a>
+            <a
+              href="https://www.miloniwater.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[var(--ink)]"
+            >
+              MILONI Water
+            </a>
             <span>© {new Date().getFullYear()} MHAROMO Systems</span>
           </div>
         </div>
