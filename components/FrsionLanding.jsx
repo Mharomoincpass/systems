@@ -3,7 +3,28 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Code2, Globe2, Layers3 } from "lucide-react";
+import { ArrowUpRight, Code2, Globe2, ImageIcon, Layers3, Mic, Tv } from "lucide-react";
+
+const APPS = [
+  {
+    href: "/studio",
+    title: "FrsionOS Studio",
+    copy: "AI image studio — prompts, engines, gallery, and transparent pricing.",
+    icon: ImageIcon,
+  },
+  {
+    href: "/studio/voice",
+    title: "Voice AI",
+    copy: "Live voice agent in the browser — talk, configure prompt, hang up.",
+    icon: Mic,
+  },
+  {
+    href: "/rick-and-morty",
+    title: "Rick & Morty",
+    copy: "Season streaming player with multi-server playback.",
+    icon: Tv,
+  },
+];
 import { Syne, Manrope } from "next/font/google";
 
 const display = Syne({
@@ -64,11 +85,14 @@ export default function FrsionLanding() {
               </span>
             </span>
           </Link>
-          <nav className="flex items-center gap-2 sm:gap-3 text-[11px] font-semibold uppercase tracking-[0.14em]">
+          <nav className="flex items-center gap-1 sm:gap-3 text-[11px] font-semibold uppercase tracking-[0.14em]">
             <a href="#services" className="px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
               Services
             </a>
-            <a href="#contact" className="px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
+            <a href="#apps" className="px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
+              Apps
+            </a>
+            <a href="#contact" className="hidden sm:inline px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
               Contact
             </a>
             <a
@@ -237,6 +261,55 @@ export default function FrsionLanding() {
           </div>
         </section>
 
+        {/* Apps — keep existing products visible */}
+        <section id="apps" className="border-t border-[var(--line)] bg-white px-4 py-20 sm:px-8">
+          <div className="mx-auto max-w-6xl">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--signal)]">
+              Apps
+            </p>
+            <h2
+              className="max-w-2xl text-3xl sm:text-4xl font-bold tracking-tight"
+              style={{ fontFamily: "var(--font-display), sans-serif" }}
+            >
+              Products already live on this system.
+            </h2>
+            <p className="mt-4 max-w-2xl text-[var(--muted)] leading-relaxed">
+              Studio, Voice AI, and more — same stack, same domain, still here.
+            </p>
+
+            <ul className="mt-12 divide-y divide-[var(--line)] border-y border-[var(--line)]">
+              {APPS.map((app) => (
+                <li key={app.href}>
+                  <Link
+                    href={app.href}
+                    className="group flex items-start gap-4 py-6 sm:items-center sm:gap-6 hover:bg-[#F7F9FB] transition-colors -mx-2 px-2 sm:-mx-4 sm:px-4"
+                  >
+                    <app.icon
+                      className="mt-0.5 h-5 w-5 shrink-0 text-[var(--signal)]"
+                      strokeWidth={1.75}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p
+                        className="text-lg font-bold tracking-tight"
+                        style={{ fontFamily: "var(--font-display), sans-serif" }}
+                      >
+                        {app.title}
+                      </p>
+                      <p className="mt-1 text-sm leading-relaxed text-[var(--muted)]">
+                        {app.copy}
+                      </p>
+                    </div>
+                    <span className="inline-flex shrink-0 items-center gap-1 pt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink)] opacity-60 group-hover:opacity-100 transition-opacity">
+                      Open
+                      <ArrowUpRight className="h-3.5 w-3.5" />
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
         {/* Approach — one job */}
         <section className="border-t border-[var(--line)] bg-[var(--ink)] px-4 py-20 text-[var(--paper)] sm:px-8">
           <div className="mx-auto max-w-6xl">
@@ -326,11 +399,17 @@ export default function FrsionLanding() {
             </p>
           </div>
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
+            <a href="#apps" className="hover:text-[var(--ink)]">
+              Apps
+            </a>
             <Link href="/studio" className="hover:text-[var(--ink)]">
               Studio
             </Link>
             <Link href="/studio/voice" className="hover:text-[var(--ink)]">
               Voice AI
+            </Link>
+            <Link href="/rick-and-morty" className="hover:text-[var(--ink)]">
+              Rick &amp; Morty
             </Link>
             <span>© {new Date().getFullYear()} MHAROMO Systems</span>
           </div>
