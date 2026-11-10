@@ -363,7 +363,16 @@ export default function FrsionLanding() {
               Share the product, site, or internal tool on your mind — we will reply with a clear
               next step.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <a
+                href="https://wa.me/916009325630?text=Hi%20MHAROMO%20Systems%20—%20I%27d%20like%20to%20talk%20about%20a%20project."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-[48px] items-center justify-center gap-2 bg-[#128C7E] px-6 text-sm font-semibold uppercase tracking-[0.12em] text-white hover:bg-[#0E6F64] transition-colors"
+              >
+                WhatsApp chat
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
               <a
                 href="mailto:mharomolotha6@gmail.com?subject=Project%20inquiry%20—%20MHAROMO%20Systems"
                 className="inline-flex min-h-[48px] items-center justify-center gap-2 bg-[var(--ink)] px-6 text-sm font-semibold uppercase tracking-[0.12em] text-[var(--paper)] hover:bg-[var(--signal)] transition-colors"
