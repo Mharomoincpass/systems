@@ -348,6 +348,8 @@ export default function FrsionLanding() {
                 <li key={app.href}>
                   <Link
                     href={app.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="group flex items-start gap-4 py-6 sm:items-center sm:gap-6 hover:bg-white transition-colors -mx-2 px-2 sm:-mx-4 sm:px-4"
                   >
                     <app.icon
