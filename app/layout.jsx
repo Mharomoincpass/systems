@@ -5,9 +5,9 @@ import { cn } from "@/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
-const siteName = 'FrsionOS'
+const siteName = 'MHAROMO Systems'
 const siteDescription =
-  'Pollinations-powered AI image studio — prompts, engines, gallery, and transparent Pollen pricing.'
+  'Software and web development services — custom software, modern websites, and product platforms built to ship.'
 const siteUrl = 'https://mharomo.systems'
 
 export const metadata = {
@@ -53,10 +53,11 @@ export default function RootLayout({
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Mharomo.systems',
+    name: 'MHAROMO Systems',
     url: siteUrl,
-    logo: `${siteUrl}/icon.svg`,
-    description: 'Smart AI tools and custom software solutions for businesses. Specializing in AI image generation and data integration.',
+    logo: `${siteUrl}/brand/logo-full.png`,
+    description:
+      'Software and web development services — custom software, modern websites, and product platforms.',
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'Customer Service',

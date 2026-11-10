@@ -1,14 +1,15 @@
 import FrsionLanding from "@/components/FrsionLanding";
 
 export const metadata = {
-  title: "FrsionOS — Pollinations image studio",
+  title: "MHAROMO Systems — Software & web development",
   description:
-    "Minimal AI image studio for prompts, engines, and gallery — powered by Pollinations.ai on mharomo.systems.",
+    "MHAROMO Systems designs and builds custom software, modern websites, and product platforms. Clear scope, direct delivery, full ownership.",
   openGraph: {
-    title: "FrsionOS — Pollinations image studio",
+    title: "MHAROMO Systems — Software & web development",
     description:
-      "Generate images with FLUX, DreamShaper, and more. Transparent Pollen pricing and a 24-hour server gallery.",
+      "Custom software, web development, and product systems — built to ship.",
     url: "/",
+    images: [{ url: "/brand/logo-full.png" }],
   },
 };
 
