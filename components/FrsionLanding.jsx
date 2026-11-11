@@ -101,7 +101,10 @@ export default function FrsionLanding() {
             <a href="#projects" className="px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
               Projects
             </a>
-            <a href="#apps" className="hidden md:inline px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
+            <Link href="/blogs" className="px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
+              Blog
+            </Link>
+            <a href="#apps" className="hidden lg:inline px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
               Apps
             </a>
             <a href="#contact" className="hidden sm:inline px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
@@ -479,6 +482,9 @@ export default function FrsionLanding() {
             <a href="#projects" className="hover:text-[var(--ink)]">
               Projects
             </a>
+            <Link href="/blogs" className="hover:text-[var(--ink)]">
+              Blog
+            </Link>
             <a href="#apps" className="hover:text-[var(--ink)]">
               Timepass apps
             </a>
