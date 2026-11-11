@@ -1,9 +1,7 @@
 import './globals.css'
 import { Toaster } from '@/components/ui/sonner'
-import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+import { body, display, geist } from "@/lib/fonts";
 
 const siteName = 'MHAROMO Systems'
 const siteDescription =
@@ -78,7 +76,7 @@ export default function RootLayout({
   }
   
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)}>
+    <html lang="en" className={cn("font-sans", geist.variable, display.variable, body.variable)}>
       <head>
       </head>
       <body className="font-sans">

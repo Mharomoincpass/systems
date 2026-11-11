@@ -1,23 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Syne, Manrope } from "next/font/google";
-
-const display = Syne({
-  subsets: ["latin"],
-  weight: ["600", "700", "800"],
-  variable: "--font-display",
-});
-
-const body = Manrope({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-body",
-});
 
 export default function BlogShell({ children }) {
   return (
     <div
-      className={`${display.variable} ${body.variable} min-h-[100dvh] text-[var(--ink)] bg-[var(--paper)]`}
+      className="min-h-[100dvh] text-[var(--ink)] bg-[var(--paper)]"
       style={{
         "--ink": "#0B0D10",
         "--paper": "#EEF1F4",

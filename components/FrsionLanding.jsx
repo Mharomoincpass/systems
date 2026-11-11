@@ -4,19 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Code2, Globe2, ImageIcon, Layers3, Mic, Tv } from "lucide-react";
-import { Syne, Manrope } from "next/font/google";
-
-const display = Syne({
-  subsets: ["latin"],
-  weight: ["600", "700", "800"],
-  variable: "--font-display",
-});
-
-const body = Manrope({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-body",
-});
 
 const PROJECTS = [
   {
@@ -60,7 +47,7 @@ const fadeUp = {
 export default function FrsionLanding() {
   return (
     <div
-      className={`${display.variable} ${body.variable} min-h-[100dvh] text-[var(--ink)]`}
+      className="min-h-[100dvh] text-[var(--ink)]"
       style={{
         "--ink": "#0B0D10",
         "--paper": "#EEF1F4",
