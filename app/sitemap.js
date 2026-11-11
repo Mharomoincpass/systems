@@ -1,4 +1,5 @@
 import { getAllPosts } from "@/lib/blogs/posts";
+import { getAllServicePages } from "@/lib/services/pages";
 
 const SITE = "https://mharomo.systems";
 
@@ -10,6 +11,13 @@ export default function sitemap() {
     priority: 0.7,
   }));
 
+  const services = getAllServicePages().map((page) => ({
+    url: `${SITE}/services/${page.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.95,
+  }));
+
   return [
     {
       url: `${SITE}/`,
@@ -18,10 +26,17 @@ export default function sitemap() {
       priority: 1,
     },
     {
+      url: `${SITE}/services`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.95,
+    },
+    ...services,
+    {
       url: `${SITE}/blogs`,
       lastModified: new Date(),
       changeFrequency: "weekly",
-      priority: 0.9,
+      priority: 0.85,
     },
     ...posts,
     {

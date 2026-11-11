@@ -82,13 +82,13 @@ export default function FrsionLanding() {
             </span>
           </Link>
           <nav className="flex items-center gap-1 sm:gap-3 text-[11px] font-semibold uppercase tracking-[0.14em]">
-            <a href="#services" className="px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
+            <Link href="/services" className="px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
               Services
-            </a>
+            </Link>
             <a href="#projects" className="px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
               Projects
             </a>
-            <Link href="/blogs" className="px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
+            <Link href="/blogs" className="hidden sm:inline px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
               Blog
             </Link>
             <a href="#apps" className="hidden lg:inline px-2 py-2 text-[var(--muted)] hover:text-[var(--ink)] transition-colors">
@@ -227,7 +227,19 @@ export default function FrsionLanding() {
             </h2>
             <p className="mt-4 max-w-2xl text-[var(--muted)] leading-relaxed">
               From marketing sites to internal tools and full product backends — we ship systems you
-              can run, extend, and own.
+              can run, extend, and own. Hire us for{" "}
+              <Link href="/services/web-development-wokha" className="text-[var(--signal)] font-semibold underline underline-offset-2">
+                web development in Wokha
+              </Link>
+              ,{" "}
+              <Link href="/services/web-development-nagaland" className="text-[var(--signal)] font-semibold underline underline-offset-2">
+                Nagaland websites
+              </Link>
+              , or{" "}
+              <Link href="/services/software-development-nagaland" className="text-[var(--signal)] font-semibold underline underline-offset-2">
+                custom software
+              </Link>
+              .
             </p>
 
             <div className="mt-12 grid gap-10 md:grid-cols-3">
@@ -236,19 +248,26 @@ export default function FrsionLanding() {
                   icon: Globe2,
                   title: "Web development",
                   copy: "Fast, responsive sites and web apps with clean UX, SEO foundations, and production hosting.",
+                  href: "/services/web-development-nagaland",
                 },
                 {
                   icon: Code2,
                   title: "Custom software",
                   copy: "APIs, dashboards, integrations, and business workflows tailored to how your team actually works.",
+                  href: "/services/software-development-nagaland",
                 },
                 {
                   icon: Layers3,
-                  title: "Product systems",
-                  copy: "End-to-end product builds — architecture, UI, auth, data, and deployment — without the agency fog.",
+                  title: "City pages",
+                  copy: "Wokha, Kohima, Dimapur — dedicated service pages for buyers searching locally.",
+                  href: "/services",
                 },
               ].map((item) => (
-                <div key={item.title} className="border-t border-[var(--ink)]/15 pt-5">
+                <Link
+                  key={item.title}
+                  href={item.href}
+                  className="border-t border-[var(--ink)]/15 pt-5 block hover:opacity-90 transition-opacity"
+                >
                   <item.icon className="mb-4 h-5 w-5 text-[var(--signal)]" strokeWidth={1.75} />
                   <h3
                     className="text-lg font-bold tracking-tight"
@@ -257,7 +276,11 @@ export default function FrsionLanding() {
                     {item.title}
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">{item.copy}</p>
-                </div>
+                  <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--signal)]">
+                    View service
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                  </span>
+                </Link>
               ))}
             </div>
           </div>
@@ -466,6 +489,9 @@ export default function FrsionLanding() {
             </p>
           </div>
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
+            <Link href="/services" className="hover:text-[var(--ink)]">
+              Services
+            </Link>
             <a href="#projects" className="hover:text-[var(--ink)]">
               Projects
             </a>

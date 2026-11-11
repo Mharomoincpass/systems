@@ -37,10 +37,13 @@ export default function BlogShell({ children }) {
             </span>
           </Link>
           <nav className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.14em]">
+            <Link href="/services" className="text-[var(--muted)] hover:text-[var(--ink)]">
+              Services
+            </Link>
             <Link href="/blogs" className="text-[var(--ink)]">
               Blog
             </Link>
-            <Link href="/#contact" className="text-[var(--muted)] hover:text-[var(--ink)]">
+            <Link href="/#contact" className="hidden sm:inline text-[var(--muted)] hover:text-[var(--ink)]">
               Contact
             </Link>
             <a

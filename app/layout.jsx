@@ -53,26 +53,45 @@ export default function RootLayout({
 }) {
   const organizationSchema = {
     '@context': 'https://schema.org',
-    '@type': 'Organization',
+    '@type': ['Organization', 'ProfessionalService'],
     name: 'MHAROMO Systems',
     url: siteUrl,
     logo: `${siteUrl}/brand/logo-full.png`,
     description:
-      'Software and web development services — custom software, modern websites, and product platforms.',
+      'Software and web development services for Wokha, Kohima, Dimapur, and Nagaland — custom software, modern websites, and product platforms.',
+    telephone: '+916009325630',
+    email: 'mharomolotha6@gmail.com',
     contactPoint: {
       '@type': 'ContactPoint',
-      contactType: 'Customer Service',
+      contactType: 'sales',
+      telephone: '+916009325630',
       email: 'mharomolotha6@gmail.com',
-      areaServed: 'Worldwide',
+      areaServed: ['IN', 'Nagaland', 'Wokha', 'Kohima', 'Dimapur'],
+      availableLanguage: ['English', 'Nagamese'],
     },
     sameAs: [
       'https://linkedin.com/in/mharomo-ezung-51b158191',
+      'https://wa.me/916009325630',
+    ],
+    areaServed: [
+      { '@type': 'State', name: 'Nagaland' },
+      { '@type': 'City', name: 'Wokha' },
+      { '@type': 'City', name: 'Kohima' },
+      { '@type': 'City', name: 'Dimapur' },
+      { '@type': 'City', name: 'Mokokchung' },
     ],
     address: {
       '@type': 'PostalAddress',
-      addressLocality: 'Delhi',
-      addressCountry: 'India',
+      addressRegion: 'Nagaland',
+      addressCountry: 'IN',
     },
+    knowsAbout: [
+      'Web development',
+      'Custom software',
+      'Website design',
+      'Local SEO',
+      'Ecommerce websites',
+    ],
   }
   
   return (
