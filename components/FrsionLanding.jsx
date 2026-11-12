@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Code2, Globe2, ImageIcon, Layers3, Mic, Tv } from "lucide-react";
+import { ArrowUpRight, Code2, Globe2, ImageIcon, Layers3, Mic } from "lucide-react";
 
 const PROJECTS = [
   {
@@ -26,12 +26,6 @@ const APPS = [
     title: "Voice AI",
     copy: "Live voice agent in the browser — talk, configure prompt, hang up.",
     icon: Mic,
-  },
-  {
-    href: "/rick-and-morty",
-    title: "Rick & Morty",
-    copy: "Season streaming player with multi-server playback.",
-    icon: Tv,
   },
 ];
 
